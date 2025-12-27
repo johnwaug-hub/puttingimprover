@@ -317,8 +317,8 @@ class App {
      */
     renderApp() {
         const user = userManager.getCurrentUser();
-        const stats = userManager.getStats();
-        const sessions = storageManager.getSessions();
+        const stats = userManager.getStatistics();
+        const sessions = userManager.sessions;
         
         return `
             <!-- Header -->
