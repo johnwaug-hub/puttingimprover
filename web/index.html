@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Putting Improver - Lock Jaw Disc Golf</title>
+    
+    <!-- Firebase SDK v11 (latest stable) - Must load BEFORE our modules -->
+    <!-- DO NOT use 'defer' - we need Firebase loaded before our app -->
+    <script src="https://www.gstatic.com/firebasejs/11.0.2/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/11.0.2/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/11.0.2/firebase-firestore-compat.js"></script>
+    
+    <!-- Application CSS -->
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <!-- Main application container -->
+    <div id="app"></div>
+
+    <!-- Load our modular JavaScript - waits for Firebase to be ready -->
+    <script type="module" src="js/app.js"></script>
+</body>
+</html>

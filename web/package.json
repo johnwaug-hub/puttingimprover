@@ -1,0 +1,41 @@
+{
+  "name": "putting-improver",
+  "version": "1.0.0",
+  "description": "Disc golf putting practice tracker for Lock Jaw Disc Golf in Tucson, AZ",
+  "main": "index.html",
+  "scripts": {
+    "start": "npx serve .",
+    "deploy": "firebase deploy",
+    "deploy:hosting": "firebase deploy --only hosting",
+    "deploy:firestore": "firebase deploy --only firestore:rules",
+    "deploy:preview": "firebase hosting:channel:deploy preview",
+    "serve": "firebase serve --only hosting",
+    "build": "echo 'No build step required - static HTML app'",
+    "test": "echo 'No tests configured yet'"
+  },
+  "keywords": [
+    "disc-golf",
+    "putting",
+    "practice",
+    "tracker",
+    "sports",
+    "lock-jaw"
+  ],
+  "author": "Lock Jaw Disc Golf",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/yourusername/putting-improver.git"
+  },
+  "bugs": {
+    "url": "https://github.com/yourusername/putting-improver/issues"
+  },
+  "homepage": "https://putting-improver-5fac4.web.app",
+  "devDependencies": {
+    "firebase-tools": "^13.0.0"
+  },
+  "engines": {
+    "node": ">=16.0.0",
+    "npm": ">=8.0.0"
+  }
+}
