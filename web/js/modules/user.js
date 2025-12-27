@@ -157,9 +157,8 @@ class UserManager {
         this.currentUser.totalSessions = Math.max(0, (this.currentUser.totalSessions || 0) - 1);
         await storageManager.saveUser(this.currentUser);
 
-        // Delete session
-        const key = `${CONSTANTS.STORAGE_KEYS.SESSIONS_PREFIX}${this.currentUser.id}:${sessionId}`;
-        await storageManager.delete(key, false);
+        // Delete session using the storage manager's deleteSession method
+        await storageManager.deleteSession(this.currentUser.id, sessionId);
 
         // Reload sessions
         await this.loadSessions();

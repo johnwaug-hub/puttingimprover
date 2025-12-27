@@ -176,6 +176,47 @@ class App {
     }
 
     /**
+     * Delete a practice session
+     * @param {string} sessionId - ID of session to delete
+     */
+    async deleteSession(sessionId) {
+        try {
+            // Confirm deletion
+            const session = userManager.sessions.find(s => s.id === sessionId);
+            if (!session) {
+                throw new Error('Session not found');
+            }
+
+            const confirmed = confirm(
+                `Are you sure you want to delete this session?\n\n` +
+                `Date: ${new Date(session.date).toLocaleDateString()}\n` +
+                `Distance: ${session.distance}ft\n` +
+                `Score: ${session.makes}/${session.attempts} (${session.percentage.toFixed(1)}%)\n` +
+                `Points: ${session.points}`
+            );
+
+            if (!confirmed) {
+                return;
+            }
+
+            // Delete the session
+            await userManager.deleteSession(sessionId);
+
+            // Reload leaderboard
+            await this.loadLeaderboard();
+
+            // Re-render
+            this.render();
+
+            console.log('✅ Session deleted successfully');
+
+        } catch (error) {
+            console.error('Error deleting session:', error);
+            alert('Failed to delete session: ' + error.message);
+        }
+    }
+
+    /**
      * Change current view
      * @param {string} view - View name
      */
@@ -501,14 +542,19 @@ class App {
         const routineTag = session.routineName ? `<span class="routine-tag">📋 ${session.routineName}</span>` : '';
         
         return `
-            <div class="session-item">
+            <div class="session-item" data-session-id="${session.id}">
                 <div class="session-header">
                     <div>
                         <span class="session-date">${date}</span>
                         ${time ? `<span class="session-time">${time}</span>` : ''}
                         ${routineTag}
                     </div>
-                    <span class="session-points">${session.points} pts</span>
+                    <div class="session-actions">
+                        <span class="session-points">${session.points} pts</span>
+                        <button class="btn-delete-session" data-session-id="${session.id}" title="Delete session">
+                            🗑️
+                        </button>
+                    </div>
                 </div>
                 <div class="session-stats">
                     <span>${session.distance}ft</span>
@@ -817,6 +863,18 @@ class App {
                 this.render();
             });
         }
+        
+        // Delete session buttons
+        const deleteSessionBtns = document.querySelectorAll('.btn-delete-session');
+        deleteSessionBtns.forEach(btn => {
+            btn.addEventListener('click', async (e) => {
+                e.stopPropagation();
+                const sessionId = e.target.dataset.sessionId;
+                if (sessionId) {
+                    await this.deleteSession(sessionId);
+                }
+            });
+        });
         
         // Start routine buttons
         const startRoutineBtns = document.querySelectorAll('.start-routine-btn');
