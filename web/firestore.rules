@@ -18,6 +18,18 @@ service cloud.firestore {
         allow read: if request.auth != null && request.auth.uid == userId;
         allow write: if request.auth != null && request.auth.uid == userId;
       }
+      
+      // User's routine completions subcollection
+      match /routineCompletions/{completionId} {
+        allow read: if request.auth != null && request.auth.uid == userId;
+        allow write: if request.auth != null && request.auth.uid == userId;
+      }
+      
+      // User's game completions subcollection
+      match /gameCompletions/{completionId} {
+        allow read: if request.auth != null && request.auth.uid == userId;
+        allow write: if request.auth != null && request.auth.uid == userId;
+      }
     }
     
     // Weekly challenges - all authenticated users can read and write
