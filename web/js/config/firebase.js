@@ -4,14 +4,14 @@
  */
 
 // Your Firebase configuration (from Firebase Console)
-const firebaseConfig = {
-  apiKey: "AIzaSyCgmfArNbUbrVF4Myd5Vjb33Iu4y91NJl0",
-  authDomain: "putting-improver-waugs.firebaseapp.com",
-  projectId: "putting-improver-waugs",
-  storageBucket: "putting-improver-waugs.firebasestorage.app",
-  messagingSenderId: "775646376758",
-  appId: "1:775646376758:web:015aff788bb2b4cd9fb997",
-  measurementId: "G-X91923BWL1"
+export const firebaseConfig = {
+    apiKey: "AIzaSyCgmfArNbUbrVF4Myd5Vjb33Iu4y91NJl0",
+    authDomain: "putting-improver-waugs.firebaseapp.com",
+    projectId: "putting-improver-waugs",
+    storageBucket: "putting-improver-waugs.firebasestorage.app",
+    messagingSenderId: "775646376758",
+    appId: "1:775646376758:web:015aff788bb2b4cd9fb997",
+    measurementId: "G-X91923BWL1"
 };
 
 /**

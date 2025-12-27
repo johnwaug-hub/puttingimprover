@@ -9,6 +9,8 @@ import { userManager } from './modules/user.js';
 import { storageManager } from './modules/storage.js';
 import { achievementManager } from './modules/achievements.js';
 import { challengeManager } from './modules/challenges.js';
+import { routineTracker } from './modules/routineTracker.js';
+import { gameTracker } from './modules/gameTracker.js';
 import { MOTIVATIONAL_QUOTES, SUGGESTED_ROUTINES, PUTTING_GAMES } from './config/constants.js';
 
 class App {
@@ -25,7 +27,9 @@ class App {
             activeRoutine: null,
             routineProgress: [],
             currentDrill: 0,
-            selectedGame: null
+            selectedGame: null,
+            showGameScoreModal: false,
+            selectedGameForScore: null
         };
 
         this.newSession = {
@@ -451,6 +455,9 @@ class App {
                     <p>Made with 🥏 for disc golf enthusiasts</p>
                 </div>
             </footer>
+            
+            <!-- Game Score Modal -->
+            ${this.state.showGameScoreModal ? this.renderGameScoreModal() : ''}
         `;
     }
     
@@ -547,6 +554,122 @@ class App {
             </div>
         `).join('');
     }
+    
+    /**
+     * Render game score modal
+     */
+    renderGameScoreModal() {
+        const game = PUTTING_GAMES.find(g => g.id === this.state.selectedGameForScore);
+        if (!game) return '';
+        
+        let formHTML = '';
+        
+        // Create form based on game type
+        switch (game.scoring.type) {
+            case 'time':
+                formHTML = `
+                    <div class="form-group">
+                        <label for="gameTime">Completion Time (minutes)</label>
+                        <input type="number" id="gameTime" min="1" max="120" step="0.5" required>
+                        <p class="form-hint">Goal: ${game.scoring.goal}</p>
+                    </div>
+                `;
+                break;
+            case 'strokes':
+                formHTML = `
+                    <div class="form-group">
+                        <label for="gameStrokes">Total Strokes</label>
+                        <input type="number" id="gameStrokes" min="1" max="100" required>
+                        <p class="form-hint">Goal: ${game.scoring.goal}</p>
+                    </div>
+                `;
+                break;
+            case 'points':
+                formHTML = `
+                    <div class="form-group">
+                        <label for="gamePoints">Points Scored</label>
+                        <input type="number" id="gamePoints" min="0" max="500" required>
+                        <p class="form-hint">Goal: ${game.scoring.goal}</p>
+                    </div>
+                    <div class="form-group">
+                        <label for="totalPutts">Total Putts Attempted</label>
+                        <input type="number" id="totalPutts" min="1" max="200">
+                    </div>
+                `;
+                break;
+            case 'distance':
+                formHTML = `
+                    <div class="form-group">
+                        <label for="maxDistance">Maximum Distance Reached (feet)</label>
+                        <input type="number" id="maxDistance" min="10" max="100" step="5" required>
+                        <p class="form-hint">Goal: ${game.scoring.goal}</p>
+                    </div>
+                    <div class="form-group">
+                        <label for="totalRounds">Total Rounds Attempted</label>
+                        <input type="number" id="totalRounds" min="1" max="20">
+                    </div>
+                `;
+                break;
+            case 'streak':
+                formHTML = `
+                    <div class="form-group">
+                        <label for="bestStreak">Best Streak Achieved</label>
+                        <input type="number" id="bestStreak" min="0" max="50" required>
+                        <p class="form-hint">Goal: ${game.scoring.goal}</p>
+                    </div>
+                    <div class="form-group">
+                        <label for="totalAttempts">Total Attempts</label>
+                        <input type="number" id="totalAttempts" min="10" max="200">
+                    </div>
+                `;
+                break;
+            case 'elimination':
+                formHTML = `
+                    <div class="form-group">
+                        <label>Did you win?</label>
+                        <div class="radio-group">
+                            <label class="radio-label">
+                                <input type="radio" name="won" value="true" required> Yes, I won! 🎉
+                            </label>
+                            <label class="radio-label">
+                                <input type="radio" name="won" value="false" required> No, I lost 😔
+                            </label>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="opponentName">Opponent Name (optional)</label>
+                        <input type="text" id="opponentName" placeholder="Who did you play against?">
+                    </div>
+                `;
+                break;
+        }
+        
+        return `
+            <div class="modal-overlay" id="gameScoreModal">
+                <div class="modal game-score-modal">
+                    <div class="modal-header">
+                        <h3>📊 Log Score: ${game.name}</h3>
+                        <button type="button" class="close-modal-btn" id="closeGameScoreModal">✕</button>
+                    </div>
+                    <div class="modal-body">
+                        <form id="gameScoreForm" class="game-score-form">
+                            ${formHTML}
+                            
+                            <div class="form-group">
+                                <label for="gameNotes">Notes (optional)</label>
+                                <textarea id="gameNotes" rows="3" placeholder="How did it go?"></textarea>
+                            </div>
+                            
+                            <div class="form-actions">
+                                <button type="submit" class="btn btn-primary">Save Score</button>
+                                <button type="button" class="btn btn-secondary" id="cancelGameScore">Cancel</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        `;
+    }
 
     /**
      * Render routines panel
@@ -618,9 +741,14 @@ class App {
                     </div>
                 </div>
                 
-                <button class="btn btn-primary btn-small toggle-game-btn" data-game="${game.id}">
-                    ${this.state.selectedGame === game.id ? 'Hide Details' : 'View Details'}
-                </button>
+                <div class="game-actions">
+                    <button class="btn btn-primary btn-small toggle-game-btn" data-game="${game.id}">
+                        ${this.state.selectedGame === game.id ? 'Hide Details' : 'View Details'}
+                    </button>
+                    <button class="btn btn-secondary btn-small log-score-btn" data-game="${game.id}">
+                        📊 Log Score
+                    </button>
+                </div>
             </div>
         `).join('');
     }
@@ -696,6 +824,16 @@ class App {
                 const gameId = e.target.dataset.game;
                 this.state.selectedGame = this.state.selectedGame === gameId ? null : gameId;
                 this.render();
+            });
+        });
+        
+        // Log score buttons
+        const logScoreBtns = document.querySelectorAll('.log-score-btn');
+        logScoreBtns.forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const gameId = e.target.dataset.game;
+                this.openGameScoreModal(gameId);
             });
         });
         
@@ -793,7 +931,144 @@ class App {
             alert('Failed to add session: ' + error.message);
         }
     }
+    
+    /**
+     * Open game score modal
+     */
+    openGameScoreModal(gameId) {
+        this.state.showGameScoreModal = true;
+        this.state.selectedGameForScore = gameId;
+        this.render();
+        
+        // Attach modal event listeners after render
+        setTimeout(() => {
+            const closeBtn = document.getElementById('closeGameScoreModal');
+            if (closeBtn) {
+                closeBtn.addEventListener('click', () => this.closeGameScoreModal());
+            }
+            
+            const cancelBtn = document.getElementById('cancelGameScore');
+            if (cancelBtn) {
+                cancelBtn.addEventListener('click', () => this.closeGameScoreModal());
+            }
+            
+            const form = document.getElementById('gameScoreForm');
+            if (form) {
+                form.addEventListener('submit', (e) => this.handleGameScoreSubmit(e));
+            }
+            
+            // Close on overlay click
+            const overlay = document.getElementById('gameScoreModal');
+            if (overlay) {
+                overlay.addEventListener('click', (e) => {
+                    if (e.target === overlay) {
+                        this.closeGameScoreModal();
+                    }
+                });
+            }
+        }, 100);
+    }
+    
+    /**
+     * Close game score modal
+     */
+    closeGameScoreModal() {
+        this.state.showGameScoreModal = false;
+        this.state.selectedGameForScore = null;
+        this.render();
+    }
+    
+    /**
+     * Handle game score submission
+     */
+    async handleGameScoreSubmit(e) {
+        e.preventDefault();
+        
+        const game = PUTTING_GAMES.find(g => g.id === this.state.selectedGameForScore);
+        if (!game) return;
+        
+        try {
+            let scoreData = {};
+            
+            // Collect score data based on game type
+            switch (game.scoring.type) {
+                case 'time':
+                    scoreData = {
+                        score: parseFloat(document.getElementById('gameTime').value),
+                        timeInMinutes: parseFloat(document.getElementById('gameTime').value),
+                        targetTime: 15 // Could be dynamic based on game
+                    };
+                    break;
+                    
+                case 'strokes':
+                    scoreData = {
+                        score: parseInt(document.getElementById('gameStrokes').value),
+                        par: 18 // Could be dynamic
+                    };
+                    break;
+                    
+                case 'points':
+                    scoreData = {
+                        score: parseInt(document.getElementById('gamePoints').value),
+                        targetScore: 100,
+                        totalPutts: parseInt(document.getElementById('totalPutts')?.value || 0)
+                    };
+                    break;
+                    
+                case 'distance':
+                    scoreData = {
+                        score: parseInt(document.getElementById('maxDistance').value),
+                        maxDistance: parseInt(document.getElementById('maxDistance').value),
+                        targetDistance: 40,
+                        totalRounds: parseInt(document.getElementById('totalRounds')?.value || 0)
+                    };
+                    break;
+                    
+                case 'streak':
+                    scoreData = {
+                        score: parseInt(document.getElementById('bestStreak').value),
+                        streak: parseInt(document.getElementById('bestStreak').value),
+                        targetStreak: 10,
+                        totalAttempts: parseInt(document.getElementById('totalAttempts')?.value || 0)
+                    };
+                    break;
+                    
+                case 'elimination':
+                    const won = document.querySelector('input[name="won"]:checked')?.value === 'true';
+                    scoreData = {
+                        score: won ? 1 : 0,
+                        won: won,
+                        opponent: document.getElementById('opponentName')?.value || 'Unknown'
+                    };
+                    break;
+            }
+            
+            // Add notes if provided
+            const notes = document.getElementById('gameNotes')?.value;
+            if (notes) {
+                scoreData.notes = notes;
+            }
+            
+            // Start and complete game in one go
+            gameTracker.startGame(game);
+            await gameTracker.completeGame(scoreData);
+            
+            // Check achievements
+            await achievementManager.checkAchievements();
+            
+            // Close modal
+            this.closeGameScoreModal();
+            
+            // Show success
+            alert(`✅ Score logged for ${game.name}!${scoreData.won !== undefined ? (scoreData.won ? ' You won! 🎉' : ' Better luck next time!') : ''}`);
+            
+        } catch (error) {
+            console.error('Error logging game score:', error);
+            alert('Failed to log score: ' + error.message);
+        }
+    }
 }
+
 
 // Create and export app instance
 export const app = new App();

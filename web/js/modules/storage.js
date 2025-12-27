@@ -256,6 +256,72 @@ class StorageManager {
         return await this.getCollection('routines');
     }
 
+    /**
+     * Save a routine completion
+     * @param {string} userId - User ID
+     * @param {Object} completion - Routine completion object
+     * @returns {Promise<void>}
+     */
+    async saveRoutineCompletion(userId, completion) {
+        const completionId = `routine_${Date.now()}`;
+        await this.set(`users/${userId}/routineCompletions`, completionId, completion);
+    }
+
+    /**
+     * Get all routine completions for a user
+     * @param {string} userId - User ID
+     * @returns {Promise<Array>} Array of routine completion objects
+     */
+    async getRoutineCompletions(userId) {
+        try {
+            if (!this.db) this.init();
+            const snapshot = await this.db
+                .collection('users')
+                .doc(userId)
+                .collection('routineCompletions')
+                .orderBy('endTime', 'desc')
+                .get();
+            
+            return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        } catch (error) {
+            console.error(`Error getting routine completions for ${userId}:`, error);
+            return [];
+        }
+    }
+
+    /**
+     * Save a game completion
+     * @param {string} userId - User ID
+     * @param {Object} completion - Game completion object
+     * @returns {Promise<void>}
+     */
+    async saveGameCompletion(userId, completion) {
+        const completionId = `game_${Date.now()}`;
+        await this.set(`users/${userId}/gameCompletions`, completionId, completion);
+    }
+
+    /**
+     * Get all game completions for a user
+     * @param {string} userId - User ID
+     * @returns {Promise<Array>} Array of game completion objects
+     */
+    async getGameCompletions(userId) {
+        try {
+            if (!this.db) this.init();
+            const snapshot = await this.db
+                .collection('users')
+                .doc(userId)
+                .collection('gameCompletions')
+                .orderBy('endTime', 'desc')
+                .get();
+            
+            return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        } catch (error) {
+            console.error(`Error getting game completions for ${userId}:`, error);
+            return [];
+        }
+    }
+
     // Leaderboard methods
 
     /**
