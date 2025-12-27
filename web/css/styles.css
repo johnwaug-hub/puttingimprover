@@ -1190,14 +1190,50 @@
     margin-top: 1rem;
 }
 
+.routine-actions,
 .game-actions {
     display: flex;
     gap: 0.5rem;
     margin-top: 1rem;
 }
 
+.routine-actions button,
 .game-actions button {
     flex: 1;
+}
+
+/* Routine Completion Modal */
+.routine-completion-modal {
+    max-width: 700px;
+}
+
+.modal-description {
+    margin-bottom: 1.5rem;
+    color: #6b7280;
+}
+
+.drill-completion-group {
+    background: #f9fafb;
+    padding: 1rem;
+    border-radius: 8px;
+    margin-bottom: 1rem;
+    border-left: 4px solid #FF6B35;
+}
+
+.drill-completion-group h4 {
+    margin: 0 0 0.5rem 0;
+    color: #1f2937;
+    font-size: 1rem;
+}
+
+.drill-desc {
+    font-size: 0.875rem;
+    color: #6b7280;
+    margin-bottom: 0.75rem;
+}
+
+.drill-completion-group .form-row {
+    margin-bottom: 0;
 }
 
 /* Game Score Modal */

@@ -29,7 +29,9 @@ class App {
             currentDrill: 0,
             selectedGame: null,
             showGameScoreModal: false,
-            selectedGameForScore: null
+            selectedGameForScore: null,
+            showRoutineCompletionModal: false,
+            selectedRoutineForCompletion: null
         };
 
         this.newSession = {
@@ -458,6 +460,9 @@ class App {
             
             <!-- Game Score Modal -->
             ${this.state.showGameScoreModal ? this.renderGameScoreModal() : ''}
+            
+            <!-- Routine Completion Modal -->
+            ${this.state.showRoutineCompletionModal ? this.renderRoutineCompletionModal() : ''}
         `;
     }
     
@@ -702,9 +707,14 @@ class App {
                                     </div>
                                 `).join('')}
                             </div>
-                            <button class="btn btn-primary btn-small start-routine-btn" data-routine="${routine.id}">
-                                Start Routine
-                            </button>
+                            <div class="routine-actions">
+                                <button class="btn btn-primary btn-small start-routine-btn" data-routine="${routine.id}">
+                                    Start Routine
+                                </button>
+                                <button class="btn btn-secondary btn-small log-routine-btn" data-routine="${routine.id}">
+                                    📊 Log Completion
+                                </button>
+                            </div>
                         </div>
                     `).join('')}
                 </div>
@@ -814,6 +824,16 @@ class App {
             btn.addEventListener('click', (e) => {
                 const routineId = e.target.dataset.routine;
                 this.startRoutine(routineId);
+            });
+        });
+        
+        // Log routine completion buttons
+        const logRoutineBtns = document.querySelectorAll('.log-routine-btn');
+        logRoutineBtns.forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const routineId = e.target.dataset.routine;
+                this.openRoutineCompletionModal(routineId);
             });
         });
         
@@ -1065,6 +1085,182 @@ class App {
         } catch (error) {
             console.error('Error logging game score:', error);
             alert('Failed to log score: ' + error.message);
+        }
+    }
+    
+    /**
+     * Render routine completion modal
+     */
+    renderRoutineCompletionModal() {
+        const routine = SUGGESTED_ROUTINES.find(r => r.id === this.state.selectedRoutineForCompletion);
+        if (!routine) return '';
+        
+        return `
+            <div class="modal-overlay" id="routineCompletionModal">
+                <div class="modal routine-completion-modal">
+                    <div class="modal-header">
+                        <h3>✅ Log Routine Completion: ${routine.name}</h3>
+                        <button type="button" class="close-modal-btn" id="closeRoutineCompletionModal">✕</button>
+                    </div>
+                    <div class="modal-body">
+                        <p class="modal-description">Log your performance for each drill in this routine:</p>
+                        <form id="routineCompletionForm" class="routine-completion-form">
+                            ${routine.drills.map((drill, idx) => `
+                                <div class="drill-completion-group">
+                                    <h4>Drill ${idx + 1}: ${drill.distance}ft - ${drill.attempts} attempts</h4>
+                                    <p class="drill-desc">${drill.description}</p>
+                                    <div class="form-row">
+                                        <div class="form-group">
+                                            <label for="drill${idx}Makes">Makes</label>
+                                            <input type="number" id="drill${idx}Makes" min="0" max="${drill.attempts}" required>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="drill${idx}Attempts">Attempts</label>
+                                            <input type="number" id="drill${idx}Attempts" value="${drill.attempts}" min="1" max="100" required>
+                                        </div>
+                                    </div>
+                                </div>
+                            `).join('')}
+                            
+                            <div class="form-group">
+                                <label for="routineDuration">Total Duration (minutes)</label>
+                                <input type="number" id="routineDuration" min="1" max="120" placeholder="How long did it take?">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="routineNotes">Notes (optional)</label>
+                                <textarea id="routineNotes" rows="3" placeholder="How did it go? Which drills were challenging?"></textarea>
+                            </div>
+                            
+                            <div class="form-actions">
+                                <button type="submit" class="btn btn-primary">Save Completion</button>
+                                <button type="button" class="btn btn-secondary" id="cancelRoutineCompletion">Cancel</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        `;
+    }
+    
+    /**
+     * Open routine completion modal
+     */
+    openRoutineCompletionModal(routineId) {
+        this.state.showRoutineCompletionModal = true;
+        this.state.selectedRoutineForCompletion = routineId;
+        this.render();
+        
+        // Attach modal event listeners after render
+        setTimeout(() => {
+            const closeBtn = document.getElementById('closeRoutineCompletionModal');
+            if (closeBtn) {
+                closeBtn.addEventListener('click', () => this.closeRoutineCompletionModal());
+            }
+            
+            const cancelBtn = document.getElementById('cancelRoutineCompletion');
+            if (cancelBtn) {
+                cancelBtn.addEventListener('click', () => this.closeRoutineCompletionModal());
+            }
+            
+            const form = document.getElementById('routineCompletionForm');
+            if (form) {
+                form.addEventListener('submit', (e) => this.handleRoutineCompletionSubmit(e));
+            }
+            
+            // Close on overlay click
+            const overlay = document.getElementById('routineCompletionModal');
+            if (overlay) {
+                overlay.addEventListener('click', (e) => {
+                    if (e.target === overlay) {
+                        this.closeRoutineCompletionModal();
+                    }
+                });
+            }
+        }, 100);
+    }
+    
+    /**
+     * Close routine completion modal
+     */
+    closeRoutineCompletionModal() {
+        this.state.showRoutineCompletionModal = false;
+        this.state.selectedRoutineForCompletion = null;
+        this.render();
+    }
+    
+    /**
+     * Handle routine completion submission
+     */
+    async handleRoutineCompletionSubmit(e) {
+        e.preventDefault();
+        
+        const routine = SUGGESTED_ROUTINES.find(r => r.id === this.state.selectedRoutineForCompletion);
+        if (!routine) return;
+        
+        try {
+            // Collect drill data
+            const drills = routine.drills.map((drill, idx) => {
+                const makes = parseInt(document.getElementById(`drill${idx}Makes`).value);
+                const attempts = parseInt(document.getElementById(`drill${idx}Attempts`).value);
+                
+                return {
+                    drillNumber: idx + 1,
+                    distance: drill.distance,
+                    targetAttempts: drill.attempts,
+                    description: drill.description,
+                    makes,
+                    attempts,
+                    percentage: (makes / attempts) * 100,
+                    completed: true
+                };
+            });
+            
+            // Calculate overall stats
+            const totalMakes = drills.reduce((sum, d) => sum + d.makes, 0);
+            const totalAttempts = drills.reduce((sum, d) => sum + d.attempts, 0);
+            const overallPercentage = (totalMakes / totalAttempts) * 100;
+            
+            const duration = parseInt(document.getElementById('routineDuration')?.value || 0);
+            const notes = document.getElementById('routineNotes')?.value;
+            
+            // Create completion record
+            const completion = {
+                routineId: routine.id,
+                routineName: routine.name,
+                startTime: new Date(Date.now() - duration * 60000).toISOString(), // Estimate start time
+                endTime: new Date().toISOString(),
+                duration,
+                drills,
+                totalStats: {
+                    totalDrills: drills.length,
+                    completedDrills: drills.length,
+                    totalMakes,
+                    totalAttempts,
+                    overallPercentage: Math.round(overallPercentage * 10) / 10
+                },
+                notes: notes || null,
+                completed: true
+            };
+            
+            // Save to Firestore
+            const user = userManager.getCurrentUser();
+            if (user) {
+                await storageManager.saveRoutineCompletion(user.id, completion);
+            }
+            
+            // Check achievements
+            await achievementManager.checkAchievements();
+            
+            // Close modal
+            this.closeRoutineCompletionModal();
+            
+            // Show success
+            alert(`✅ Routine completion logged!\n\n${routine.name}\nOverall: ${totalMakes}/${totalAttempts} (${Math.round(overallPercentage)}%)\nDuration: ${duration} minutes`);
+            
+        } catch (error) {
+            console.error('Error logging routine completion:', error);
+            alert('Failed to log routine completion: ' + error.message);
         }
     }
 }
