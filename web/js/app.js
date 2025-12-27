@@ -522,17 +522,17 @@ class App {
     }
     
     renderAchievements() {
-        const achievements = achievementManager.getAchievements();
+        const achievements = achievementManager.getAchievementsWithStatus();
         if (!achievements || achievements.length === 0) {
             return '<p class="empty-state">No achievements yet. Keep practicing!</p>';
         }
         
         return achievements.map(achievement => `
-            <div class="achievement-card ${achievement.unlocked ? 'unlocked' : 'locked'}">
+            <div class="achievement-card ${achievement.isUnlocked ? 'unlocked' : 'locked'}">
                 <div class="achievement-icon">${achievement.icon}</div>
                 <div class="achievement-name">${achievement.name}</div>
-                <div class="achievement-description">${achievement.description}</div>
-                ${achievement.unlocked ? '<div class="achievement-badge">✓ Unlocked</div>' : ''}
+                <div class="achievement-description">${achievement.desc}</div>
+                ${achievement.isUnlocked ? '<div class="achievement-badge">✓ Unlocked</div>' : ''}
             </div>
         `).join('');
     }
