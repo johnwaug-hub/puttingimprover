@@ -173,8 +173,18 @@ class App {
      * Change current view
      * @param {string} view - View name
      */
-    changeView(view) {
+    async changeView(view) {
         this.state.currentView = view;
+        
+        // Unlock "Game On" achievement when viewing Games tab for first time
+        if (view === 'games') {
+            const user = userManager.getCurrentUser();
+            if (user && !user.achievements.includes('game_on')) {
+                await userManager.addAchievement('game_on');
+                console.log('🎮 Game On achievement unlocked!');
+            }
+        }
+        
         this.render();
     }
 
@@ -509,11 +519,11 @@ class App {
                 </div>
                 <div class="player-stats">
                     <div class="stat-item">
-                        <div class="stat-value">${player.totalPoints}</div>
+                        <div class="stat-value">${player.totalPoints || 0}</div>
                         <div class="stat-label">Points</div>
                     </div>
                     <div class="stat-item">
-                        <div class="stat-value">${player.totalSessions}</div>
+                        <div class="stat-value">${player.totalSessions || 0}</div>
                         <div class="stat-label">Sessions</div>
                     </div>
                 </div>
@@ -637,9 +647,8 @@ class App {
         // Tab navigation
         const tabs = document.querySelectorAll('.tab');
         tabs.forEach(tab => {
-            tab.addEventListener('click', (e) => {
-                this.state.currentView = e.target.dataset.view;
-                this.render();
+            tab.addEventListener('click', async (e) => {
+                await this.changeView(e.target.dataset.view);
             });
         });
         

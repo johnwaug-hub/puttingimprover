@@ -73,7 +73,23 @@ export const ACHIEVEMENTS_CONFIG = [
     { id: 'social_butterfly', icon: '🦋', name: 'Social Butterfly', desc: 'Add 5 friends', points: 100 },
     { id: 'point_king', icon: '⭐', name: 'Point King', desc: 'Earn 1000+ total points', points: 250 },
     { id: 'podium_finish', icon: '🥇', name: 'Podium Finish', desc: 'Reach top 3 on leaderboard', points: 400 },
-    { id: 'challenge_accepted', icon: '✅', name: 'Challenge Accepted', desc: 'Complete a weekly challenge', points: 150 }
+    { id: 'challenge_accepted', icon: '✅', name: 'Challenge Accepted', desc: 'Complete a weekly challenge', points: 150 },
+    
+    // Routine Achievements
+    { id: 'routine_rookie', icon: '📋', name: 'Routine Rookie', desc: 'Complete your first routine', points: 75 },
+    { id: 'routine_regular', icon: '📚', name: 'Routine Regular', desc: 'Complete 5 different routines', points: 150 },
+    { id: 'routine_master', icon: '🎓', name: 'Routine Master', desc: 'Complete all 4 routines', points: 200 },
+    { id: 'ladder_climber', icon: '🪜', name: 'Ladder Climber', desc: 'Complete the Advanced Ladder routine', points: 100 },
+    { id: 'consistency_king', icon: '♾️', name: 'Consistency King', desc: 'Complete Consistency Builder 3 times', points: 150 },
+    
+    // Games Achievements  
+    { id: 'game_on', icon: '🎮', name: 'Game On', desc: 'View the Games tab', points: 25 },
+    { id: 'around_the_world_champ', icon: '🌍', name: 'World Champion', desc: 'Complete Around the World in under 15 mins', points: 125 },
+    { id: 'horse_master', icon: '🐴', name: 'HORSE Master', desc: 'Win 3 games of HORSE', points: 100 },
+    { id: 'perfect_streak', icon: '🔟', name: 'Perfect Streak', desc: 'Complete Perfect 10 Challenge', points: 200 },
+    { id: 'distance_champion', icon: '📏', name: 'Distance Champion', desc: 'Reach 40+ feet in Distance Ladder', points: 175 },
+    { id: 'par_shooter', icon: '⛳', name: 'Par Shooter', desc: 'Score par or better in Putting Par Game', points: 125 },
+    { id: 'poker_pro', icon: '🃏', name: 'Poker Pro', desc: 'Score 100+ points in Points Poker', points: 150 }
 ];
 
 export const MOTIVATIONAL_QUOTES = [

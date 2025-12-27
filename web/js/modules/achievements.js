@@ -99,6 +99,50 @@ class AchievementManager {
             newlyUnlocked.push('podium_finish');
         }
 
+        // Routine Rookie - Complete first routine
+        const routineSessions = sessions.filter(s => s.routineName);
+        if (routineSessions.length >= 1 && !currentAchievements.includes('routine_rookie')) {
+            await userManager.addAchievement('routine_rookie');
+            newlyUnlocked.push('routine_rookie');
+        }
+
+        // Routine Regular - Complete 5 different routines
+        const uniqueRoutines = new Set(routineSessions.map(s => s.routineName));
+        if (uniqueRoutines.size >= 5 && !currentAchievements.includes('routine_regular')) {
+            await userManager.addAchievement('routine_regular');
+            newlyUnlocked.push('routine_regular');
+        }
+
+        // Routine Master - Complete all 4 routines
+        const routineNames = ['Beginner 10ft', 'Intermediate Mixed', 'Advanced Ladder', 'Consistency Builder'];
+        const completedAll = routineNames.every(name => 
+            routineSessions.some(s => s.routineName === name)
+        );
+        if (completedAll && !currentAchievements.includes('routine_master')) {
+            await userManager.addAchievement('routine_master');
+            newlyUnlocked.push('routine_master');
+        }
+
+        // Ladder Climber - Complete Advanced Ladder
+        const ladderSession = routineSessions.find(s => s.routineName === 'Advanced Ladder');
+        if (ladderSession && !currentAchievements.includes('ladder_climber')) {
+            await userManager.addAchievement('ladder_climber');
+            newlyUnlocked.push('ladder_climber');
+        }
+
+        // Consistency King - Complete Consistency Builder 3 times
+        const consistencySessions = routineSessions.filter(s => s.routineName === 'Consistency Builder');
+        if (consistencySessions.length >= 3 && !currentAchievements.includes('consistency_king')) {
+            await userManager.addAchievement('consistency_king');
+            newlyUnlocked.push('consistency_king');
+        }
+
+        // Game On - View Games tab (checked in app.js when view changes)
+        // This is a simple achievement just for viewing the tab
+        if (!currentAchievements.includes('game_on')) {
+            // Will be unlocked when Games tab is viewed
+        }
+
         if (newlyUnlocked.length > 0) {
             console.log('🏆 New achievements unlocked:', newlyUnlocked);
         }

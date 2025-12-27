@@ -46,16 +46,22 @@ class UserManager {
         } else {
             // Update last login
             user.lastLogin = new Date().toISOString();
-            // Ensure totalSessions exists for existing users
-            if (user.totalSessions === undefined) {
-                user.totalSessions = 0;
-            }
             await storageManager.saveUser(user);
             console.log('✅ User loaded:', user.email);
         }
 
         this.currentUser = user;
         await this.loadSessions();
+        
+        // Fix totalSessions count for existing users if it's wrong
+        if (this.currentUser.totalSessions === undefined || this.currentUser.totalSessions === 0) {
+            const actualSessionCount = this.sessions.length;
+            if (actualSessionCount > 0) {
+                this.currentUser.totalSessions = actualSessionCount;
+                await storageManager.saveUser(this.currentUser);
+                console.log('✅ Session count updated:', actualSessionCount);
+            }
+        }
 
         return user;
     }
