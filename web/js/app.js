@@ -508,14 +508,15 @@ class App {
     }
     
     renderLeaderboardItem(player, rank) {
-        const isCurrentUser = player.userId === userManager.getCurrentUser().userId;
+        const currentUser = userManager.getCurrentUser();
+        const isCurrentUser = currentUser && (player.id === currentUser.id || player.userId === currentUser.userId);
         const rankClass = rank === 1 ? 'gold' : rank === 2 ? 'silver' : rank === 3 ? 'bronze' : '';
         
         return `
             <div class="leaderboard-item ${isCurrentUser ? 'current-user' : ''}">
                 <div class="rank ${rankClass}">#${rank}</div>
                 <div class="player-info">
-                    <div class="player-name">${player.displayName}${isCurrentUser ? ' (You)' : ''}</div>
+                    <div class="player-name">${player.displayName || 'Unknown Player'}${isCurrentUser ? ' (You)' : ''}</div>
                 </div>
                 <div class="player-stats">
                     <div class="stat-item">
