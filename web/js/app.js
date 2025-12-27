@@ -1119,6 +1119,29 @@ class App {
                         opponent: document.getElementById('opponentName')?.value || 'Unknown'
                     };
                     break;
+                    
+                case 'rotations':
+                    // Collect all 10 rotation scores
+                    const rotations = [];
+                    let totalMakes = 0;
+                    for (let i = 1; i <= 10; i++) {
+                        const makes = parseInt(document.getElementById(`rotation${i}`).value);
+                        rotations.push(makes);
+                        totalMakes += makes;
+                    }
+                    const distance = parseInt(document.getElementById('puttingDistance').value);
+                    const percentage = (totalMakes / 100) * 100;
+                    
+                    scoreData = {
+                        score: totalMakes,
+                        totalMakes: totalMakes,
+                        totalAttempts: 100,
+                        percentage: percentage,
+                        distance: distance,
+                        rotations: rotations,
+                        targetScore: 70
+                    };
+                    break;
             }
             
             // Add notes if provided

@@ -7,38 +7,27 @@
 
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-            background: linear-gradient(to bottom right, #FFE4B5, #DEB887, #D2B48C);
+            background-image: url('../background.jpg');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            background-repeat: no-repeat;
             position: relative;
             min-height: 100vh;
             color: #1f2937;
         }
         
+        /* Add a subtle overlay for better text readability */
         body::before {
             content: '';
             position: fixed;
-            bottom: 0;
+            top: 0;
             left: 0;
-            width: 100px;
-            height: 150px;
-            background-image: url("data:image/svg+xml,%3Csvg width='100' height='150' xmlns='http://www.w3.org/2000/svg'%3E%3Cg opacity='0.15'%3E%3Cpath d='M45 140 L45 50 Q45 45 50 45 L50 30 Q50 25 55 25 L55 45 Q60 45 60 50 L60 140' fill='%234A5D23' stroke='%233D4E1C' stroke-width='2'/%3E%3Cpath d='M40 90 L28 90 Q23 90 23 85 L23 65 Q23 60 28 60 L40 60' fill='%234A5D23' stroke='%233D4E1C' stroke-width='2'/%3E%3Cpath d='M60 100 L72 100 Q77 100 77 95 L77 75 Q77 70 72 70 L60 70' fill='%234A5D23' stroke='%233D4E1C' stroke-width='2'/%3E%3C/g%3E%3C/svg%3E");
-            background-repeat: no-repeat;
-            background-position: bottom left;
-            pointer-events: none;
-            z-index: 0;
-        }
-        
-        body::after {
-            content: '';
-            position: fixed;
+            right: 0;
             bottom: 0;
-            right: 20px;
-            width: 70px;
-            height: 110px;
-            background-image: url("data:image/svg+xml,%3Csvg width='70' height='110' xmlns='http://www.w3.org/2000/svg'%3E%3Cg opacity='0.12'%3E%3Cpath d='M32 100 L32 35 Q32 30 35 30 L35 18 Q35 15 38 15 L38 30 Q41 30 41 35 L41 100' fill='%234A5D23' stroke='%233D4E1C' stroke-width='1.5'/%3E%3Cpath d='M28 65 L20 65 Q17 65 17 62 L17 48 Q17 45 20 45 L28 45' fill='%234A5D23' stroke='%233D4E1C' stroke-width='1.5'/%3E%3Cpath d='M41 72 L49 72 Q52 72 52 69 L52 55 Q52 52 49 52 L41 52' fill='%234A5D23' stroke='%233D4E1C' stroke-width='1.5'/%3E%3C/g%3E%3C/svg%3E");
-            background-repeat: no-repeat;
-            background-position: bottom right;
-            pointer-events: none;
+            background: rgba(255, 255, 255, 0.85);
             z-index: 0;
+            pointer-events: none;
         }
 
         .container {
@@ -63,11 +52,13 @@
         }
 
         .card {
-            background: white;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
             border-radius: 12px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
             padding: 1.5rem;
             margin-bottom: 1.5rem;
+            border: 1px solid rgba(255, 255, 255, 0.3);
         }
 
         .btn {
@@ -308,11 +299,14 @@
         }
 
         .modal {
-            background: white;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
             border-radius: 12px;
             max-width: 500px;
             width: 100%;
             padding: 2rem;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
             animation: modalFadeIn 0.3s;
         }
 
@@ -1393,4 +1387,40 @@
     margin: 1.5rem 0;
 }
 
+.rotations-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 0.75rem;
+    margin-bottom: 1.5rem;
+}
+
+.rotation-input {
+    margin-bottom: 0 !important;
+}
+
+.rotation-input label {
+    font-size: 0.875rem;
+    font-weight: 600;
+    margin-bottom: 0.25rem;
+}
+
+.rotation-input input {
+    text-align: center;
+    font-weight: bold;
+}
+
+.form-description {
+    background: #f3f4f6;
+    padding: 0.75rem;
+    border-radius: 6px;
+    margin-bottom: 1rem;
+    font-size: 0.875rem;
+    color: #4b5563;
+}
+
+@media (max-width: 640px) {
+    .rotations-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
 

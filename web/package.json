@@ -37,9 +37,5 @@
   "engines": {
     "node": ">=16.0.0",
     "npm": ">=8.0.0"
-  },
-  "dependencies": {
-    "@stripe/stripe-js": "^8.6.0",
-    "stripe": "^20.1.0"
   }
 }

@@ -21,7 +21,8 @@ export function renderGameScoreModal(gameId) {
         points: renderPointsScoreForm(game),
         distance: renderDistanceScoreForm(game),
         streak: renderStreakScoreForm(game),
-        elimination: renderEliminationScoreForm(game)
+        elimination: renderEliminationScoreForm(game),
+        rotations: renderRotationsScoreForm(game)
     };
 
     return `
@@ -191,6 +192,39 @@ function renderEliminationScoreForm(game) {
             
             <div class="form-actions">
                 <button type="submit" class="btn btn-primary">Save Result</button>
+                <button type="button" class="btn btn-secondary" id="cancelGameScore">Cancel</button>
+            </div>
+        </form>
+    `;
+}
+
+function renderRotationsScoreForm(game) {
+    return `
+        <form id="gameScoreForm" class="game-score-form">
+            <p class="form-description">Log your makes for each rotation of 10 putts</p>
+            
+            <div class="rotations-grid">
+                ${Array.from({ length: 10 }, (_, i) => `
+                    <div class="form-group rotation-input">
+                        <label for="rotation${i + 1}">Rotation ${i + 1}</label>
+                        <input type="number" id="rotation${i + 1}" min="0" max="10" required placeholder="0-10">
+                    </div>
+                `).join('')}
+            </div>
+            
+            <div class="form-group">
+                <label for="puttingDistance">Putting Distance (feet)</label>
+                <input type="number" id="puttingDistance" min="10" max="50" value="20" required>
+                <p class="form-hint">Goal: ${game.scoring.goal}</p>
+            </div>
+            
+            <div class="form-group">
+                <label for="gameNotes">Notes (optional)</label>
+                <textarea id="gameNotes" rows="3" placeholder="Which rotations went well? Any observations?"></textarea>
+            </div>
+            
+            <div class="form-actions">
+                <button type="submit" class="btn btn-primary">Save Score</button>
                 <button type="button" class="btn btn-secondary" id="cancelGameScore">Cancel</button>
             </div>
         </form>

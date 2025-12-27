@@ -264,5 +264,24 @@ export const PUTTING_GAMES = [
             goal: 'Score 100+ points',
             points: 'Distance-based scoring with bonuses'
         }
+    },
+    {
+        id: 'putt_100',
+        name: 'Putt 100',
+        description: 'Make 100 putts scored in 10 rotations of 10 throws',
+        difficulty: 'Medium',
+        duration: '30-40 mins',
+        instructions: [
+            'Choose your putting distance (15-25 feet recommended)',
+            'Complete 10 rotations of 10 putts each (100 total putts)',
+            'Track makes for each rotation of 10',
+            'Goal is to make as many of the 100 putts as possible',
+            'Record your score out of 100'
+        ],
+        scoring: {
+            type: 'rotations',
+            goal: 'Make 70+ out of 100',
+            points: 'Track total makes and percentage'
+        }
     }
 ];
