@@ -7,38 +7,17 @@
 
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-            background: linear-gradient(to bottom right, #FFE4B5, #DEB887, #D2B48C);
+            background: linear-gradient(rgba(255, 228, 181, 0.5), rgba(222, 184, 135, 0.6)), 
+                        url('../images/desert-background.jpg') center/cover no-repeat fixed;
             position: relative;
             min-height: 100vh;
             color: #1f2937;
         }
         
-        body::before {
-            content: '';
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            width: 100px;
-            height: 150px;
-            background-image: url("data:image/svg+xml,%3Csvg width='100' height='150' xmlns='http://www.w3.org/2000/svg'%3E%3Cg opacity='0.15'%3E%3Cpath d='M45 140 L45 50 Q45 45 50 45 L50 30 Q50 25 55 25 L55 45 Q60 45 60 50 L60 140' fill='%234A5D23' stroke='%233D4E1C' stroke-width='2'/%3E%3Cpath d='M40 90 L28 90 Q23 90 23 85 L23 65 Q23 60 28 60 L40 60' fill='%234A5D23' stroke='%233D4E1C' stroke-width='2'/%3E%3Cpath d='M60 100 L72 100 Q77 100 77 95 L77 75 Q77 70 72 70 L60 70' fill='%234A5D23' stroke='%233D4E1C' stroke-width='2'/%3E%3C/g%3E%3C/svg%3E");
-            background-repeat: no-repeat;
-            background-position: bottom left;
-            pointer-events: none;
-            z-index: 0;
-        }
-        
+        /* Remove the cactus pseudo-elements since we have real cacti now */
+        body::before,
         body::after {
-            content: '';
-            position: fixed;
-            bottom: 0;
-            right: 20px;
-            width: 70px;
-            height: 110px;
-            background-image: url("data:image/svg+xml,%3Csvg width='70' height='110' xmlns='http://www.w3.org/2000/svg'%3E%3Cg opacity='0.12'%3E%3Cpath d='M32 100 L32 35 Q32 30 35 30 L35 18 Q35 15 38 15 L38 30 Q41 30 41 35 L41 100' fill='%234A5D23' stroke='%233D4E1C' stroke-width='1.5'/%3E%3Cpath d='M28 65 L20 65 Q17 65 17 62 L17 48 Q17 45 20 45 L28 45' fill='%234A5D23' stroke='%233D4E1C' stroke-width='1.5'/%3E%3Cpath d='M41 72 L49 72 Q52 72 52 69 L52 55 Q52 52 49 52 L41 52' fill='%234A5D23' stroke='%233D4E1C' stroke-width='1.5'/%3E%3C/g%3E%3C/svg%3E");
-            background-repeat: no-repeat;
-            background-position: bottom right;
-            pointer-events: none;
-            z-index: 0;
+            display: none;
         }
 
         .container {
