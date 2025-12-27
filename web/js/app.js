@@ -9,14 +9,14 @@ import { userManager } from './modules/user.js';
 import { storageManager } from './modules/storage.js';
 import { achievementManager } from './modules/achievements.js';
 import { challengeManager } from './modules/challenges.js';
-import { MOTIVATIONAL_QUOTES } from './config/constants.js';
+import { MOTIVATIONAL_QUOTES, SUGGESTED_ROUTINES, PUTTING_GAMES } from './config/constants.js';
 
 class App {
     constructor() {
         this.state = {
             loading: true,
             error: null,
-            currentView: 'practice', // practice, leaderboard, friends, achievements
+            currentView: 'practice', // practice, leaderboard, friends, achievements, games
             showAddSession: false,
             showRoutines: false,
             currentQuote: this.getRandomQuote(),
@@ -24,7 +24,8 @@ class App {
             friends: [],
             activeRoutine: null,
             routineProgress: [],
-            currentDrill: 0
+            currentDrill: 0,
+            selectedGame: null
         };
 
         this.newSession = {
@@ -346,6 +347,9 @@ class App {
                     <button class="tab ${this.state.currentView === 'leaderboard' ? 'active' : ''}" data-view="leaderboard">
                         🏆 Leaderboard
                     </button>
+                    <button class="tab ${this.state.currentView === 'games' ? 'active' : ''}" data-view="games">
+                        🎮 Games
+                    </button>
                     <button class="tab ${this.state.currentView === 'achievements' ? 'active' : ''}" data-view="achievements">
                         🏅 Achievements
                     </button>
@@ -378,10 +382,16 @@ class App {
                         <button id="addSessionBtn" class="btn btn-primary btn-large">
                             ➕ Add Practice Session
                         </button>
+                        <button id="viewRoutinesBtn" class="btn btn-secondary btn-large">
+                            📋 View Routines
+                        </button>
                     </div>
 
                     <!-- Add Session Form (Hidden by default) -->
                     ${this.state.showAddSession ? this.renderAddSessionForm() : ''}
+                    
+                    <!-- Routines Panel (Hidden by default) -->
+                    ${this.state.showRoutines ? this.renderRoutines() : ''}
 
                     <!-- Recent Sessions -->
                     <div class="card">
@@ -408,6 +418,17 @@ class App {
                         <h2>🏅 Your Achievements</h2>
                         <div class="achievements-grid">
                             ${this.renderAchievements()}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Games View -->
+                <div class="view ${this.state.currentView === 'games' ? 'active' : ''}" id="games-view">
+                    <div class="card">
+                        <h2>🎮 Putting Games</h2>
+                        <p style="margin-bottom: 1.5rem; color: #6b7280;">Make practice fun with these competitive putting games!</p>
+                        <div class="games-grid">
+                            ${this.renderGames()}
                         </div>
                     </div>
                 </div>
@@ -452,17 +473,25 @@ class App {
     }
     
     renderSessionItem(session) {
-        const date = new Date(session.timestamp).toLocaleDateString();
+        const dateObj = new Date(session.timestamp || session.date);
+        const date = dateObj.toLocaleDateString();
+        const time = session.timestamp ? dateObj.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '';
+        const routineTag = session.routineName ? `<span class="routine-tag">📋 ${session.routineName}</span>` : '';
+        
         return `
             <div class="session-item">
                 <div class="session-header">
-                    <span class="session-date">${date}</span>
+                    <div>
+                        <span class="session-date">${date}</span>
+                        ${time ? `<span class="session-time">${time}</span>` : ''}
+                        ${routineTag}
+                    </div>
                     <span class="session-points">${session.points} pts</span>
                 </div>
                 <div class="session-stats">
                     <span>${session.distance}ft</span>
                     <span>${session.makes}/${session.attempts}</span>
-                    <span>${session.accuracy.toFixed(1)}%</span>
+                    <span>${session.percentage.toFixed(1)}%</span>
                 </div>
             </div>
         `;
@@ -509,6 +538,83 @@ class App {
     }
 
     /**
+     * Render routines panel
+     */
+    renderRoutines() {
+        return `
+            <div class="card routines-panel">
+                <div class="header-flex">
+                    <h3>📋 Suggested Putting Routines</h3>
+                    <button id="closeRoutinesBtn" class="btn btn-secondary">Close</button>
+                </div>
+                <p style="margin-bottom: 1.5rem; color: #6b7280;">Choose a routine to structure your practice session</p>
+                <div class="routines-grid">
+                    ${SUGGESTED_ROUTINES.map(routine => `
+                        <div class="routine-card">
+                            <div class="routine-header">
+                                <h4>${routine.name}</h4>
+                                <span class="routine-badge">${routine.level}</span>
+                            </div>
+                            <p class="routine-description">${routine.description}</p>
+                            <div class="routine-meta">
+                                <span>⏱️ ${routine.duration}</span>
+                                <span>📍 ${routine.drills.length} drills</span>
+                            </div>
+                            <div class="routine-drills">
+                                ${routine.drills.map((drill, idx) => `
+                                    <div class="drill-item">
+                                        <strong>${idx + 1}. ${drill.distance}ft - ${drill.attempts} attempts</strong>
+                                        <p>${drill.description}</p>
+                                    </div>
+                                `).join('')}
+                            </div>
+                            <button class="btn btn-primary btn-small start-routine-btn" data-routine="${routine.id}">
+                                Start Routine
+                            </button>
+                        </div>
+                    `).join('')}
+                </div>
+            </div>
+        `;
+    }
+
+    /**
+     * Render games grid
+     */
+    renderGames() {
+        return PUTTING_GAMES.map(game => `
+            <div class="game-card">
+                <div class="game-header">
+                    <h3>${game.name}</h3>
+                    <span class="game-badge ${game.difficulty.toLowerCase()}">${game.difficulty}</span>
+                </div>
+                <p class="game-description">${game.description}</p>
+                <div class="game-meta">
+                    <span>⏱️ ${game.duration}</span>
+                </div>
+                
+                <div class="game-details ${this.state.selectedGame === game.id ? 'expanded' : ''}">
+                    <h4>📋 Instructions:</h4>
+                    <ol class="game-instructions">
+                        ${game.instructions.map(instruction => `<li>${instruction}</li>`).join('')}
+                    </ol>
+                    
+                    <h4>🎯 Scoring:</h4>
+                    <div class="game-scoring">
+                        <p><strong>Type:</strong> ${game.scoring.type}</p>
+                        <p><strong>Goal:</strong> ${game.scoring.goal}</p>
+                        <p><strong>Points:</strong> ${game.scoring.points}</p>
+                    </div>
+                </div>
+                
+                <button class="btn btn-primary btn-small toggle-game-btn" data-game="${game.id}">
+                    ${this.state.selectedGame === game.id ? 'Hide Details' : 'View Details'}
+                </button>
+            </div>
+        `).join('');
+    }
+
+    /**
      * Attach event listeners for login screen
      */
     attachLoginListeners() {
@@ -546,6 +652,43 @@ class App {
             });
         }
         
+        // View routines button
+        const viewRoutinesBtn = document.getElementById('viewRoutinesBtn');
+        if (viewRoutinesBtn) {
+            viewRoutinesBtn.addEventListener('click', () => {
+                this.state.showRoutines = true;
+                this.render();
+            });
+        }
+        
+        // Close routines button
+        const closeRoutinesBtn = document.getElementById('closeRoutinesBtn');
+        if (closeRoutinesBtn) {
+            closeRoutinesBtn.addEventListener('click', () => {
+                this.state.showRoutines = false;
+                this.render();
+            });
+        }
+        
+        // Start routine buttons
+        const startRoutineBtns = document.querySelectorAll('.start-routine-btn');
+        startRoutineBtns.forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const routineId = e.target.dataset.routine;
+                this.startRoutine(routineId);
+            });
+        });
+        
+        // Toggle game details buttons
+        const toggleGameBtns = document.querySelectorAll('.toggle-game-btn');
+        toggleGameBtns.forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const gameId = e.target.dataset.game;
+                this.state.selectedGame = this.state.selectedGame === gameId ? null : gameId;
+                this.render();
+            });
+        });
+        
         // Cancel session button
         const cancelSessionBtn = document.getElementById('cancelSessionBtn');
         if (cancelSessionBtn) {
@@ -569,6 +712,29 @@ class App {
                 e.preventDefault();
                 await this.handleAddSession(e);
             });
+        }
+    }
+    
+    /**
+     * Start a routine
+     */
+    startRoutine(routineId) {
+        const routine = SUGGESTED_ROUTINES.find(r => r.id === routineId);
+        if (routine) {
+            this.state.activeRoutine = routine;
+            this.state.currentDrill = 0;
+            this.state.routineProgress = [];
+            this.state.showRoutines = false;
+            this.state.showAddSession = true;
+            
+            // Pre-fill the form with first drill
+            const firstDrill = routine.drills[0];
+            this.newSession.distance = firstDrill.distance.toString();
+            this.newSession.attempts = firstDrill.attempts.toString();
+            this.newSession.routineName = routine.name;
+            
+            this.render();
+            alert(`Starting ${routine.name}!\n\nDrill 1: ${firstDrill.description}\nDistance: ${firstDrill.distance}ft\nAttempts: ${firstDrill.attempts}`);
         }
     }
     

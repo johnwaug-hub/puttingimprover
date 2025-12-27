@@ -138,3 +138,115 @@ export const SUGGESTED_ROUTINES = [
         ]
     }
 ];
+
+export const PUTTING_GAMES = [
+    {
+        id: 'around_the_world',
+        name: 'Around the World',
+        description: 'Make putts from 8 different positions around the basket',
+        difficulty: 'Easy',
+        duration: '15-20 mins',
+        instructions: [
+            'Set up 8 positions in a circle around the basket at 15 feet',
+            'Start at position 1 and make 3 putts',
+            'Move to the next position only after making 3 putts',
+            'Complete all 8 positions as fast as possible'
+        ],
+        scoring: {
+            type: 'time',
+            goal: 'Complete in under 15 minutes',
+            points: 'Track your best time'
+        }
+    },
+    {
+        id: 'horse',
+        name: 'HORSE (Disc Golf Edition)',
+        description: 'Challenge a friend to match your putting shots',
+        difficulty: 'Medium',
+        duration: '20-30 mins',
+        instructions: [
+            'Player 1 calls a distance and position, then takes a putt',
+            'If they make it, Player 2 must match from the same spot',
+            'If Player 2 misses, they get a letter (H-O-R-S-E)',
+            'First player to spell HORSE loses',
+            'Can add style points: straddle, left-hand, etc.'
+        ],
+        scoring: {
+            type: 'elimination',
+            goal: 'Avoid spelling HORSE',
+            points: 'Winner gets bragging rights!'
+        }
+    },
+    {
+        id: 'ladder_challenge',
+        name: 'Distance Ladder Challenge',
+        description: 'Progressive distance challenge to test your range',
+        difficulty: 'Hard',
+        duration: '25-35 mins',
+        instructions: [
+            'Start at 10 feet - make 3 putts to advance',
+            'Move back 5 feet after each successful round',
+            'Continue until you miss 3 putts at a distance',
+            'Record your maximum distance achieved'
+        ],
+        scoring: {
+            type: 'distance',
+            goal: 'Reach 40+ feet',
+            points: '10 points per successful distance level'
+        }
+    },
+    {
+        id: 'par_game',
+        name: 'Putting Par Game',
+        description: 'Score par or better on a putting course',
+        difficulty: 'Medium',
+        duration: '20-25 mins',
+        instructions: [
+            'Set up 9 "holes" at various distances (10-30 feet)',
+            'Par is 2 putts per hole (make within 2 attempts)',
+            'Birdie = 1 putt, Bogey = 3+ putts',
+            'Try to score par (18) or better for the course'
+        ],
+        scoring: {
+            type: 'strokes',
+            goal: 'Score par (18) or better',
+            points: 'Track your score vs. par'
+        }
+    },
+    {
+        id: 'perfect_10',
+        name: 'Perfect 10 Challenge',
+        description: 'Make 10 putts in a row without a miss',
+        difficulty: 'Hard',
+        duration: '15-20 mins',
+        instructions: [
+            'Choose your distance (recommended 15-20 feet)',
+            'Attempt to make 10 consecutive putts',
+            'Any miss resets your streak to zero',
+            'Track how many attempts it takes to achieve'
+        ],
+        scoring: {
+            type: 'streak',
+            goal: 'Make 10 in a row',
+            points: 'Bonus: Try from longer distances'
+        }
+    },
+    {
+        id: 'points_poker',
+        name: 'Points Poker',
+        description: 'Earn points for different putting achievements',
+        difficulty: 'Easy',
+        duration: '30 mins',
+        instructions: [
+            'Set time limit (30 minutes)',
+            'Earn points: Inside circle = 1pt, 20ft = 2pts, 30ft = 3pts, 40ft+ = 5pts',
+            'Bonus: 3 in a row from same distance = 2x multiplier',
+            'Try to score 100+ points in the time limit'
+        ],
+        scoring: {
+            type: 'points',
+            goal: 'Score 100+ points',
+            points: 'Distance-based scoring with bonuses'
+        }
+    }
+];

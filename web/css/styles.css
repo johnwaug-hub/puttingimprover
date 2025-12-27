@@ -201,6 +201,28 @@
             align-items: center;
             margin-bottom: 1rem;
         }
+        
+        .session-date {
+            font-weight: 600;
+            color: #1f2937;
+        }
+        
+        .session-time {
+            font-size: 0.875rem;
+            color: #6b7280;
+            margin-left: 0.5rem;
+        }
+        
+        .routine-tag {
+            display: inline-block;
+            background: #dbeafe;
+            color: #1e40af;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            margin-left: 0.5rem;
+            font-weight: 500;
+        }
 
         .session-points {
             font-size: 1.75rem;
@@ -918,4 +940,253 @@
     .achievements-grid {
         grid-template-columns: 1fr;
     }
+    
+    .routines-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .games-grid {
+        grid-template-columns: 1fr;
+    }
 }
+
+/* Routines Panel Styles */
+.routines-panel {
+    margin-bottom: 1.5rem;
+}
+
+.routines-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 1.5rem;
+}
+
+.routine-card {
+    background: #f9fafb;
+    border-radius: 8px;
+    padding: 1.5rem;
+    border: 2px solid #e5e7eb;
+    transition: all 0.3s;
+}
+
+.routine-card:hover {
+    border-color: #FF6B35;
+    box-shadow: 0 4px 12px rgba(255, 107, 53, 0.2);
+}
+
+.routine-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.75rem;
+}
+
+.routine-header h4 {
+    font-size: 1.25rem;
+    color: #1f2937;
+    margin: 0;
+}
+
+.routine-badge {
+    background: linear-gradient(135deg, #FF6B35 0%, #D9534F 100%);
+    color: white;
+    padding: 0.25rem 0.75rem;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+.routine-description {
+    color: #6b7280;
+    margin-bottom: 1rem;
+    font-size: 0.95rem;
+}
+
+.routine-meta {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 1rem;
+    font-size: 0.875rem;
+    color: #6b7280;
+}
+
+.routine-drills {
+    background: white;
+    border-radius: 6px;
+    padding: 1rem;
+    margin-bottom: 1rem;
+}
+
+.drill-item {
+    margin-bottom: 0.75rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.drill-item:last-child {
+    margin-bottom: 0;
+    padding-bottom: 0;
+    border-bottom: none;
+}
+
+.drill-item strong {
+    display: block;
+    color: #1f2937;
+    margin-bottom: 0.25rem;
+}
+
+.drill-item p {
+    color: #6b7280;
+    font-size: 0.875rem;
+    margin: 0;
+}
+
+.btn-large {
+    padding: 1rem 2rem;
+    font-size: 1.1rem;
+}
+
+.btn-small {
+    padding: 0.5rem 1rem;
+    font-size: 0.9rem;
+}
+
+.action-section {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+    flex-wrap: wrap;
+}
+
+/* Games Grid Styles */
+.games-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+    gap: 1.5rem;
+}
+
+.game-card {
+    background: white;
+    border-radius: 12px;
+    padding: 1.5rem;
+    border: 2px solid #e5e7eb;
+    transition: all 0.3s;
+}
+
+.game-card:hover {
+    border-color: #FF6B35;
+    box-shadow: 0 4px 12px rgba(255, 107, 53, 0.2);
+}
+
+.game-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 0.75rem;
+    gap: 1rem;
+}
+
+.game-header h3 {
+    font-size: 1.25rem;
+    color: #1f2937;
+    margin: 0;
+    flex: 1;
+}
+
+.game-badge {
+    padding: 0.25rem 0.75rem;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.game-badge.easy {
+    background: #10b981;
+    color: white;
+}
+
+.game-badge.medium {
+    background: #f59e0b;
+    color: white;
+}
+
+.game-badge.hard {
+    background: #ef4444;
+    color: white;
+}
+
+.game-description {
+    color: #6b7280;
+    margin-bottom: 1rem;
+    font-size: 0.95rem;
+}
+
+.game-meta {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 1rem;
+    font-size: 0.875rem;
+    color: #6b7280;
+}
+
+.game-details {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease-out;
+}
+
+.game-details.expanded {
+    max-height: 1000px;
+    transition: max-height 0.5s ease-in;
+}
+
+.game-details h4 {
+    color: #1f2937;
+    margin: 1.5rem 0 0.75rem;
+    font-size: 1rem;
+}
+
+.game-instructions {
+    background: #f9fafb;
+    border-radius: 6px;
+    padding: 1rem 1rem 1rem 2rem;
+    margin-bottom: 1rem;
+}
+
+.game-instructions li {
+    color: #4b5563;
+    margin-bottom: 0.5rem;
+    line-height: 1.6;
+}
+
+.game-instructions li:last-child {
+    margin-bottom: 0;
+}
+
+.game-scoring {
+    background: #fef3c7;
+    border-left: 4px solid #f59e0b;
+    border-radius: 6px;
+    padding: 1rem;
+    margin-bottom: 1rem;
+}
+
+.game-scoring p {
+    margin: 0.5rem 0;
+    color: #78350f;
+}
+
+.game-scoring p:first-child {
+    margin-top: 0;
+}
+
+.game-scoring p:last-child {
+    margin-bottom: 0;
+}
+
+.toggle-game-btn {
+    width: 100%;
+    margin-top: 1rem;
+}
+

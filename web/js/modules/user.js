@@ -35,6 +35,7 @@ class UserManager {
                 displayName: firebaseUser.displayName || firebaseUser.email?.split('@')[0] || 'User',
                 photoURL: firebaseUser.photoURL,
                 totalPoints: 0,
+                totalSessions: 0,
                 achievements: [],
                 createdAt: new Date().toISOString(),
                 lastLogin: new Date().toISOString()
@@ -45,6 +46,10 @@ class UserManager {
         } else {
             // Update last login
             user.lastLogin = new Date().toISOString();
+            // Ensure totalSessions exists for existing users
+            if (user.totalSessions === undefined) {
+                user.totalSessions = 0;
+            }
             await storageManager.saveUser(user);
             console.log('✅ User loaded:', user.email);
         }
@@ -102,6 +107,7 @@ class UserManager {
         const session = {
             id: `session_${Date.now()}`,
             date: date || new Date().toISOString().split('T')[0],
+            timestamp: new Date().toISOString(),
             distance: parseInt(distance),
             makes: parseInt(makes),
             attempts: parseInt(attempts),
@@ -113,8 +119,9 @@ class UserManager {
         // Save session
         await storageManager.saveSession(this.currentUser.id, session);
 
-        // Update user points
+        // Update user points and session count
         this.currentUser.totalPoints += points;
+        this.currentUser.totalSessions = (this.currentUser.totalSessions || 0) + 1;
         await storageManager.saveUser(this.currentUser);
 
         // Reload sessions
@@ -141,6 +148,7 @@ class UserManager {
 
         // Remove points from user
         this.currentUser.totalPoints = Math.max(0, this.currentUser.totalPoints - session.points);
+        this.currentUser.totalSessions = Math.max(0, (this.currentUser.totalSessions || 0) - 1);
         await storageManager.saveUser(this.currentUser);
 
         // Delete session
