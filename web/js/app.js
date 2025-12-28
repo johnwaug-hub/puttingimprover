@@ -38,7 +38,10 @@ class App {
             showProfileModal: false,
             selectedUserProfile: null,
             recentRoutines: [],
-            recentGames: []
+            recentGames: [],
+            searchedPlayer: null,
+            customAlert: null,
+            editingSession: null
         };
 
         this.newSession = {
@@ -246,6 +249,33 @@ class App {
             alert('Failed to delete session: ' + error.message);
         }
     }
+    
+    /**
+     * Edit a session
+     * @param {string} sessionId - ID of session to edit
+     */
+    editSession(sessionId) {
+        const session = userManager.sessions.find(s => s.id === sessionId);
+        if (!session) {
+            this.showCustomAlert('Session not found', 'error');
+            return;
+        }
+        
+        // Set editing mode
+        this.state.editingSession = sessionId;
+        this.state.showAddSession = true;
+        
+        // Pre-fill form with session data
+        this.newSession = {
+            date: session.date,
+            distance: session.distance.toString(),
+            makes: session.makes.toString(),
+            attempts: session.attempts.toString(),
+            routineName: session.routineName
+        };
+        
+        this.render();
+    }
 
     /**
      * Change current view
@@ -442,6 +472,9 @@ class App {
                     <button class="tab ${this.state.currentView === 'practice' ? 'active' : ''}" data-view="practice">
                         📊 Practice
                     </button>
+                    <button class="tab ${this.state.currentView === 'stats' ? 'active' : ''}" data-view="stats">
+                        📈 Stats
+                    </button>
                     <button class="tab ${this.state.currentView === 'leaderboard' ? 'active' : ''}" data-view="leaderboard">
                         🏆 Leaderboard
                     </button>
@@ -498,6 +531,11 @@ class App {
                             ${this.renderRecentPractice()}
                         </div>
                     </div>
+                </div>
+
+                <!-- Stats View -->
+                <div class="view ${this.state.currentView === 'stats' ? 'active' : ''}" id="stats-view">
+                    ${this.renderStatsView()}
                 </div>
 
                 <!-- Leaderboard View -->
@@ -588,13 +626,37 @@ class App {
             
             <!-- Profile Modal -->
             ${this.state.showProfileModal ? this.renderProfileModal() : ''}
+            
+            <!-- Custom Alert -->
+            ${this.state.customAlert ? this.renderCustomAlert() : ''}
+        `;
+    }
+    
+    /**
+     * Render custom alert
+     */
+    renderCustomAlert() {
+        const { message, type } = this.state.customAlert;
+        const icons = {
+            success: '✅',
+            error: '❌',
+            warning: '⚠️',
+            info: 'ℹ️'
+        };
+        
+        return `
+            <div class="custom-alert ${type}">
+                <span class="alert-icon">${icons[type] || icons.info}</span>
+                <span class="alert-message">${message}</span>
+            </div>
         `;
     }
     
     renderAddSessionForm() {
+        const isEditing = this.state.editingSession !== null;
         return `
             <div class="card add-session-form">
-                <h3>Add Practice Session</h3>
+                <h3>${isEditing ? '✏️ Edit Practice Session' : 'Add Practice Session'}</h3>
                 <form id="sessionForm">
                     <div class="form-row">
                         <div class="form-group">
@@ -611,7 +673,7 @@ class App {
                         </div>
                     </div>
                     <div class="form-actions">
-                        <button type="submit" class="btn btn-primary">Save Session</button>
+                        <button type="submit" class="btn btn-primary">${isEditing ? 'Update Session' : 'Save Session'}</button>
                         <button type="button" id="cancelSessionBtn" class="btn btn-secondary">Cancel</button>
                     </div>
                 </form>
@@ -759,6 +821,9 @@ class App {
                     </div>
                     <div class="session-actions">
                         <span class="session-points">${session.points} pts</span>
+                        <button class="btn-edit-session" data-session-id="${session.id}" title="Edit session">
+                            ✏️
+                        </button>
                         <button class="btn-delete-session" data-session-id="${session.id}" title="Delete session">
                             🗑️
                         </button>
@@ -945,6 +1010,202 @@ class App {
         }
         
         return html;
+    }
+    
+    /**
+     * Render Stats View with player search and filters
+     */
+    renderStatsView() {
+        const user = userManager.getCurrentUser();
+        let displayPlayer = user;
+        let displaySessions = userManager.sessions || [];
+        let displayStats = userManager.getStatistics();
+        
+        // If searching for another player
+        if (this.state.searchedPlayer && this.state.searchedPlayer !== user.id) {
+            displayPlayer = this.state.leaderboard.find(p => p.id === this.state.searchedPlayer);
+            if (displayPlayer) {
+                // For other players, we show aggregate stats but not detailed sessions
+                displaySessions = [];
+                displayStats = {
+                    totalSessions: displayPlayer.totalSessions || 0,
+                    totalPutts: 0,
+                    totalMakes: 0,
+                    accuracy: 0,
+                    bestSession: null,
+                    currentStreak: 0,
+                    longestStreak: 0
+                };
+            }
+        }
+        
+        return `
+            <div class="card">
+                <h2>📈 Player Statistics</h2>
+                
+                <!-- Search Bar -->
+                <div class="stats-search-container">
+                    <input type="text" 
+                           id="playerSearch" 
+                           class="stats-search-input" 
+                           placeholder="Search player by name..."
+                           value="">
+                    <button class="btn btn-primary" id="searchPlayerBtn">Search</button>
+                    <button class="btn btn-secondary" id="viewMyStatsBtn">My Stats</button>
+                </div>
+                
+                <!-- Stats Display -->
+                <div id="statsDisplay">
+                    ${this.renderPlayerStats(displayPlayer, displaySessions, displayStats)}
+                </div>
+            </div>
+        `;
+    }
+    
+    /**
+     * Render player stats details
+     */
+    renderPlayerStats(player, sessions, stats) {
+        if (!player) {
+            return '<p class="empty-state">No player selected</p>';
+        }
+        
+        // Calculate additional stats
+        const totalDistance = sessions.reduce((sum, s) => sum + (s.distance * s.attempts), 0);
+        const avgDistance = sessions.length > 0 ? (totalDistance / sessions.reduce((sum, s) => sum + s.attempts, 0)).toFixed(1) : 0;
+        const bestAccuracy = sessions.length > 0 ? Math.max(...sessions.map(s => s.percentage)).toFixed(1) : 0;
+        const avgAccuracy = stats.accuracy || 0;
+        
+        // Distance breakdown
+        const distanceRanges = {
+            '0-15ft': sessions.filter(s => s.distance < 15).length,
+            '15-25ft': sessions.filter(s => s.distance >= 15 && s.distance < 25).length,
+            '25-35ft': sessions.filter(s => s.distance >= 25 && s.distance < 35).length,
+            '35-50ft': sessions.filter(s => s.distance >= 35 && s.distance <= 50).length,
+            '50ft+': sessions.filter(s => s.distance > 50).length
+        };
+        
+        return `
+            <!-- Player Header -->
+            <div class="stats-player-header">
+                <div class="stats-player-pic">
+                    ${player.profilePictureURL 
+                        ? `<img src="${player.profilePictureURL}" alt="${player.displayName}">` 
+                        : `<div class="stats-profile-placeholder">${(player.displayName || 'U')[0].toUpperCase()}</div>`
+                    }
+                </div>
+                <div class="stats-player-info">
+                    <h3>${player.displayName}</h3>
+                    <p class="stats-player-meta">
+                        ${player.gender ? `${player.gender === 'male' ? '♂️' : '♀️'} ` : ''}
+                        Member since ${new Date(player.createdAt).toLocaleDateString()}
+                    </p>
+                </div>
+            </div>
+            
+            <!-- Overall Stats Grid -->
+            <div class="stats-grid-detailed">
+                <div class="stat-card-detailed">
+                    <div class="stat-icon">🎯</div>
+                    <div class="stat-value">${player.totalPoints || 0}</div>
+                    <div class="stat-label">Total Points</div>
+                </div>
+                <div class="stat-card-detailed">
+                    <div class="stat-icon">📊</div>
+                    <div class="stat-value">${player.totalSessions || 0}</div>
+                    <div class="stat-label">Total Sessions</div>
+                </div>
+                <div class="stat-card-detailed">
+                    <div class="stat-icon">📋</div>
+                    <div class="stat-value">${player.totalRoutines || 0}</div>
+                    <div class="stat-label">Total Routines</div>
+                </div>
+                <div class="stat-card-detailed">
+                    <div class="stat-icon">🎮</div>
+                    <div class="stat-value">${player.totalGames || 0}</div>
+                    <div class="stat-label">Total Games</div>
+                </div>
+                <div class="stat-card-detailed">
+                    <div class="stat-icon">🏅</div>
+                    <div class="stat-value">${player.achievements ? player.achievements.length : 0}</div>
+                    <div class="stat-label">Achievements</div>
+                </div>
+                <div class="stat-card-detailed">
+                    <div class="stat-icon">🔥</div>
+                    <div class="stat-value">${stats.currentStreak || 0}</div>
+                    <div class="stat-label">Current Streak</div>
+                </div>
+            </div>
+            
+            <!-- Performance Stats -->
+            <div class="stats-section">
+                <h3 class="stats-section-title">📈 Performance</h3>
+                <div class="stats-grid-detailed">
+                    <div class="stat-card-detailed">
+                        <div class="stat-icon">💯</div>
+                        <div class="stat-value">${avgAccuracy}%</div>
+                        <div class="stat-label">Avg Accuracy</div>
+                    </div>
+                    <div class="stat-card-detailed">
+                        <div class="stat-icon">⭐</div>
+                        <div class="stat-value">${bestAccuracy}%</div>
+                        <div class="stat-label">Best Accuracy</div>
+                    </div>
+                    <div class="stat-card-detailed">
+                        <div class="stat-icon">📏</div>
+                        <div class="stat-value">${avgDistance}ft</div>
+                        <div class="stat-label">Avg Distance</div>
+                    </div>
+                    <div class="stat-card-detailed">
+                        <div class="stat-icon">🎪</div>
+                        <div class="stat-value">${stats.totalMakes || 0}</div>
+                        <div class="stat-label">Total Makes</div>
+                    </div>
+                    <div class="stat-card-detailed">
+                        <div class="stat-icon">🎲</div>
+                        <div class="stat-value">${stats.totalPutts || 0}</div>
+                        <div class="stat-label">Total Attempts</div>
+                    </div>
+                    <div class="stat-card-detailed">
+                        <div class="stat-icon">🏆</div>
+                        <div class="stat-value">${stats.longestStreak || 0}</div>
+                        <div class="stat-label">Longest Streak</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Distance Breakdown -->
+            <div class="stats-section">
+                <h3 class="stats-section-title">📍 Distance Breakdown</h3>
+                <div class="distance-breakdown">
+                    ${Object.entries(distanceRanges).map(([range, count]) => `
+                        <div class="distance-bar-container">
+                            <div class="distance-label">${range}</div>
+                            <div class="distance-bar-bg">
+                                <div class="distance-bar" style="width: ${sessions.length > 0 ? (count / sessions.length * 100) : 0}%"></div>
+                            </div>
+                            <div class="distance-count">${count}</div>
+                        </div>
+                    `).join('')}
+                </div>
+            </div>
+            
+            <!-- Best Session -->
+            ${stats.bestSession ? `
+                <div class="stats-section">
+                    <h3 class="stats-section-title">🌟 Best Session</h3>
+                    <div class="best-session-card">
+                        <div class="best-session-stats">
+                            <span>${stats.bestSession.distance}ft</span>
+                            <span>${stats.bestSession.makes}/${stats.bestSession.attempts}</span>
+                            <span>${stats.bestSession.percentage.toFixed(1)}%</span>
+                        </div>
+                        <div class="best-session-points">${stats.bestSession.points} points</div>
+                        <div class="best-session-date">${new Date(stats.bestSession.date).toLocaleDateString()}</div>
+                    </div>
+                </div>
+            ` : ''}
+        `;
     }
     
     /**
@@ -1278,6 +1539,18 @@ class App {
             });
         });
         
+        // Edit session buttons
+        const editSessionBtns = document.querySelectorAll('.btn-edit-session');
+        editSessionBtns.forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const sessionId = e.target.dataset.sessionId;
+                if (sessionId) {
+                    this.editSession(sessionId);
+                }
+            });
+        });
+        
         // Start routine buttons
         const startRoutineBtns = document.querySelectorAll('.start-routine-btn');
         startRoutineBtns.forEach(btn => {
@@ -1341,6 +1614,7 @@ class App {
         if (cancelSessionBtn) {
             cancelSessionBtn.addEventListener('click', () => {
                 this.state.showAddSession = false;
+                this.state.editingSession = null;
                 this.newSession = {
                     date: new Date().toISOString().split('T')[0],
                     distance: '10',
@@ -1358,6 +1632,29 @@ class App {
             sessionForm.addEventListener('submit', async (e) => {
                 e.preventDefault();
                 await this.handleAddSession(e);
+            });
+        }
+        
+        // Stats page search
+        const searchPlayerBtn = document.getElementById('searchPlayerBtn');
+        if (searchPlayerBtn) {
+            searchPlayerBtn.addEventListener('click', () => this.handlePlayerSearch());
+        }
+        
+        const playerSearchInput = document.getElementById('playerSearch');
+        if (playerSearchInput) {
+            playerSearchInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    this.handlePlayerSearch();
+                }
+            });
+        }
+        
+        const viewMyStatsBtn = document.getElementById('viewMyStatsBtn');
+        if (viewMyStatsBtn) {
+            viewMyStatsBtn.addEventListener('click', () => {
+                this.state.searchedPlayer = null;
+                this.render();
             });
         }
     }
@@ -1394,19 +1691,34 @@ class App {
         const attempts = parseInt(document.getElementById('attempts').value);
         
         if (makes > attempts) {
-            alert('Makes cannot be greater than attempts!');
+            this.showCustomAlert('Makes cannot be greater than attempts!', 'warning');
             return;
         }
         
         try {
-            await userManager.addSession({
-                distance,
-                makes,
-                attempts
-            });
+            const isEditing = this.state.editingSession !== null;
+            
+            if (isEditing) {
+                // Update existing session
+                await userManager.updateSession(this.state.editingSession, {
+                    distance,
+                    makes,
+                    attempts
+                });
+                this.showCustomAlert('Session updated successfully!', 'success');
+            } else {
+                // Add new session
+                await userManager.addSession({
+                    distance,
+                    makes,
+                    attempts
+                });
+                this.showCustomAlert('Session added successfully!', 'success');
+            }
             
             // Reset form and hide
             this.state.showAddSession = false;
+            this.state.editingSession = null;
             this.newSession = {
                 date: new Date().toISOString().split('T')[0],
                 distance: '10',
@@ -1417,17 +1729,55 @@ class App {
             
             // Reload data
             await this.loadLeaderboard();
+            await this.loadRecentPractice();
             await achievementManager.checkAchievements();
             
             // Re-render
             this.render();
             
-            // Show success message
-            alert('Session added successfully!');
-            
         } catch (error) {
-            console.error('Error adding session:', error);
-            alert('Failed to add session: ' + error.message);
+            console.error('Error saving session:', error);
+            this.showCustomAlert('Failed to save session: ' + error.message, 'error');
+        }
+    }
+    
+    /**
+     * Show custom styled alert
+     */
+    showCustomAlert(message, type = 'info') {
+        this.state.customAlert = { message, type };
+        this.render();
+        
+        // Auto-hide after 3 seconds
+        setTimeout(() => {
+            this.state.customAlert = null;
+            this.render();
+        }, 3000);
+    }
+    
+    /**
+     * Handle player search
+     */
+    async handlePlayerSearch() {
+        const searchInput = document.getElementById('playerSearch');
+        if (!searchInput) return;
+        
+        const searchQuery = searchInput.value.trim().toLowerCase();
+        if (!searchQuery) {
+            this.showCustomAlert('Please enter a player name', 'warning');
+            return;
+        }
+        
+        // Search in leaderboard
+        const player = this.state.leaderboard.find(p => 
+            p.displayName && p.displayName.toLowerCase().includes(searchQuery)
+        );
+        
+        if (player) {
+            this.state.searchedPlayer = player.id;
+            this.render();
+        } else {
+            this.showCustomAlert(`No player found matching "${searchQuery}"`, 'info');
         }
     }
     

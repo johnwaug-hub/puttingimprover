@@ -222,6 +222,69 @@ class UserManager {
     }
 
     /**
+     * Update an existing session
+     * @param {string} sessionId - Session ID to update
+     * @param {Object} sessionData - Updated session data
+     * @returns {Promise<Object>} Updated session
+     */
+    async updateSession(sessionId, sessionData) {
+        if (!this.currentUser) {
+            throw new Error('No user is currently set');
+        }
+
+        const oldSession = this.sessions.find(s => s.id === sessionId);
+        if (!oldSession) {
+            throw new Error('Session not found');
+        }
+
+        const { makes, attempts, distance } = sessionData;
+
+        // Validate input
+        const validation = validateSessionInput(
+            parseInt(makes),
+            parseInt(attempts),
+            parseInt(distance)
+        );
+
+        if (!validation.isValid) {
+            throw new Error(validation.errors.join('. '));
+        }
+
+        // Calculate new points and percentage
+        const { points, percentage } = calculateSessionPoints(
+            parseInt(makes),
+            parseInt(attempts),
+            parseInt(distance)
+        );
+
+        // Calculate points difference
+        const pointsDiff = points - oldSession.points;
+
+        // Update session object
+        const updatedSession = {
+            ...oldSession,
+            distance: parseInt(distance),
+            makes: parseInt(makes),
+            attempts: parseInt(attempts),
+            percentage,
+            points
+        };
+
+        // Save updated session
+        await storageManager.saveSession(this.currentUser.id, updatedSession);
+
+        // Update user's total points
+        this.currentUser.totalPoints = (this.currentUser.totalPoints || 0) + pointsDiff;
+        await storageManager.saveUser(this.currentUser);
+
+        // Reload sessions
+        await this.loadSessions();
+
+        console.log('✅ Session updated:', updatedSession);
+        return updatedSession;
+    }
+
+    /**
      * Get user statistics
      * @returns {Object} User statistics
      */
