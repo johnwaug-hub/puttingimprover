@@ -2369,6 +2369,34 @@ class App {
             });
         }
         
+        // Game selector - re-render when game changes to update input fields
+        const gameSelect = document.getElementById('bulkGameSelect');
+        if (gameSelect) {
+            gameSelect.addEventListener('change', () => {
+                // Save current selections before re-render
+                const checkedPlayers = Array.from(document.querySelectorAll('.bulk-player-checkbox:checked'))
+                    .map(cb => cb.dataset.playerId);
+                
+                this.render();
+                
+                // Re-attach listeners and restore selections
+                setTimeout(() => {
+                    this.attachBulkLogModalListeners();
+                    
+                    // Restore checked players
+                    checkedPlayers.forEach(playerId => {
+                        const checkbox = document.querySelector(`.bulk-player-checkbox[data-player-id="${playerId}"]`);
+                        if (checkbox) {
+                            checkbox.checked = true;
+                            // Trigger change event to enable inputs
+                            const event = new Event('change', { bubbles: true });
+                            checkbox.dispatchEvent(event);
+                        }
+                    });
+                }, 100);
+            });
+        }
+        
         // Close button
         const closeBtn = document.getElementById('closeBulkLogModal');
         if (closeBtn) {
@@ -2548,13 +2576,46 @@ class App {
                     }
                     else if (activityType === 'game') {
                         const gameId = document.getElementById('bulkGameSelect').value;
-                        const score = parseInt(document.querySelector(`.bulk-input[data-player-id="${playerId}"][data-field="score"]`).value);
+                        const game = PUTTING_GAMES.find(g => g.id === gameId);
+                        
+                        if (!game) continue;
+                        
+                        // Extract score data based on game type
+                        let scoreData = {};
+                        
+                        switch (game.scoring.type) {
+                            case 'time':
+                                scoreData.time = parseFloat(document.querySelector(`.bulk-input[data-player-id="${playerId}"][data-field="time"]`)?.value);
+                                scoreData.score = scoreData.time;
+                                break;
+                            case 'strokes':
+                                scoreData.strokes = parseInt(document.querySelector(`.bulk-input[data-player-id="${playerId}"][data-field="strokes"]`)?.value);
+                                scoreData.score = scoreData.strokes;
+                                break;
+                            case 'points':
+                                scoreData.points = parseInt(document.querySelector(`.bulk-input[data-player-id="${playerId}"][data-field="points"]`)?.value);
+                                scoreData.putts = parseInt(document.querySelector(`.bulk-input[data-player-id="${playerId}"][data-field="putts"]`)?.value || 0);
+                                scoreData.score = scoreData.points;
+                                break;
+                            case 'distance':
+                                scoreData.maxDistance = parseInt(document.querySelector(`.bulk-input[data-player-id="${playerId}"][data-field="maxDistance"]`)?.value);
+                                scoreData.rounds = parseInt(document.querySelector(`.bulk-input[data-player-id="${playerId}"][data-field="rounds"]`)?.value || 0);
+                                scoreData.score = scoreData.maxDistance;
+                                break;
+                            case 'streak':
+                                scoreData.streak = parseInt(document.querySelector(`.bulk-input[data-player-id="${playerId}"][data-field="streak"]`)?.value);
+                                scoreData.attempts = parseInt(document.querySelector(`.bulk-input[data-player-id="${playerId}"][data-field="attempts"]`)?.value || 0);
+                                scoreData.score = scoreData.streak;
+                                break;
+                            default:
+                                scoreData.score = parseInt(document.querySelector(`.bulk-input[data-player-id="${playerId}"][data-field="score"]`)?.value || 0);
+                        }
                         
                         if (isCurrentUser) {
-                            // Log for self - simplified for now
-                            await this.addGameForUser(playerId, gameId, score, false);
+                            // Log for self
+                            await this.addGameForUser(playerId, gameId, scoreData, false);
                         } else {
-                            await this.addGameForUser(playerId, gameId, score, requireApproval);
+                            await this.addGameForUser(playerId, gameId, scoreData, requireApproval);
                         }
                     }
                     
@@ -2632,12 +2693,14 @@ class App {
     /**
      * Add game for another user
      */
-    async addGameForUser(userId, gameId, score, requireApproval = false) {
+    async addGameForUser(userId, gameId, scoreData, requireApproval = false) {
         const game = PUTTING_GAMES.find(g => g.id === gameId);
         if (!game) return;
         
+        // Score is either a number or an object with detailed data
+        const score = typeof scoreData === 'object' ? scoreData.score : scoreData;
+        
         // Calculate points based on score (simplified)
-        const { calculateGamePoints } = await import('./modules/gameTracker.js');
         const points = Math.round(score * 10); // Simplified
         
         const gameCompletion = {
@@ -2652,6 +2715,18 @@ class App {
             loggedByName: userManager.getCurrentUser().displayName,
             pending: requireApproval
         };
+        
+        // Add additional fields based on game type if scoreData is an object
+        if (typeof scoreData === 'object') {
+            if (scoreData.time) gameCompletion.time = scoreData.time;
+            if (scoreData.strokes) gameCompletion.strokes = scoreData.strokes;
+            if (scoreData.points) gameCompletion.gamePoints = scoreData.points;
+            if (scoreData.putts) gameCompletion.totalPutts = scoreData.putts;
+            if (scoreData.maxDistance) gameCompletion.maxDistance = scoreData.maxDistance;
+            if (scoreData.rounds) gameCompletion.rounds = scoreData.rounds;
+            if (scoreData.streak) gameCompletion.streak = scoreData.streak;
+            if (scoreData.attempts) gameCompletion.attempts = scoreData.attempts;
+        }
         
         // Save game for target user
         await storageManager.saveGameCompletion(userId, gameCompletion);
@@ -3317,6 +3392,150 @@ class App {
                 </div>
             `;
         } else if (activityType === 'game') {
+            // Get selected game to determine scoring type
+            const gameId = document.getElementById('bulkGameSelect')?.value;
+            const game = PUTTING_GAMES.find(g => g.id === gameId);
+            
+            if (!game) {
+                return `
+                    <div class="bulk-player-card ${isCurrentUser ? 'current-user-card' : ''}" data-player-name="${player.displayName.toLowerCase()}">
+                        <div class="bulk-player-header">
+                            <label class="checkbox-label">
+                                <input type="checkbox" 
+                                       class="bulk-player-checkbox" 
+                                       data-player-id="${player.id}"
+                                       data-player-name="${player.displayName}"
+                                       value="${player.id}">
+                                <strong>${playerLabel}</strong>
+                            </label>
+                        </div>
+                        <div class="bulk-player-stats">
+                            <p class="form-hint">Select a game first</p>
+                        </div>
+                    </div>
+                `;
+            }
+            
+            // Render fields based on game scoring type
+            let gameFields = '';
+            switch (game.scoring.type) {
+                case 'time':
+                    gameFields = `
+                        <div class="form-group-inline">
+                            <label>Time (min)</label>
+                            <input type="number" 
+                                   class="bulk-input" 
+                                   data-player-id="${player.id}"
+                                   data-field="time"
+                                   min="1" 
+                                   max="120"
+                                   step="0.5"
+                                   disabled>
+                        </div>
+                    `;
+                    break;
+                case 'strokes':
+                    gameFields = `
+                        <div class="form-group-inline">
+                            <label>Strokes</label>
+                            <input type="number" 
+                                   class="bulk-input" 
+                                   data-player-id="${player.id}"
+                                   data-field="strokes"
+                                   min="1" 
+                                   max="100"
+                                   disabled>
+                        </div>
+                    `;
+                    break;
+                case 'points':
+                    gameFields = `
+                        <div class="form-group-inline">
+                            <label>Points</label>
+                            <input type="number" 
+                                   class="bulk-input" 
+                                   data-player-id="${player.id}"
+                                   data-field="points"
+                                   min="0" 
+                                   max="500"
+                                   disabled>
+                        </div>
+                        <div class="form-group-inline">
+                            <label>Putts</label>
+                            <input type="number" 
+                                   class="bulk-input" 
+                                   data-player-id="${player.id}"
+                                   data-field="putts"
+                                   min="1" 
+                                   max="200"
+                                   disabled>
+                        </div>
+                    `;
+                    break;
+                case 'distance':
+                    gameFields = `
+                        <div class="form-group-inline">
+                            <label>Max Dist (ft)</label>
+                            <input type="number" 
+                                   class="bulk-input" 
+                                   data-player-id="${player.id}"
+                                   data-field="maxDistance"
+                                   min="10" 
+                                   max="100"
+                                   step="5"
+                                   disabled>
+                        </div>
+                        <div class="form-group-inline">
+                            <label>Rounds</label>
+                            <input type="number" 
+                                   class="bulk-input" 
+                                   data-player-id="${player.id}"
+                                   data-field="rounds"
+                                   min="1" 
+                                   max="20"
+                                   disabled>
+                        </div>
+                    `;
+                    break;
+                case 'streak':
+                    gameFields = `
+                        <div class="form-group-inline">
+                            <label>Best Streak</label>
+                            <input type="number" 
+                                   class="bulk-input" 
+                                   data-player-id="${player.id}"
+                                   data-field="streak"
+                                   min="0" 
+                                   max="50"
+                                   disabled>
+                        </div>
+                        <div class="form-group-inline">
+                            <label>Attempts</label>
+                            <input type="number" 
+                                   class="bulk-input" 
+                                   data-player-id="${player.id}"
+                                   data-field="attempts"
+                                   min="10" 
+                                   max="200"
+                                   disabled>
+                        </div>
+                    `;
+                    break;
+                default:
+                    gameFields = `
+                        <div class="form-group-inline">
+                            <label>Score</label>
+                            <input type="number" 
+                                   class="bulk-input" 
+                                   data-player-id="${player.id}"
+                                   data-field="score"
+                                   min="0" 
+                                   max="1000"
+                                   disabled>
+                        </div>
+                    `;
+            }
+            
             return `
                 <div class="bulk-player-card ${isCurrentUser ? 'current-user-card' : ''}" data-player-name="${player.displayName.toLowerCase()}">
                     <div class="bulk-player-header">
@@ -3330,16 +3549,7 @@ class App {
                         </label>
                     </div>
                     <div class="bulk-player-stats">
-                        <div class="form-group-inline">
-                            <label>Score</label>
-                            <input type="number" 
-                                   class="bulk-input" 
-                                   data-player-id="${player.id}"
-                                   data-field="score"
-                                   min="0" 
-                                   max="1000"
-                                   disabled>
-                        </div>
+                        ${gameFields}
                     </div>
                 </div>
             `;
