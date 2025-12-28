@@ -1076,13 +1076,38 @@ class App {
         const bestAccuracy = sessions.length > 0 ? Math.max(...sessions.map(s => s.percentage)).toFixed(1) : 0;
         const avgAccuracy = stats.accuracy || 0;
         
-        // Distance breakdown
+        // Distance breakdown with accuracy
         const distanceRanges = {
-            '0-15ft': sessions.filter(s => s.distance < 15).length,
-            '15-25ft': sessions.filter(s => s.distance >= 15 && s.distance < 25).length,
-            '25-35ft': sessions.filter(s => s.distance >= 25 && s.distance < 35).length,
-            '35-50ft': sessions.filter(s => s.distance >= 35 && s.distance <= 50).length,
-            '50ft+': sessions.filter(s => s.distance > 50).length
+            '0-15ft': {
+                sessions: sessions.filter(s => s.distance < 15),
+                get makes() { return this.sessions.reduce((sum, s) => sum + s.makes, 0); },
+                get attempts() { return this.sessions.reduce((sum, s) => sum + s.attempts, 0); },
+                get percentage() { return this.attempts > 0 ? (this.makes / this.attempts * 100).toFixed(1) : 0; }
+            },
+            '15-25ft': {
+                sessions: sessions.filter(s => s.distance >= 15 && s.distance < 25),
+                get makes() { return this.sessions.reduce((sum, s) => sum + s.makes, 0); },
+                get attempts() { return this.sessions.reduce((sum, s) => sum + s.attempts, 0); },
+                get percentage() { return this.attempts > 0 ? (this.makes / this.attempts * 100).toFixed(1) : 0; }
+            },
+            '25-35ft': {
+                sessions: sessions.filter(s => s.distance >= 25 && s.distance < 35),
+                get makes() { return this.sessions.reduce((sum, s) => sum + s.makes, 0); },
+                get attempts() { return this.sessions.reduce((sum, s) => sum + s.attempts, 0); },
+                get percentage() { return this.attempts > 0 ? (this.makes / this.attempts * 100).toFixed(1) : 0; }
+            },
+            '35-50ft': {
+                sessions: sessions.filter(s => s.distance >= 35 && s.distance <= 50),
+                get makes() { return this.sessions.reduce((sum, s) => sum + s.makes, 0); },
+                get attempts() { return this.sessions.reduce((sum, s) => sum + s.attempts, 0); },
+                get percentage() { return this.attempts > 0 ? (this.makes / this.attempts * 100).toFixed(1) : 0; }
+            },
+            '50ft+': {
+                sessions: sessions.filter(s => s.distance > 50),
+                get makes() { return this.sessions.reduce((sum, s) => sum + s.makes, 0); },
+                get attempts() { return this.sessions.reduce((sum, s) => sum + s.attempts, 0); },
+                get percentage() { return this.attempts > 0 ? (this.makes / this.attempts * 100).toFixed(1) : 0; }
+            }
         };
         
         return `
@@ -1178,15 +1203,20 @@ class App {
             <div class="stats-section">
                 <h3 class="stats-section-title">📍 Distance Breakdown</h3>
                 <div class="distance-breakdown">
-                    ${Object.entries(distanceRanges).map(([range, count]) => `
+                    ${Object.entries(distanceRanges).map(([range, data]) => {
+                        const percentage = parseFloat(data.percentage);
+                        return `
                         <div class="distance-bar-container">
                             <div class="distance-label">${range}</div>
                             <div class="distance-bar-bg">
-                                <div class="distance-bar" style="width: ${sessions.length > 0 ? (count / sessions.length * 100) : 0}%"></div>
+                                <div class="distance-bar" style="width: ${percentage}%"></div>
                             </div>
-                            <div class="distance-count">${count}</div>
+                            <div class="distance-stats">
+                                <span class="distance-percentage">${data.percentage}%</span>
+                                <span class="distance-makes">${data.makes}/${data.attempts}</span>
+                            </div>
                         </div>
-                    `).join('')}
+                    `}).join('')}
                 </div>
             </div>
             
