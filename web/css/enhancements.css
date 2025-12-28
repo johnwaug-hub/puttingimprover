@@ -231,6 +231,43 @@
     font-size: 0.875rem;
 }
 
+/* Bulk Routine Drills */
+.bulk-player-card-routine {
+    background: #fafafa;
+}
+
+.bulk-routine-drills {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    margin-left: 1.5rem;
+}
+
+.bulk-drill-group {
+    background: white;
+    border: 1px solid #e5e7eb;
+    border-radius: 6px;
+    padding: 0.75rem;
+}
+
+.bulk-drill-header {
+    font-size: 0.875rem;
+    color: #1f2937;
+    margin-bottom: 0.5rem;
+}
+
+.bulk-drill-inputs {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.5rem;
+}
+
+@media (max-width: 768px) {
+    .bulk-drill-inputs {
+        grid-template-columns: 1fr;
+    }
+}
+
 /* Bulk Players List */
 .bulk-players-list {
     display: flex;
@@ -276,6 +313,26 @@
     grid-template-columns: repeat(3, 1fr);
     gap: 0.75rem;
     margin-left: 1.5rem;
+}
+
+.bulk-routine-stats,
+.bulk-game-stats {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.bulk-routine-select,
+.bulk-game-select {
+    width: 100%;
+    padding: 0.5rem;
+    border: 1px solid #d1d5db;
+    border-radius: 4px;
+    font-size: 0.875rem;
+}
+
+.full-width {
+    grid-column: 1 / -1;
 }
 
 .form-group-inline {

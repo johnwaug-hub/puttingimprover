@@ -2397,6 +2397,34 @@ class App {
             });
         }
         
+        // Routine selector - re-render when routine changes to update drill fields
+        const routineSelect = document.getElementById('bulkRoutineSelect');
+        if (routineSelect) {
+            routineSelect.addEventListener('change', () => {
+                // Save current selections before re-render
+                const checkedPlayers = Array.from(document.querySelectorAll('.bulk-player-checkbox:checked'))
+                    .map(cb => cb.dataset.playerId);
+                
+                this.render();
+                
+                // Re-attach listeners and restore selections
+                setTimeout(() => {
+                    this.attachBulkLogModalListeners();
+                    
+                    // Restore checked players
+                    checkedPlayers.forEach(playerId => {
+                        const checkbox = document.querySelector(`.bulk-player-checkbox[data-player-id="${playerId}"]`);
+                        if (checkbox) {
+                            checkbox.checked = true;
+                            // Trigger change event to enable inputs
+                            const event = new Event('change', { bubbles: true });
+                            checkbox.dispatchEvent(event);
+                        }
+                    });
+                }, 100);
+            });
+        }
+        
         // Close button
         const closeBtn = document.getElementById('closeBulkLogModal');
         if (closeBtn) {
@@ -2475,15 +2503,117 @@ class App {
             checkbox.addEventListener('change', (e) => {
                 const playerId = e.target.dataset.playerId;
                 const inputs = document.querySelectorAll(`.bulk-input[data-player-id="${playerId}"]`);
+                const routineSelect = document.querySelector(`.bulk-routine-select[data-player-id="${playerId}"]`);
+                const gameSelect = document.querySelector(`.bulk-game-select[data-player-id="${playerId}"]`);
+                
                 inputs.forEach(input => {
                     input.disabled = !e.target.checked;
-                    if (e.target.checked && !input.value) {
+                    if (e.target.checked && !input.value && input.type === 'number') {
                         // Set default values when enabled
                         if (input.dataset.field === 'distance') input.value = '20';
                         if (input.dataset.field === 'attempts') input.value = '20';
                     }
                 });
+                
+                // Enable/disable routine select
+                if (routineSelect) {
+                    routineSelect.disabled = !e.target.checked;
+                }
+                
+                // Enable/disable game select
+                if (gameSelect) {
+                    gameSelect.disabled = !e.target.checked;
+                }
+                
                 this.updateSelectedCount();
+            });
+        });
+        
+        // Game selection change listeners - update fields when game changes
+        const gameSelects = document.querySelectorAll('.bulk-game-select');
+        gameSelects.forEach(select => {
+            select.addEventListener('change', (e) => {
+                const playerId = select.dataset.playerId;
+                const gameId = e.target.value;
+                const game = PUTTING_GAMES.find(g => g.id === gameId);
+                
+                const fieldsContainer = document.querySelector(`.bulk-game-fields-${playerId}`);
+                if (!fieldsContainer || !game) return;
+                
+                // Generate fields based on game type
+                let gameFields = '';
+                switch (game.scoring.type) {
+                    case 'time':
+                        gameFields = `
+                            <div class="form-group-inline">
+                                <label>Time (min)</label>
+                                <input type="number" class="bulk-input" 
+                                       data-player-id="${playerId}" data-field="time"
+                                       min="1" max="120" step="0.5">
+                            </div>
+                        `;
+                        break;
+                    case 'strokes':
+                        gameFields = `
+                            <div class="form-group-inline">
+                                <label>Strokes</label>
+                                <input type="number" class="bulk-input" 
+                                       data-player-id="${playerId}" data-field="strokes"
+                                       min="1" max="100">
+                            </div>
+                        `;
+                        break;
+                    case 'points':
+                        gameFields = `
+                            <div class="form-group-inline">
+                                <label>Points</label>
+                                <input type="number" class="bulk-input" 
+                                       data-player-id="${playerId}" data-field="points"
+                                       min="0" max="500">
+                            </div>
+                            <div class="form-group-inline">
+                                <label>Putts</label>
+                                <input type="number" class="bulk-input" 
+                                       data-player-id="${playerId}" data-field="putts"
+                                       min="1" max="200">
+                            </div>
+                        `;
+                        break;
+                    case 'distance':
+                        gameFields = `
+                            <div class="form-group-inline">
+                                <label>Max Dist (ft)</label>
+                                <input type="number" class="bulk-input" 
+                                       data-player-id="${playerId}" data-field="maxDistance"
+                                       min="10" max="100" step="5">
+                            </div>
+                            <div class="form-group-inline">
+                                <label>Rounds</label>
+                                <input type="number" class="bulk-input" 
+                                       data-player-id="${playerId}" data-field="rounds"
+                                       min="1" max="20">
+                            </div>
+                        `;
+                        break;
+                    case 'streak':
+                        gameFields = `
+                            <div class="form-group-inline">
+                                <label>Best Streak</label>
+                                <input type="number" class="bulk-input" 
+                                       data-player-id="${playerId}" data-field="streak"
+                                       min="0" max="50">
+                            </div>
+                            <div class="form-group-inline">
+                                <label>Attempts</label>
+                                <input type="number" class="bulk-input" 
+                                       data-player-id="${playerId}" data-field="attempts"
+                                       min="10" max="200">
+                            </div>
+                        `;
+                        break;
+                }
+                
+                fieldsContainer.innerHTML = gameFields;
             });
         });
         
@@ -2564,21 +2694,53 @@ class App {
                         }
                     } 
                     else if (activityType === 'routine') {
-                        const routineId = document.getElementById('bulkRoutineSelect').value;
-                        const duration = parseInt(document.querySelector(`.bulk-input[data-player-id="${playerId}"][data-field="duration"]`)?.value || 20);
+                        const routineId = document.getElementById('bulkRoutineSelect')?.value;
+                        const routine = SUGGESTED_ROUTINES.find(r => r.id === routineId);
+                        
+                        if (!routine) {
+                            this.showCustomAlert(`Please select a routine`, 'warning');
+                            continue;
+                        }
+                        
+                        // Extract drill results
+                        const drillResults = [];
+                        for (let idx = 0; idx < routine.drills.length; idx++) {
+                            const makesInput = document.querySelector(`.bulk-input[data-player-id="${playerId}"][data-field="drill${idx}Makes"]`);
+                            const attemptsInput = document.querySelector(`.bulk-input[data-player-id="${playerId}"][data-field="drill${idx}Attempts"]`);
+                            
+                            const makes = parseInt(makesInput?.value || 0);
+                            const attempts = parseInt(attemptsInput?.value || routine.drills[idx].attempts);
+                            
+                            if (makes > attempts) {
+                                this.showCustomAlert(`Drill ${idx + 1} for ${checkbox.dataset.playerName}: Makes cannot exceed attempts`, 'error');
+                                continue;
+                            }
+                            
+                            drillResults.push({
+                                distance: routine.drills[idx].distance,
+                                makes,
+                                attempts,
+                                percentage: attempts > 0 ? (makes / attempts * 100) : 0
+                            });
+                        }
+                        
+                        const duration = parseInt(document.querySelector(`.bulk-input[data-player-id="${playerId}"][data-field="duration"]`)?.value || routine.duration);
                         
                         if (isCurrentUser) {
-                            // Log for self - simplified for now
-                            await this.addRoutineForUser(playerId, routineId, duration, false);
+                            // Log for self
+                            await this.addRoutineForUser(playerId, routineId, drillResults, duration, false);
                         } else {
-                            await this.addRoutineForUser(playerId, routineId, duration, requireApproval);
+                            await this.addRoutineForUser(playerId, routineId, drillResults, duration, requireApproval);
                         }
                     }
                     else if (activityType === 'game') {
-                        const gameId = document.getElementById('bulkGameSelect').value;
+                        const gameId = document.querySelector(`.bulk-game-select[data-player-id="${playerId}"]`)?.value;
                         const game = PUTTING_GAMES.find(g => g.id === gameId);
                         
-                        if (!game) continue;
+                        if (!game) {
+                            this.showCustomAlert(`Please select a game for ${checkbox.dataset.playerName}`, 'warning');
+                            continue;
+                        }
                         
                         // Extract score data based on game type
                         let scoreData = {};
@@ -2654,17 +2816,28 @@ class App {
     /**
      * Add routine for another user
      */
-    async addRoutineForUser(userId, routineId, duration, requireApproval = false) {
+    async addRoutineForUser(userId, routineId, drillResults, duration, requireApproval = false) {
         const routine = SUGGESTED_ROUTINES.find(r => r.id === routineId);
         if (!routine) return;
         
-        // Calculate points based on routine
-        const points = routine.drills.length * 50; // Simplified calculation
+        // Calculate total stats from drill results
+        const totalMakes = drillResults.reduce((sum, d) => sum + d.makes, 0);
+        const totalAttempts = drillResults.reduce((sum, d) => sum + d.attempts, 0);
+        const overallPercentage = totalAttempts > 0 ? (totalMakes / totalAttempts * 100) : 0;
+        
+        // Calculate points based on performance
+        const points = Math.round(totalMakes * 2); // 2 points per make
         
         const routineCompletion = {
             id: `routine_${Date.now()}_${userId}`,
             routineId: routine.id,
             routineName: routine.name,
+            drillResults: drillResults,
+            totalStats: {
+                totalMakes,
+                totalAttempts,
+                overallPercentage
+            },
             duration: duration,
             date: new Date().toISOString().split('T')[0],
             timestamp: new Date().toISOString(),
@@ -3235,29 +3408,6 @@ class App {
                                 </select>
                             </div>
                             
-                            <!-- Routine/Game Selection (shown when applicable) -->
-                            ${activityType === 'routine' ? `
-                            <div class="form-group">
-                                <label for="bulkRoutineSelect">Select Routine</label>
-                                <select id="bulkRoutineSelect" class="form-input">
-                                    ${SUGGESTED_ROUTINES.map(r => `
-                                        <option value="${r.id}">${r.name} (${r.level})</option>
-                                    `).join('')}
-                                </select>
-                            </div>
-                            ` : ''}
-                            
-                            ${activityType === 'game' ? `
-                            <div class="form-group">
-                                <label for="bulkGameSelect">Select Game</label>
-                                <select id="bulkGameSelect" class="form-input">
-                                    ${PUTTING_GAMES.map(g => `
-                                        <option value="${g.id}">${g.name}</option>
-                                    `).join('')}
-                                </select>
-                            </div>
-                            ` : ''}
-                            
                             <!-- Search/Filter Players -->
                             <div class="form-group">
                                 <label for="bulkPlayerSearch">Search Players</label>
@@ -3365,38 +3515,11 @@ class App {
                 </div>
             `;
         } else if (activityType === 'routine') {
-            return `
-                <div class="bulk-player-card ${isCurrentUser ? 'current-user-card' : ''}" data-player-name="${player.displayName.toLowerCase()}">
-                    <div class="bulk-player-header">
-                        <label class="checkbox-label">
-                            <input type="checkbox" 
-                                   class="bulk-player-checkbox" 
-                                   data-player-id="${player.id}"
-                                   data-player-name="${player.displayName}"
-                                   value="${player.id}">
-                            <strong>${playerLabel}</strong>
-                        </label>
-                    </div>
-                    <div class="bulk-player-stats">
-                        <div class="form-group-inline">
-                            <label>Duration (min)</label>
-                            <input type="number" 
-                                   class="bulk-input" 
-                                   data-player-id="${player.id}"
-                                   data-field="duration"
-                                   min="1" 
-                                   max="120"
-                                   disabled>
-                        </div>
-                    </div>
-                </div>
-            `;
-        } else if (activityType === 'game') {
-            // Get selected game to determine scoring type
-            const gameId = document.getElementById('bulkGameSelect')?.value;
-            const game = PUTTING_GAMES.find(g => g.id === gameId);
+            // Get selected routine to show drills
+            const routineId = document.getElementById('bulkRoutineSelect')?.value;
+            const routine = SUGGESTED_ROUTINES.find(r => r.id === routineId);
             
-            if (!game) {
+            if (!routine) {
                 return `
                     <div class="bulk-player-card ${isCurrentUser ? 'current-user-card' : ''}" data-player-name="${player.displayName.toLowerCase()}">
                         <div class="bulk-player-header">
@@ -3410,132 +3533,76 @@ class App {
                             </label>
                         </div>
                         <div class="bulk-player-stats">
-                            <p class="form-hint">Select a game first</p>
+                            <p class="form-hint">Select a routine first</p>
                         </div>
                     </div>
                 `;
             }
             
-            // Render fields based on game scoring type
-            let gameFields = '';
-            switch (game.scoring.type) {
-                case 'time':
-                    gameFields = `
-                        <div class="form-group-inline">
-                            <label>Time (min)</label>
-                            <input type="number" 
-                                   class="bulk-input" 
+            return `
+                <div class="bulk-player-card bulk-player-card-routine ${isCurrentUser ? 'current-user-card' : ''}" data-player-name="${player.displayName.toLowerCase()}">
+                    <div class="bulk-player-header">
+                        <label class="checkbox-label">
+                            <input type="checkbox" 
+                                   class="bulk-player-checkbox" 
                                    data-player-id="${player.id}"
-                                   data-field="time"
-                                   min="1" 
-                                   max="120"
-                                   step="0.5"
-                                   disabled>
+                                   data-player-name="${player.displayName}"
+                                   value="${player.id}">
+                            <strong>${playerLabel}</strong>
+                        </label>
+                    </div>
+                    <div class="bulk-routine-drills">
+                        ${routine.drills.map((drill, idx) => `
+                            <div class="bulk-drill-group">
+                                <div class="bulk-drill-header">
+                                    <strong>Drill ${idx + 1}:</strong> ${drill.distance}ft - ${drill.attempts} attempts
+                                </div>
+                                <div class="bulk-drill-inputs">
+                                    <div class="form-group-inline">
+                                        <label>Makes</label>
+                                        <input type="number" 
+                                               class="bulk-input" 
+                                               data-player-id="${player.id}"
+                                               data-field="drill${idx}Makes"
+                                               min="0" 
+                                               max="${drill.attempts}"
+                                               disabled>
+                                    </div>
+                                    <div class="form-group-inline">
+                                        <label>Attempts</label>
+                                        <input type="number" 
+                                               class="bulk-input" 
+                                               data-player-id="${player.id}"
+                                               data-field="drill${idx}Attempts"
+                                               value="${drill.attempts}"
+                                               min="1" 
+                                               max="100"
+                                               disabled>
+                                    </div>
+                                </div>
+                            </div>
+                        `).join('')}
+                        <div class="bulk-drill-group">
+                            <div class="bulk-drill-header">
+                                <strong>Duration & Notes</strong>
+                            </div>
+                            <div class="bulk-drill-inputs">
+                                <div class="form-group-inline">
+                                    <label>Duration (min)</label>
+                                    <input type="number" 
+                                           class="bulk-input" 
+                                           data-player-id="${player.id}"
+                                           data-field="duration"
+                                           min="1" 
+                                           max="120"
+                                           disabled>
+                                </div>
+                            </div>
                         </div>
-                    `;
-                    break;
-                case 'strokes':
-                    gameFields = `
-                        <div class="form-group-inline">
-                            <label>Strokes</label>
-                            <input type="number" 
-                                   class="bulk-input" 
-                                   data-player-id="${player.id}"
-                                   data-field="strokes"
-                                   min="1" 
-                                   max="100"
-                                   disabled>
-                        </div>
-                    `;
-                    break;
-                case 'points':
-                    gameFields = `
-                        <div class="form-group-inline">
-                            <label>Points</label>
-                            <input type="number" 
-                                   class="bulk-input" 
-                                   data-player-id="${player.id}"
-                                   data-field="points"
-                                   min="0" 
-                                   max="500"
-                                   disabled>
-                        </div>
-                        <div class="form-group-inline">
-                            <label>Putts</label>
-                            <input type="number" 
-                                   class="bulk-input" 
-                                   data-player-id="${player.id}"
-                                   data-field="putts"
-                                   min="1" 
-                                   max="200"
-                                   disabled>
-                        </div>
-                    `;
-                    break;
-                case 'distance':
-                    gameFields = `
-                        <div class="form-group-inline">
-                            <label>Max Dist (ft)</label>
-                            <input type="number" 
-                                   class="bulk-input" 
-                                   data-player-id="${player.id}"
-                                   data-field="maxDistance"
-                                   min="10" 
-                                   max="100"
-                                   step="5"
-                                   disabled>
-                        </div>
-                        <div class="form-group-inline">
-                            <label>Rounds</label>
-                            <input type="number" 
-                                   class="bulk-input" 
-                                   data-player-id="${player.id}"
-                                   data-field="rounds"
-                                   min="1" 
-                                   max="20"
-                                   disabled>
-                        </div>
-                    `;
-                    break;
-                case 'streak':
-                    gameFields = `
-                        <div class="form-group-inline">
-                            <label>Best Streak</label>
-                            <input type="number" 
-                                   class="bulk-input" 
-                                   data-player-id="${player.id}"
-                                   data-field="streak"
-                                   min="0" 
-                                   max="50"
-                                   disabled>
-                        </div>
-                        <div class="form-group-inline">
-                            <label>Attempts</label>
-                            <input type="number" 
-                                   class="bulk-input" 
-                                   data-player-id="${player.id}"
-                                   data-field="attempts"
-                                   min="10" 
-                                   max="200"
-                                   disabled>
-                        </div>
-                    `;
-                    break;
-                default:
-                    gameFields = `
-                        <div class="form-group-inline">
-                            <label>Score</label>
-                            <input type="number" 
-                                   class="bulk-input" 
-                                   data-player-id="${player.id}"
-                                   data-field="score"
-                                   min="0" 
-                                   max="1000"
-                                   disabled>
-                        </div>
-                    `;
-            }
-            
+                    </div>
+                </div>
+            `;
+        } else if (activityType === 'game') {
             return `
                 <div class="bulk-player-card ${isCurrentUser ? 'current-user-card' : ''}" data-player-name="${player.displayName.toLowerCase()}">
                     <div class="bulk-player-header">
@@ -3548,8 +3615,22 @@ class App {
                             <strong>${playerLabel}</strong>
                         </label>
                     </div>
-                    <div class="bulk-player-stats">
-                        ${gameFields}
+                    <div class="bulk-player-stats bulk-game-stats">
+                        <div class="form-group-inline full-width">
+                            <label>Game</label>
+                            <select class="bulk-input bulk-game-select" 
+                                   data-player-id="${player.id}"
+                                   data-field="gameId"
+                                   disabled>
+                                <option value="">Select game...</option>
+                                ${PUTTING_GAMES.map(g => `
+                                    <option value="${g.id}">${g.name}</option>
+                                `).join('')}
+                            </select>
+                        </div>
+                        <div class="bulk-game-fields-${player.id}">
+                            <p class="form-hint">Select a game to see scoring fields</p>
+                        </div>
                     </div>
                 </div>
             `;
