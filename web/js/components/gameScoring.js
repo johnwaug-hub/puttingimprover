@@ -201,13 +201,36 @@ function renderEliminationScoreForm(game) {
 function renderRotationsScoreForm(game) {
     return `
         <form id="gameScoreForm" class="game-score-form">
-            <p class="form-description">Log how many makes out of 10 throws for each set (100 total throws)</p>
+            <p class="form-description">Log each turn's results - enter makes out of attempts for each of the 10 turns</p>
             
-            <div class="rotations-grid">
+            <div class="rotations-grid-detailed">
                 ${Array.from({ length: 10 }, (_, i) => `
-                    <div class="form-group rotation-input">
-                        <label for="rotation${i + 1}">Set ${i + 1} (10 throws)</label>
-                        <input type="number" id="rotation${i + 1}" min="0" max="10" required placeholder="0-10 makes">
+                    <div class="turn-input-group">
+                        <label class="turn-label">Turn ${i + 1}</label>
+                        <div class="turn-inputs">
+                            <div class="turn-field">
+                                <label for="turn${i + 1}Makes">Makes</label>
+                                <input type="number" 
+                                       id="turn${i + 1}Makes" 
+                                       class="turn-makes-input"
+                                       min="0" 
+                                       max="100" 
+                                       required 
+                                       placeholder="0">
+                            </div>
+                            <span class="turn-separator">/</span>
+                            <div class="turn-field">
+                                <label for="turn${i + 1}Attempts">Attempts</label>
+                                <input type="number" 
+                                       id="turn${i + 1}Attempts" 
+                                       class="turn-attempts-input"
+                                       min="1" 
+                                       max="100" 
+                                       value="10"
+                                       required 
+                                       placeholder="10">
+                            </div>
+                        </div>
                     </div>
                 `).join('')}
             </div>
@@ -220,7 +243,7 @@ function renderRotationsScoreForm(game) {
             
             <div class="form-group">
                 <label for="gameNotes">Notes (optional)</label>
-                <textarea id="gameNotes" rows="3" placeholder="Which sets went well? Any observations?"></textarea>
+                <textarea id="gameNotes" rows="3" placeholder="Which turns went well? Any observations?"></textarea>
             </div>
             
             <div class="form-actions">

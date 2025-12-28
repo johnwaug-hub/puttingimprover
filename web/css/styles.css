@@ -1495,6 +1495,71 @@
     margin-bottom: 1.5rem;
 }
 
+.rotations-grid-detailed {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.turn-input-group {
+    background: #f9fafb;
+    padding: 1rem;
+    border-radius: 8px;
+    border: 2px solid #e5e7eb;
+}
+
+.turn-label {
+    display: block;
+    font-weight: 700;
+    font-size: 0.95rem;
+    margin-bottom: 0.5rem;
+    color: #374151;
+}
+
+.turn-inputs {
+    display: flex;
+    align-items: flex-end;
+    gap: 0.5rem;
+}
+
+.turn-field {
+    flex: 1;
+}
+
+.turn-field label {
+    display: block;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #6b7280;
+    margin-bottom: 0.25rem;
+}
+
+.turn-makes-input,
+.turn-attempts-input {
+    width: 100%;
+    text-align: center;
+    font-weight: bold;
+    font-size: 1.1rem;
+    padding: 0.5rem;
+    border: 2px solid #d1d5db;
+    border-radius: 6px;
+}
+
+.turn-makes-input:focus,
+.turn-attempts-input:focus {
+    outline: none;
+    border-color: #FF6B35;
+}
+
+.turn-separator {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #9ca3af;
+    padding: 0 0.25rem;
+    padding-bottom: 0.5rem;
+}
+
 .rotation-input {
     margin-bottom: 0 !important;
 }
@@ -1522,6 +1587,10 @@
 @media (max-width: 640px) {
     .rotations-grid {
         grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .rotations-grid-detailed {
+        grid-template-columns: 1fr;
     }
 }
 

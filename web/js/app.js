@@ -1213,24 +1213,42 @@ class App {
                     break;
                     
                 case 'rotations':
-                    // Collect all 10 rotation scores
-                    const rotations = [];
+                    // Collect all 10 turn scores (makes and attempts)
+                    const turns = [];
                     let totalMakes = 0;
+                    let totalAttempts = 0;
+                    
                     for (let i = 1; i <= 10; i++) {
-                        const makes = parseInt(document.getElementById(`rotation${i}`).value);
-                        rotations.push(makes);
+                        const makes = parseInt(document.getElementById(`turn${i}Makes`).value);
+                        const attempts = parseInt(document.getElementById(`turn${i}Attempts`).value);
+                        
+                        // Validate makes <= attempts
+                        if (makes > attempts) {
+                            alert(`Turn ${i}: Makes (${makes}) cannot be greater than Attempts (${attempts})`);
+                            return;
+                        }
+                        
+                        turns.push({
+                            turn: i,
+                            makes: makes,
+                            attempts: attempts,
+                            percentage: attempts > 0 ? (makes / attempts * 100) : 0
+                        });
+                        
                         totalMakes += makes;
+                        totalAttempts += attempts;
                     }
+                    
                     const distance = parseInt(document.getElementById('puttingDistance').value);
-                    const percentage = (totalMakes / 100) * 100;
+                    const overallPercentage = totalAttempts > 0 ? (totalMakes / totalAttempts * 100) : 0;
                     
                     scoreData = {
                         score: totalMakes,
                         totalMakes: totalMakes,
-                        totalAttempts: 100,
-                        percentage: percentage,
+                        totalAttempts: totalAttempts,
+                        percentage: overallPercentage,
                         distance: distance,
-                        rotations: rotations,
+                        turns: turns,
                         targetScore: 70
                     };
                     break;
