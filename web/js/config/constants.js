@@ -163,6 +163,7 @@ export const MOTIVATIONAL_QUOTES = [
 ];
 
 export const SUGGESTED_ROUTINES = [
+    // BEGINNER (5 routines)
     {
         id: 'beginner_10ft',
         name: 'Beginner 10ft',
@@ -175,6 +176,55 @@ export const SUGGESTED_ROUTINES = [
         ]
     },
     {
+        id: 'beginner_short_game',
+        name: 'Short Game Foundation',
+        description: 'Master the basics within 15 feet',
+        level: 'Beginner',
+        duration: '20 mins',
+        drills: [
+            { distance: 8, attempts: 20, description: 'Guaranteed makes - build confidence' },
+            { distance: 12, attempts: 25, description: 'Focus on follow-through' },
+            { distance: 15, attempts: 20, description: 'Slight challenge' }
+        ]
+    },
+    {
+        id: 'beginner_form_focus',
+        name: 'Form & Fundamentals',
+        description: 'Slow and steady, perfect your technique',
+        level: 'Beginner',
+        duration: '18 mins',
+        drills: [
+            { distance: 10, attempts: 15, description: 'Slow motion practice' },
+            { distance: 15, attempts: 20, description: 'Normal speed with form checks' },
+            { distance: 10, attempts: 15, description: 'Speed up while maintaining form' }
+        ]
+    },
+    {
+        id: 'beginner_circle_1',
+        name: 'Circle 1 Confidence',
+        description: 'Practice inside Circle 1 (33 feet)',
+        level: 'Beginner',
+        duration: '22 mins',
+        drills: [
+            { distance: 15, attempts: 20, description: 'Inner circle practice' },
+            { distance: 20, attempts: 20, description: 'Mid-range confidence' },
+            { distance: 25, attempts: 15, description: 'Pushing toward Circle 1 edge' }
+        ]
+    },
+    {
+        id: 'beginner_consistency',
+        name: 'Consistency Drills',
+        description: 'Build repeatable putting motion',
+        level: 'Beginner',
+        duration: '20 mins',
+        drills: [
+            { distance: 12, attempts: 30, description: 'Same spot, same motion' },
+            { distance: 18, attempts: 25, description: 'Extend the pattern' }
+        ]
+    },
+    
+    // INTERMEDIATE (6 routines)
+    {
         id: 'intermediate_mixed',
         name: 'Intermediate Mixed',
         description: 'Practice from multiple distances',
@@ -186,6 +236,71 @@ export const SUGGESTED_ROUTINES = [
             { distance: 25, attempts: 15, description: 'Push your range' }
         ]
     },
+    {
+        id: 'intermediate_ladder_up',
+        name: 'Ladder Up',
+        description: 'Progressive distance increases',
+        level: 'Intermediate',
+        duration: '28 mins',
+        drills: [
+            { distance: 15, attempts: 15, description: 'Warm up' },
+            { distance: 20, attempts: 15, description: 'Step back' },
+            { distance: 25, attempts: 15, description: 'Moderate challenge' },
+            { distance: 30, attempts: 12, description: 'Long putts' }
+        ]
+    },
+    {
+        id: 'intermediate_circle_edge',
+        name: 'Circle Edge Training',
+        description: 'Master the 30-33 foot range',
+        level: 'Intermediate',
+        duration: '25 mins',
+        drills: [
+            { distance: 28, attempts: 20, description: 'Just inside the edge' },
+            { distance: 30, attempts: 20, description: 'Right at Circle 1' },
+            { distance: 33, attempts: 15, description: 'Maximum Circle 1 distance' }
+        ]
+    },
+    {
+        id: 'intermediate_pressure',
+        name: 'Pressure Situations',
+        description: 'Make it when it counts',
+        level: 'Intermediate',
+        duration: '24 mins',
+        drills: [
+            { distance: 20, attempts: 10, description: 'Must make 8/10' },
+            { distance: 25, attempts: 10, description: 'Must make 6/10' },
+            { distance: 30, attempts: 10, description: 'Must make 4/10' },
+            { distance: 20, attempts: 15, description: 'Finish strong' }
+        ]
+    },
+    {
+        id: 'intermediate_angles',
+        name: 'Angle Practice',
+        description: 'Different approaches to the basket',
+        level: 'Intermediate',
+        duration: '26 mins',
+        drills: [
+            { distance: 20, attempts: 15, description: 'Straight on' },
+            { distance: 20, attempts: 15, description: 'From left side' },
+            { distance: 20, attempts: 15, description: 'From right side' },
+            { distance: 20, attempts: 10, description: 'Behind obstacles' }
+        ]
+    },
+    {
+        id: 'intermediate_comeback',
+        name: 'Comeback Putts',
+        description: 'Practice your second putts',
+        level: 'Intermediate',
+        duration: '23 mins',
+        drills: [
+            { distance: 25, attempts: 20, description: 'First putt attempt' },
+            { distance: 8, attempts: 20, description: 'Tap-in practice' },
+            { distance: 15, attempts: 15, description: 'Common comeback distance' }
+        ]
+    },
+
+    // ADVANCED (6 routines)
     {
         id: 'advanced_ladder',
         name: 'Advanced Ladder',
@@ -201,13 +316,116 @@ export const SUGGESTED_ROUTINES = [
         ]
     },
     {
-        id: 'consistency_builder',
-        name: 'Consistency Builder',
-        description: 'Lock in your form from one distance',
-        level: 'All Levels',
+        id: 'advanced_long_range',
+        name: 'Long Range Power',
+        description: 'Build confidence beyond Circle 1',
+        level: 'Advanced',
+        duration: '30 mins',
+        drills: [
+            { distance: 35, attempts: 20, description: 'Circle 2 practice' },
+            { distance: 40, attempts: 15, description: 'Extended range' },
+            { distance: 45, attempts: 12, description: 'Long bombs' },
+            { distance: 30, attempts: 15, description: 'Finish closer in' }
+        ]
+    },
+    {
+        id: 'advanced_tournament_prep',
+        name: 'Tournament Prep',
+        description: 'Simulate tournament pressure',
+        level: 'Advanced',
+        duration: '32 mins',
+        drills: [
+            { distance: 25, attempts: 18, description: 'Must make 15/18 (tournament %)' },
+            { distance: 30, attempts: 18, description: 'Must make 12/18' },
+            { distance: 20, attempts: 18, description: 'Must make 16/18' },
+            { distance: 35, attempts: 10, description: 'Bonus round' }
+        ]
+    },
+    {
+        id: 'advanced_endurance',
+        name: 'Putting Endurance',
+        description: 'Maintain form under fatigue',
+        level: 'Advanced',
+        duration: '40 mins',
+        drills: [
+            { distance: 20, attempts: 30, description: 'Volume round 1' },
+            { distance: 25, attempts: 30, description: 'Volume round 2' },
+            { distance: 30, attempts: 25, description: 'Distance & fatigue' },
+            { distance: 15, attempts: 20, description: 'Tired but accurate' }
+        ]
+    },
+    {
+        id: 'advanced_all_ranges',
+        name: 'Complete Range Mastery',
+        description: 'Every distance from 10 to 40',
+        level: 'Advanced',
+        duration: '38 mins',
+        drills: [
+            { distance: 10, attempts: 10, description: 'Tap-ins' },
+            { distance: 15, attempts: 12, description: 'Easy makes' },
+            { distance: 20, attempts: 15, description: 'Bread and butter' },
+            { distance: 25, attempts: 15, description: 'Challenge zone' },
+            { distance: 30, attempts: 12, description: 'Circle 1 edge' },
+            { distance: 35, attempts: 10, description: 'Circle 2' },
+            { distance: 40, attempts: 8, description: 'Long range' }
+        ]
+    },
+    {
+        id: 'advanced_speed_round',
+        name: 'Speed Round',
+        description: 'Fast-paced putting rhythm',
+        level: 'Advanced',
         duration: '20 mins',
         drills: [
-            { distance: 20, attempts: 50, description: 'Find your rhythm and repeat' }
+            { distance: 20, attempts: 25, description: 'Quick rhythm - 30 seconds per putt' },
+            { distance: 25, attempts: 25, description: 'Maintain speed' },
+            { distance: 30, attempts: 20, description: 'Fast but focused' }
+        ]
+    },
+
+    // EXPERT (3 routines)
+    {
+        id: 'expert_ultimate_test',
+        name: 'Ultimate Putting Test',
+        description: 'The most comprehensive routine',
+        level: 'Expert',
+        duration: '50 mins',
+        drills: [
+            { distance: 15, attempts: 20, description: 'Perfect warm-up' },
+            { distance: 20, attempts: 25, description: 'Core distance 1' },
+            { distance: 25, attempts: 25, description: 'Core distance 2' },
+            { distance: 30, attempts: 20, description: 'Core distance 3' },
+            { distance: 35, attempts: 15, description: 'Extended range' },
+            { distance: 40, attempts: 15, description: 'Long bombs' },
+            { distance: 45, attempts: 10, description: 'Maximum distance' },
+            { distance: 20, attempts: 20, description: 'Cool down & finish strong' }
+        ]
+    },
+    {
+        id: 'expert_100_putt_challenge',
+        name: '100 Putt Challenge',
+        description: 'Century of putts at various distances',
+        level: 'Expert',
+        duration: '45 mins',
+        drills: [
+            { distance: 20, attempts: 40, description: 'Volume at core distance' },
+            { distance: 30, attempts: 35, description: 'Long-range volume' },
+            { distance: 40, attempts: 25, description: 'Maximum challenge' }
+        ]
+    },
+    {
+        id: 'expert_perfect_practice',
+        name: 'Perfect Practice Protocol',
+        description: 'Every putt must count',
+        level: 'Expert',
+        duration: '42 mins',
+        drills: [
+            { distance: 15, attempts: 15, description: 'Must make 14/15' },
+            { distance: 20, attempts: 20, description: 'Must make 17/20' },
+            { distance: 25, attempts: 20, description: 'Must make 15/20' },
+            { distance: 30, attempts: 20, description: 'Must make 12/20' },
+            { distance: 35, attempts: 15, description: 'Must make 8/15' },
+            { distance: 25, attempts: 15, description: 'Finish at medium range' }
         ]
     }
 ];

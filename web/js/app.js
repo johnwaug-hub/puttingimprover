@@ -1598,40 +1598,67 @@ class App {
      * Render routines panel
      */
     renderRoutines() {
-        return `
+        // Group routines by difficulty level
+        const difficultyLevels = ['Beginner', 'Intermediate', 'Advanced', 'Expert'];
+        
+        let html = `
             <div class="card routines-panel">
                 <h3>📋 Suggested Putting Routines</h3>
                 <p style="margin-bottom: 1.5rem; color: #6b7280;">Choose a routine to structure your practice session</p>
-                <div class="routines-grid">
-                    ${SUGGESTED_ROUTINES.map(routine => `
-                        <div class="routine-card">
-                            <div class="routine-header">
-                                <h4>${routine.name}</h4>
-                                <span class="routine-badge">${routine.level}</span>
+        `;
+        
+        // Render each difficulty level
+        difficultyLevels.forEach(level => {
+            const routinesInLevel = SUGGESTED_ROUTINES.filter(r => r.level === level);
+            
+            if (routinesInLevel.length === 0) return;
+            
+            const isCollapsed = this.state.collapsedCategories[`routine-${level}`];
+            
+            html += `
+                <div class="routine-difficulty-section ${isCollapsed ? 'collapsed' : ''}">
+                    <h4 class="difficulty-title clickable" data-category="routine-${level}">
+                        <span class="category-toggle">${isCollapsed ? '▶' : '▼'}</span>
+                        ${level}
+                        <span class="difficulty-count">${routinesInLevel.length} routine${routinesInLevel.length > 1 ? 's' : ''}</span>
+                    </h4>
+                    <div class="routines-grid" style="display: ${isCollapsed ? 'none' : 'grid'}">
+                        ${routinesInLevel.map(routine => `
+                            <div class="routine-card">
+                                <div class="routine-header">
+                                    <h4>${routine.name}</h4>
+                                    <span class="routine-badge">${routine.level}</span>
+                                </div>
+                                <p class="routine-description">${routine.description}</p>
+                                <div class="routine-meta">
+                                    <span>⏱️ ${routine.duration}</span>
+                                    <span>📍 ${routine.drills.length} drills</span>
+                                </div>
+                                <div class="routine-drills">
+                                    ${routine.drills.map((drill, idx) => `
+                                        <div class="drill-item">
+                                            <strong>${idx + 1}. ${drill.distance}ft - ${drill.attempts} attempts</strong>
+                                            <p>${drill.description}</p>
+                                        </div>
+                                    `).join('')}
+                                </div>
+                                <div class="routine-actions">
+                                    <button class="btn btn-primary log-routine-btn" data-routine="${routine.id}">
+                                        📊 Log Completion
+                                    </button>
+                                </div>
                             </div>
-                            <p class="routine-description">${routine.description}</p>
-                            <div class="routine-meta">
-                                <span>⏱️ ${routine.duration}</span>
-                                <span>📍 ${routine.drills.length} drills</span>
-                            </div>
-                            <div class="routine-drills">
-                                ${routine.drills.map((drill, idx) => `
-                                    <div class="drill-item">
-                                        <strong>${idx + 1}. ${drill.distance}ft - ${drill.attempts} attempts</strong>
-                                        <p>${drill.description}</p>
-                                    </div>
-                                `).join('')}
-                            </div>
-                            <div class="routine-actions">
-                                <button class="btn btn-primary log-routine-btn" data-routine="${routine.id}">
-                                    📊 Log Completion
-                                </button>
-                            </div>
-                        </div>
-                    `).join('')}
+                        `).join('')}
+                    </div>
                 </div>
+            `;
+        });
+        
+        html += `
             </div>
         `;
+        
+        return html;
     }
 
     /**
