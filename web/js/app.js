@@ -391,7 +391,15 @@ class App {
                             <h1 class="app-title">Putting Improver</h1>
                         </div>
                         <div class="user-section">
-                            <span class="user-name">${user.displayName}</span>
+                            <div class="header-user-profile">
+                                <div class="header-profile-pic">
+                                    ${user.profilePictureURL 
+                                        ? `<img src="${user.profilePictureURL}" alt="${user.displayName}">` 
+                                        : `<div class="header-profile-placeholder">${(user.displayName || 'U')[0].toUpperCase()}</div>`
+                                    }
+                                </div>
+                                <span class="user-name clickable" id="headerUsername">${user.displayName}</span>
+                            </div>
                             <button id="logoutBtn" class="btn btn-secondary">Logout</button>
                         </div>
                     </div>
@@ -693,9 +701,15 @@ class App {
         return `
             <div class="leaderboard-item ${isCurrentUser ? 'current-user' : ''}">
                 <div class="rank ${rankClass}">#${rank}</div>
+                <div class="leaderboard-profile-pic">
+                    ${player.profilePictureURL 
+                        ? `<img src="${player.profilePictureURL}" alt="${player.displayName}">` 
+                        : `<div class="leaderboard-profile-placeholder">${(player.displayName || 'U')[0].toUpperCase()}</div>`
+                    }
+                </div>
                 <div class="player-info">
                     <div class="player-name-wrapper">
-                        <span class="player-name clickable" data-user-id="${player.id}">
+                        <span class="player-name">
                             ${player.displayName || 'Unknown Player'}
                         </span>
                         ${isCurrentUser ? '<span class="you-badge">(You)</span>' : ''}
@@ -1101,14 +1115,24 @@ class App {
             });
         });
         
-        // Player name clicks (open profile)
-        const playerNames = document.querySelectorAll('.player-name.clickable');
-        playerNames.forEach(name => {
-            name.addEventListener('click', (e) => {
-                const userId = e.target.dataset.userId;
-                this.openProfileModal(userId);
-            });
-        });
+        // Header username click (open own profile)
+        const headerUsername = document.getElementById('headerUsername');
+        const headerProfile = document.querySelector('.header-user-profile');
+        
+        const openOwnProfile = () => {
+            const currentUser = userManager.getCurrentUser();
+            if (currentUser) {
+                this.openProfileModal(currentUser.id);
+            }
+        };
+        
+        if (headerUsername) {
+            headerUsername.addEventListener('click', openOwnProfile);
+        }
+        
+        if (headerProfile) {
+            headerProfile.addEventListener('click', openOwnProfile);
+        }
         
         // Cancel session button
         const cancelSessionBtn = document.getElementById('cancelSessionBtn');
