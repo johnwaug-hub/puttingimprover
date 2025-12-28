@@ -19,6 +19,7 @@ class App {
             loading: true,
             error: null,
             currentView: 'practice', // practice, leaderboard, friends, achievements, games
+            leaderboardCategory: 'points', // points, sessions, routines, games
             showAddSession: false,
             showRoutines: false,
             currentQuote: this.getRandomQuote(),
@@ -463,8 +464,29 @@ class App {
                 <div class="view ${this.state.currentView === 'leaderboard' ? 'active' : ''}" id="leaderboard-view">
                     <div class="card">
                         <h2>🏆 Leaderboard</h2>
+                        
+                        <!-- Leaderboard Category Tabs -->
+                        <div class="leaderboard-tabs">
+                            <button class="leaderboard-tab ${!this.state.leaderboardCategory || this.state.leaderboardCategory === 'points' ? 'active' : ''}" 
+                                    data-category="points">
+                                💰 Points Leader
+                            </button>
+                            <button class="leaderboard-tab ${this.state.leaderboardCategory === 'sessions' ? 'active' : ''}" 
+                                    data-category="sessions">
+                                🎯 Sessions Leader
+                            </button>
+                            <button class="leaderboard-tab ${this.state.leaderboardCategory === 'routines' ? 'active' : ''}" 
+                                    data-category="routines">
+                                📋 Routines Leader
+                            </button>
+                            <button class="leaderboard-tab ${this.state.leaderboardCategory === 'games' ? 'active' : ''}" 
+                                    data-category="games">
+                                🎮 Games Leader
+                            </button>
+                        </div>
+                        
                         <div class="leaderboard-list">
-                            ${this.state.leaderboard.length > 0 ? this.state.leaderboard.map((player, index) => this.renderLeaderboardItem(player, index + 1)).join('') : '<p class="empty-state">No players yet</p>'}
+                            ${this.renderLeaderboardList()}
                         </div>
                     </div>
                 </div>
@@ -565,10 +587,71 @@ class App {
         `;
     }
     
-    renderLeaderboardItem(player, rank) {
+    renderLeaderboardList() {
+        if (this.state.leaderboard.length === 0) {
+            return '<p class="empty-state">No players yet</p>';
+        }
+        
+        const category = this.state.leaderboardCategory || 'points';
+        
+        // Sort based on category
+        let sortedPlayers = [...this.state.leaderboard];
+        switch(category) {
+            case 'sessions':
+                sortedPlayers.sort((a, b) => (b.totalSessions || 0) - (a.totalSessions || 0));
+                break;
+            case 'routines':
+                sortedPlayers.sort((a, b) => (b.totalRoutines || 0) - (a.totalRoutines || 0));
+                break;
+            case 'games':
+                sortedPlayers.sort((a, b) => (b.totalGames || 0) - (a.totalGames || 0));
+                break;
+            case 'points':
+            default:
+                sortedPlayers.sort((a, b) => (b.totalPoints || 0) - (a.totalPoints || 0));
+                break;
+        }
+        
+        return sortedPlayers.map((player, index) => 
+            this.renderLeaderboardItem(player, index + 1, category)
+        ).join('');
+    }
+    
+    renderLeaderboardItem(player, rank, category = 'points') {
         const currentUser = userManager.getCurrentUser();
         const isCurrentUser = currentUser && (player.id === currentUser.id || player.userId === currentUser.userId);
         const rankClass = rank === 1 ? 'gold' : rank === 2 ? 'silver' : rank === 3 ? 'bronze' : '';
+        
+        // Determine which stats to show based on category
+        let stat1Value, stat1Label, stat2Value, stat2Label;
+        
+        switch(category) {
+            case 'sessions':
+                stat1Value = player.totalSessions || 0;
+                stat1Label = 'Sessions';
+                stat2Value = player.totalPoints || 0;
+                stat2Label = 'Points';
+                break;
+            case 'routines':
+                stat1Value = player.totalRoutines || 0;
+                stat1Label = 'Routines';
+                stat2Value = player.totalSessions || 0;
+                stat2Label = 'Sessions';
+                break;
+            case 'games':
+                stat1Value = player.totalGames || 0;
+                stat1Label = 'Games';
+                stat2Value = player.totalPoints || 0;
+                stat2Label = 'Points';
+                break;
+            case 'points':
+            default:
+                stat1Value = player.totalPoints || 0;
+                stat1Label = 'Points';
+                stat2Value = player.totalSessions || 0;
+                stat2Label = 'Sessions';
+                break;
+        }
         
         return `
             <div class="leaderboard-item ${isCurrentUser ? 'current-user' : ''}">
@@ -578,12 +661,12 @@ class App {
                 </div>
                 <div class="player-stats">
                     <div class="stat-item">
-                        <div class="stat-value">${player.totalPoints || 0}</div>
-                        <div class="stat-label">Points</div>
+                        <div class="stat-value">${stat1Value}</div>
+                        <div class="stat-label">${stat1Label}</div>
                     </div>
                     <div class="stat-item">
-                        <div class="stat-value">${player.totalSessions || 0}</div>
-                        <div class="stat-label">Sessions</div>
+                        <div class="stat-value">${stat2Value}</div>
+                        <div class="stat-label">${stat2Label}</div>
                     </div>
                 </div>
             </div>
@@ -834,6 +917,15 @@ class App {
         tabs.forEach(tab => {
             tab.addEventListener('click', async (e) => {
                 await this.changeView(e.target.dataset.view);
+            });
+        });
+        
+        // Leaderboard category tabs
+        const leaderboardTabs = document.querySelectorAll('.leaderboard-tab');
+        leaderboardTabs.forEach(tab => {
+            tab.addEventListener('click', (e) => {
+                this.state.leaderboardCategory = e.target.dataset.category;
+                this.render();
             });
         });
         
@@ -1328,10 +1420,17 @@ class App {
             const user = userManager.getCurrentUser();
             if (user) {
                 await storageManager.saveRoutineCompletion(user.id, completion);
+                
+                // Increment totalRoutines counter
+                user.totalRoutines = (user.totalRoutines || 0) + 1;
+                await storageManager.saveUser(user);
             }
             
             // Check achievements
             await achievementManager.checkAchievements();
+            
+            // Reload leaderboard
+            await this.loadLeaderboard();
             
             // Close modal
             this.closeRoutineCompletionModal();

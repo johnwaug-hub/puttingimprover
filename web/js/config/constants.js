@@ -268,15 +268,15 @@ export const PUTTING_GAMES = [
     {
         id: 'putt_100',
         name: 'Putt 100',
-        description: 'Make 100 putts scored in 10 rotations of 10 throws',
+        description: 'Score 100 putts with 10 inputs tracking 10 throws each',
         difficulty: 'Medium',
         duration: '30-40 mins',
         instructions: [
             'Choose your putting distance (15-25 feet recommended)',
-            'Complete 10 rotations of 10 putts each (100 total putts)',
-            'Track makes for each rotation of 10',
-            'Goal is to make as many of the 100 putts as possible',
-            'Record your score out of 100'
+            'Throw 10 putts at a time, 10 times (100 total putts)',
+            'After each set of 10 throws, record how many you made',
+            'Track makes for each set of 10 in the 10 input fields',
+            'Goal is to make as many of the 100 putts as possible'
         ],
         scoring: {
             type: 'rotations',

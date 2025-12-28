@@ -84,6 +84,10 @@ class GameTracker {
         const user = userManager.getCurrentUser();
         if (user) {
             await storageManager.saveGameCompletion(user.id, this.currentGame);
+            
+            // Increment totalGames counter
+            user.totalGames = (user.totalGames || 0) + 1;
+            await storageManager.saveUser(user);
         }
 
         // Add to history

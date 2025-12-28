@@ -36,6 +36,8 @@ class UserManager {
                 photoURL: firebaseUser.photoURL,
                 totalPoints: 0,
                 totalSessions: 0,
+                totalRoutines: 0,
+                totalGames: 0,
                 achievements: [],
                 createdAt: new Date().toISOString(),
                 lastLogin: new Date().toISOString()
@@ -46,6 +48,11 @@ class UserManager {
         } else {
             // Update last login
             user.lastLogin = new Date().toISOString();
+            
+            // Initialize counters if they don't exist
+            if (user.totalRoutines === undefined) user.totalRoutines = 0;
+            if (user.totalGames === undefined) user.totalGames = 0;
+            
             await storageManager.saveUser(user);
             console.log('✅ User loaded:', user.email);
         }
@@ -62,8 +69,30 @@ class UserManager {
                 console.log('✅ Session count updated:', actualSessionCount);
             }
         }
+        
+        // Update totalRoutines and totalGames counts
+        await this.updateActivityCounts();
 
         return user;
+    }
+    
+    /**
+     * Update user's routine and game completion counts
+     */
+    async updateActivityCounts() {
+        if (!this.currentUser) return;
+        
+        try {
+            const routines = await storageManager.getRoutineCompletions(this.currentUser.id);
+            const games = await storageManager.getGameCompletions(this.currentUser.id);
+            
+            this.currentUser.totalRoutines = routines.length;
+            this.currentUser.totalGames = games.length;
+            
+            await storageManager.saveUser(this.currentUser);
+        } catch (error) {
+            console.error('Error updating activity counts:', error);
+        }
     }
 
     /**

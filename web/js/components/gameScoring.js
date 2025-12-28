@@ -201,13 +201,13 @@ function renderEliminationScoreForm(game) {
 function renderRotationsScoreForm(game) {
     return `
         <form id="gameScoreForm" class="game-score-form">
-            <p class="form-description">Log your makes for each rotation of 10 putts</p>
+            <p class="form-description">Log how many makes out of 10 throws for each set (100 total throws)</p>
             
             <div class="rotations-grid">
                 ${Array.from({ length: 10 }, (_, i) => `
                     <div class="form-group rotation-input">
-                        <label for="rotation${i + 1}">Rotation ${i + 1}</label>
-                        <input type="number" id="rotation${i + 1}" min="0" max="10" required placeholder="0-10">
+                        <label for="rotation${i + 1}">Set ${i + 1} (10 throws)</label>
+                        <input type="number" id="rotation${i + 1}" min="0" max="10" required placeholder="0-10 makes">
                     </div>
                 `).join('')}
             </div>
@@ -220,7 +220,7 @@ function renderRotationsScoreForm(game) {
             
             <div class="form-group">
                 <label for="gameNotes">Notes (optional)</label>
-                <textarea id="gameNotes" rows="3" placeholder="Which rotations went well? Any observations?"></textarea>
+                <textarea id="gameNotes" rows="3" placeholder="Which sets went well? Any observations?"></textarea>
             </div>
             
             <div class="form-actions">
