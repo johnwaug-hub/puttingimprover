@@ -276,6 +276,127 @@ class App {
         
         this.render();
     }
+    
+    /**
+     * Delete a routine
+     * @param {string} routineId - ID of routine to delete
+     */
+    async deleteRoutine(routineId) {
+        try {
+            const routine = this.state.recentRoutines.find(r => r.id === routineId);
+            if (!routine) {
+                throw new Error('Routine not found');
+            }
+
+            const confirmed = confirm(
+                `Are you sure you want to delete this routine?\n\n` +
+                `Routine: ${routine.routineName}\n` +
+                `Duration: ${routine.duration} minutes\n` +
+                `Score: ${routine.totalStats.totalMakes}/${routine.totalStats.totalAttempts} (${routine.totalStats.overallPercentage.toFixed(1)}%)\n` +
+                `Points: ${routine.points || 0}`
+            );
+
+            if (!confirmed) {
+                return;
+            }
+
+            const user = userManager.getCurrentUser();
+            
+            // Remove points from user
+            user.totalPoints = Math.max(0, user.totalPoints - (routine.points || 0));
+            user.totalRoutines = Math.max(0, (user.totalRoutines || 0) - 1);
+            await storageManager.saveUser(user);
+            
+            // Delete routine
+            await storageManager.deleteRoutineCompletion(user.id, routineId);
+
+            // Reload data
+            await this.loadRecentPractice();
+            await this.loadLeaderboard();
+
+            this.render();
+            this.showCustomAlert('Routine deleted successfully', 'success');
+
+        } catch (error) {
+            console.error('Error deleting routine:', error);
+            this.showCustomAlert('Failed to delete routine: ' + error.message, 'error');
+        }
+    }
+    
+    /**
+     * Edit a routine
+     * @param {string} routineId - ID of routine to edit
+     */
+    editRoutine(routineId) {
+        const routine = this.state.recentRoutines.find(r => r.id === routineId);
+        if (!routine) {
+            this.showCustomAlert('Routine not found', 'error');
+            return;
+        }
+        
+        // For now, show message that editing is not yet implemented
+        this.showCustomAlert('Routine editing coming soon! Delete and re-log for now.', 'info');
+    }
+    
+    /**
+     * Delete a game
+     * @param {string} gameId - ID of game to delete
+     */
+    async deleteGame(gameId) {
+        try {
+            const game = this.state.recentGames.find(g => g.id === gameId);
+            if (!game) {
+                throw new Error('Game not found');
+            }
+
+            const confirmed = confirm(
+                `Are you sure you want to delete this game?\n\n` +
+                `Game: ${game.gameName}\n` +
+                `Score: ${game.score}\n` +
+                `Points: ${game.points || 0}`
+            );
+
+            if (!confirmed) {
+                return;
+            }
+
+            const user = userManager.getCurrentUser();
+            
+            // Remove points from user
+            user.totalPoints = Math.max(0, user.totalPoints - (game.points || 0));
+            user.totalGames = Math.max(0, (user.totalGames || 0) - 1);
+            await storageManager.saveUser(user);
+            
+            // Delete game
+            await storageManager.deleteGameCompletion(user.id, gameId);
+
+            // Reload data
+            await this.loadRecentPractice();
+            await this.loadLeaderboard();
+
+            this.render();
+            this.showCustomAlert('Game deleted successfully', 'success');
+
+        } catch (error) {
+            console.error('Error deleting game:', error);
+            this.showCustomAlert('Failed to delete game: ' + error.message, 'error');
+        }
+    }
+    
+    /**
+     * Edit a game
+     * @param {string} gameId - ID of game to edit
+     */
+    editGame(gameId) {
+        const game = this.state.recentGames.find(g => g.id === gameId);
+        if (!game) {
+            this.showCustomAlert('Game not found', 'error');
+            return;
+        }
+        
+        // For now, show message that editing is not yet implemented
+        this.showCustomAlert('Game editing coming soon! Delete and re-log for now.', 'info');
+    }
 
     /**
      * Change current view
@@ -766,6 +887,12 @@ class App {
                     </div>
                     <div class="session-actions">
                         <span class="session-points">${routine.points || 0} pts</span>
+                        <button class="btn-edit-routine" data-routine-id="${routine.id}" title="Edit routine">
+                            ✏️
+                        </button>
+                        <button class="btn-delete-routine" data-routine-id="${routine.id}" title="Delete routine">
+                            🗑️
+                        </button>
                     </div>
                 </div>
                 <div class="session-stats">
@@ -795,6 +922,12 @@ class App {
                     </div>
                     <div class="session-actions">
                         <span class="session-points">${game.points || 0} pts</span>
+                        <button class="btn-edit-game" data-game-id="${game.id}" title="Edit game">
+                            ✏️
+                        </button>
+                        <button class="btn-delete-game" data-game-id="${game.id}" title="Delete game">
+                            🗑️
+                        </button>
                     </div>
                 </div>
                 <div class="session-stats">
@@ -1577,6 +1710,54 @@ class App {
                 const sessionId = e.target.dataset.sessionId;
                 if (sessionId) {
                     this.editSession(sessionId);
+                }
+            });
+        });
+        
+        // Delete routine buttons
+        const deleteRoutineBtns = document.querySelectorAll('.btn-delete-routine');
+        deleteRoutineBtns.forEach(btn => {
+            btn.addEventListener('click', async (e) => {
+                e.stopPropagation();
+                const routineId = e.target.dataset.routineId;
+                if (routineId) {
+                    await this.deleteRoutine(routineId);
+                }
+            });
+        });
+        
+        // Edit routine buttons
+        const editRoutineBtns = document.querySelectorAll('.btn-edit-routine');
+        editRoutineBtns.forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const routineId = e.target.dataset.routineId;
+                if (routineId) {
+                    this.editRoutine(routineId);
+                }
+            });
+        });
+        
+        // Delete game buttons
+        const deleteGameBtns = document.querySelectorAll('.btn-delete-game');
+        deleteGameBtns.forEach(btn => {
+            btn.addEventListener('click', async (e) => {
+                e.stopPropagation();
+                const gameId = e.target.dataset.gameId;
+                if (gameId) {
+                    await this.deleteGame(gameId);
+                }
+            });
+        });
+        
+        // Edit game buttons
+        const editGameBtns = document.querySelectorAll('.btn-edit-game');
+        editGameBtns.forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const gameId = e.target.dataset.gameId;
+                if (gameId) {
+                    this.editGame(gameId);
                 }
             });
         });

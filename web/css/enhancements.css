@@ -281,7 +281,11 @@
 }
 
 .btn-edit-session,
-.btn-delete-session {
+.btn-delete-session,
+.btn-edit-routine,
+.btn-delete-routine,
+.btn-edit-game,
+.btn-delete-game {
     background: none;
     border: none;
     font-size: 1.2rem;
@@ -291,12 +295,16 @@
     transition: all 0.2s;
 }
 
-.btn-edit-session:hover {
+.btn-edit-session:hover,
+.btn-edit-routine:hover,
+.btn-edit-game:hover {
     background: rgba(59, 130, 246, 0.1);
     transform: scale(1.1);
 }
 
-.btn-delete-session:hover {
+.btn-delete-session:hover,
+.btn-delete-routine:hover,
+.btn-delete-game:hover {
     background: rgba(239, 68, 68, 0.1);
     transform: scale(1.1);
 }
