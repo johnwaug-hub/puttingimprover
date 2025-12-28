@@ -46,7 +46,8 @@ class App {
             editingGame: null,
             showEditRoutineModal: false,
             showEditGameModal: false,
-            achievementSplash: null // { id, name, icon, desc, points }
+            achievementSplash: null, // { id, name, icon, desc, points }
+            collapsedCategories: {} // Track which achievement categories are collapsed
         };
 
         this.newSession = {
@@ -1169,14 +1170,16 @@ class App {
             if (categoryAchievements.length === 0) continue;
             
             const unlockedCount = categoryAchievements.filter(a => a.isUnlocked).length;
+            const isCollapsed = this.state.collapsedCategories[categoryName];
             
             html += `
-                <div class="achievement-category">
-                    <h3 class="category-title">
+                <div class="achievement-category ${isCollapsed ? 'collapsed' : ''}">
+                    <h3 class="category-title clickable" data-category="${categoryName}">
+                        <span class="category-toggle">${isCollapsed ? '▶' : '▼'}</span>
                         ${categoryName}
                         <span class="category-progress">${unlockedCount}/${categoryAchievements.length}</span>
                     </h3>
-                    <div class="achievements-grid">
+                    <div class="achievements-grid" style="display: ${isCollapsed ? 'none' : 'grid'}">
                         ${categoryAchievements.map(achievement => `
                             <div class="achievement-card ${achievement.isUnlocked ? 'unlocked' : 'locked'}">
                                 <div class="achievement-icon">${achievement.icon}</div>
@@ -1620,10 +1623,7 @@ class App {
                                 `).join('')}
                             </div>
                             <div class="routine-actions">
-                                <button class="btn btn-primary btn-small start-routine-btn" data-routine="${routine.id}">
-                                    Start Routine
-                                </button>
-                                <button class="btn btn-secondary btn-small log-routine-btn" data-routine="${routine.id}">
+                                <button class="btn btn-primary log-routine-btn" data-routine="${routine.id}">
                                     📊 Log Completion
                                 </button>
                             </div>
@@ -1908,6 +1908,16 @@ class App {
                 this.render();
             });
         }
+        
+        // Achievement category toggles
+        const categoryTitles = document.querySelectorAll('.category-title.clickable');
+        categoryTitles.forEach(title => {
+            title.addEventListener('click', (e) => {
+                const category = e.currentTarget.dataset.category;
+                this.state.collapsedCategories[category] = !this.state.collapsedCategories[category];
+                this.render();
+            });
+        });
         
         // Edit routine form
         const editRoutineForm = document.getElementById('editRoutineForm');
@@ -2556,6 +2566,50 @@ class App {
                                 ` : ''}
                             </div>
                             
+                            <!-- Personal Goals Section -->
+                            ${isOwnProfile ? `
+                            <div class="profile-disc-section">
+                                <h4>🎯 Personal Goals</h4>
+                                <p class="profile-hint">Set your practice targets</p>
+                                
+                                <div class="goal-item">
+                                    <label>Weekly Putts Goal</label>
+                                    <input type="number" id="goalPutts" value="${user.goals?.putts || 0}" min="0" max="10000" class="profile-input">
+                                    <div class="goal-progress-bar">
+                                        <div class="goal-progress-fill" style="width: ${user.goals?.putts ? Math.min((user.weeklyPutts || 0) / user.goals.putts * 100, 100) : 0}%"></div>
+                                    </div>
+                                    <div class="goal-progress-text">${user.weeklyPutts || 0} / ${user.goals?.putts || 0}</div>
+                                </div>
+                                
+                                <div class="goal-item">
+                                    <label>Weekly Sessions Goal</label>
+                                    <input type="number" id="goalSessions" value="${user.goals?.sessions || 0}" min="0" max="100" class="profile-input">
+                                    <div class="goal-progress-bar">
+                                        <div class="goal-progress-fill" style="width: ${user.goals?.sessions ? Math.min((user.weeklySessions || 0) / user.goals.sessions * 100, 100) : 0}%"></div>
+                                    </div>
+                                    <div class="goal-progress-text">${user.weeklySessions || 0} / ${user.goals?.sessions || 0}</div>
+                                </div>
+                                
+                                <div class="goal-item">
+                                    <label>Weekly Routines Goal</label>
+                                    <input type="number" id="goalRoutines" value="${user.goals?.routines || 0}" min="0" max="50" class="profile-input">
+                                    <div class="goal-progress-bar">
+                                        <div class="goal-progress-fill" style="width: ${user.goals?.routines ? Math.min((user.weeklyRoutines || 0) / user.goals.routines * 100, 100) : 0}%"></div>
+                                    </div>
+                                    <div class="goal-progress-text">${user.weeklyRoutines || 0} / ${user.goals?.routines || 0}</div>
+                                </div>
+                                
+                                <div class="goal-item">
+                                    <label>Weekly Games Goal</label>
+                                    <input type="number" id="goalGames" value="${user.goals?.games || 0}" min="0" max="50" class="profile-input">
+                                    <div class="goal-progress-bar">
+                                        <div class="goal-progress-fill" style="width: ${user.goals?.games ? Math.min((user.weeklyGames || 0) / user.goals.games * 100, 100) : 0}%"></div>
+                                    </div>
+                                    <div class="goal-progress-text">${user.weeklyGames || 0} / ${user.goals?.games || 0}</div>
+                                </div>
+                            </div>
+                            ` : ''}
+                            
                             <!-- Stats Section -->
                             <div class="profile-stats-section">
                                 <h4>📊 Stats</h4>
@@ -2834,6 +2888,14 @@ class App {
             user.favoriteMidrange = document.getElementById('profileMidrange').value;
             user.favoriteDriver = document.getElementById('profileDriver').value;
             user.hideFromLeaderboard = document.getElementById('profileHideFromLeaderboard').checked;
+            
+            // Update goals
+            user.goals = {
+                putts: parseInt(document.getElementById('goalPutts')?.value || 0),
+                sessions: parseInt(document.getElementById('goalSessions')?.value || 0),
+                routines: parseInt(document.getElementById('goalRoutines')?.value || 0),
+                games: parseInt(document.getElementById('goalGames')?.value || 0)
+            };
             
             // Save to database
             await storageManager.saveUser(user);

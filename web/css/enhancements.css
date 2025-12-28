@@ -213,6 +213,64 @@
     font-size: 0.95rem;
 }
 
+/* Personal Goals in Profile */
+.goal-item {
+    margin-bottom: 1.5rem;
+}
+
+.goal-item label {
+    display: block;
+    font-weight: 600;
+    color: #374151;
+    margin-bottom: 0.5rem;
+}
+
+.goal-progress-bar {
+    width: 100%;
+    height: 24px;
+    background: #e5e7eb;
+    border-radius: 12px;
+    overflow: hidden;
+    margin-top: 0.5rem;
+}
+
+.goal-progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #FF6B35 0%, #FFA07A 100%);
+    transition: width 0.5s ease;
+    border-radius: 12px;
+}
+
+.goal-progress-text {
+    font-size: 0.875rem;
+    color: #6b7280;
+    margin-top: 0.25rem;
+    text-align: right;
+}
+
+/* Achievement Collapsible Categories */
+.category-title.clickable {
+    cursor: pointer;
+    user-select: none;
+    transition: all 0.2s;
+}
+
+.category-title.clickable:hover {
+    color: #FF6B35;
+}
+
+.category-toggle {
+    font-size: 0.875rem;
+    color: #FF6B35;
+    transition: transform 0.3s;
+    display: inline-block;
+    min-width: 1rem;
+}
+
+.achievement-category.collapsed .category-toggle {
+    transform: rotate(0deg);
+}
+
 /* Achievement Splash Screen */
 .achievement-splash-overlay {
     position: fixed;
