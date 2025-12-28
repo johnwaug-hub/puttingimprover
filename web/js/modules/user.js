@@ -183,6 +183,28 @@ class UserManager {
         // Update user points and session count
         this.currentUser.totalPoints += points;
         this.currentUser.totalSessions = (this.currentUser.totalSessions || 0) + 1;
+        
+        // Update aggregate performance stats
+        this.currentUser.totalPutts = (this.currentUser.totalPutts || 0) + parseInt(attempts);
+        this.currentUser.totalMakes = (this.currentUser.totalMakes || 0) + parseInt(makes);
+        
+        // Update best session if this one is better
+        if (!this.currentUser.bestSession || points > (this.currentUser.bestSession.points || 0)) {
+            this.currentUser.bestSession = {
+                distance: parseInt(distance),
+                makes: parseInt(makes),
+                attempts: parseInt(attempts),
+                percentage,
+                points,
+                date: session.date
+            };
+        }
+        
+        // Update best accuracy
+        if (!this.currentUser.bestAccuracy || percentage > this.currentUser.bestAccuracy) {
+            this.currentUser.bestAccuracy = percentage;
+        }
+        
         await storageManager.saveUser(this.currentUser);
 
         // Reload sessions

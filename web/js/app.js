@@ -1229,16 +1229,18 @@ class App {
         if (this.state.searchedPlayer && this.state.searchedPlayer !== user.id) {
             displayPlayer = this.state.leaderboard.find(p => p.id === this.state.searchedPlayer);
             if (displayPlayer) {
-                // For other players, we show aggregate stats but not detailed sessions
-                displaySessions = [];
+                // For other players, show their stored stats
+                displaySessions = []; // Don't show individual sessions for privacy
                 displayStats = {
                     totalSessions: displayPlayer.totalSessions || 0,
-                    totalPutts: 0,
-                    totalMakes: 0,
-                    accuracy: 0,
-                    bestSession: null,
-                    currentStreak: 0,
-                    longestStreak: 0
+                    totalPutts: displayPlayer.totalPutts || 0,
+                    totalMakes: displayPlayer.totalMakes || 0,
+                    accuracy: displayPlayer.totalPutts > 0 ? ((displayPlayer.totalMakes / displayPlayer.totalPutts) * 100).toFixed(1) : 0,
+                    bestSession: displayPlayer.bestSession || null,
+                    currentStreak: displayPlayer.currentStreak || 0,
+                    longestStreak: displayPlayer.longestStreak || 0,
+                    avgDistance: displayPlayer.avgDistance || 0,
+                    bestAccuracy: displayPlayer.bestAccuracy || 0
                 };
             }
         }
@@ -1274,14 +1276,25 @@ class App {
             return '<p class="empty-state">No player selected</p>';
         }
         
-        // Calculate additional stats
-        const totalDistance = sessions.reduce((sum, s) => sum + (s.distance * s.attempts), 0);
-        const avgDistance = sessions.length > 0 ? (totalDistance / sessions.reduce((sum, s) => sum + s.attempts, 0)).toFixed(1) : 0;
-        const bestAccuracy = sessions.length > 0 ? Math.max(...sessions.map(s => s.percentage)).toFixed(1) : 0;
-        const avgAccuracy = stats.accuracy || 0;
+        // Calculate additional stats (use stored stats if sessions aren't available)
+        let avgDistance, bestAccuracy;
         
-        // Distance breakdown with accuracy
-        const distanceRanges = {
+        if (sessions.length > 0) {
+            const totalDistance = sessions.reduce((sum, s) => sum + (s.distance * s.attempts), 0);
+            avgDistance = (totalDistance / sessions.reduce((sum, s) => sum + s.attempts, 0)).toFixed(1);
+            bestAccuracy = Math.max(...sessions.map(s => s.percentage)).toFixed(1);
+        } else {
+            // Use stored aggregate stats for other players
+            avgDistance = stats.avgDistance || player.avgDistance || 0;
+            bestAccuracy = stats.bestAccuracy || player.bestAccuracy || 0;
+        }
+        
+        const avgAccuracy = stats.totalPutts > 0 
+            ? ((stats.totalMakes / stats.totalPutts) * 100).toFixed(1)
+            : (stats.accuracy || 0);
+        
+        // Distance breakdown with accuracy (only for own stats with sessions)
+        const distanceRanges = sessions.length > 0 ? {
             '0-5ft': {
                 sessions: sessions.filter(s => s.distance >= 0 && s.distance < 5),
                 get makes() { return this.sessions.reduce((sum, s) => sum + s.makes, 0); },
@@ -1360,7 +1373,7 @@ class App {
                 get attempts() { return this.sessions.reduce((sum, s) => sum + s.attempts, 0); },
                 get percentage() { return this.attempts > 0 ? (this.makes / this.attempts * 100).toFixed(1) : 0; }
             }
-        };
+        } : {}; // Empty object when no sessions
         
         return `
             <!-- Player Header -->
@@ -1472,7 +1485,8 @@ class App {
                 </div>
             </div>
             
-            <!-- Distance Breakdown -->
+            <!-- Distance Breakdown (only show for own stats) -->
+            ${sessions.length > 0 ? `
             <div class="stats-section">
                 <h3 class="stats-section-title">📍 Distance Breakdown</h3>
                 <div class="distance-breakdown">
@@ -1492,6 +1506,7 @@ class App {
                     `}).join('')}
                 </div>
             </div>
+            ` : ''}
         `;
     }
     
