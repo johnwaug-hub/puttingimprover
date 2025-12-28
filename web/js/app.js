@@ -630,15 +630,17 @@ class App {
         const category = this.state.leaderboardCategory || 'points';
         const genderFilter = this.state.leaderboardGenderFilter || 'both';
         
-        // Filter by gender first
-        let filteredPlayers = [...this.state.leaderboard];
+        // Filter out users who opted out of leaderboard
+        let filteredPlayers = this.state.leaderboard.filter(player => !player.hideFromLeaderboard);
+        
+        // Filter by gender
         if (genderFilter !== 'both') {
             filteredPlayers = filteredPlayers.filter(player => player.gender === genderFilter);
         }
         
         // Check if any players after filtering
         if (filteredPlayers.length === 0) {
-            return `<p class="empty-state">No ${genderFilter === 'male' ? 'male' : 'female'} players yet</p>`;
+            return `<p class="empty-state">No ${genderFilter === 'male' ? 'male' : genderFilter === 'female' ? 'female' : ''} players yet</p>`;
         }
         
         // Sort based on category
@@ -1683,6 +1685,16 @@ class App {
                                         : `<div class="profile-value">${user.favoriteDriver || 'Not set'}</div>`
                                     }
                                 </div>
+                                
+                                ${isOwnProfile ? `
+                                    <div class="profile-field">
+                                        <label class="checkbox-label">
+                                            <input type="checkbox" id="profileHideFromLeaderboard" ${user.hideFromLeaderboard ? 'checked' : ''} class="profile-checkbox">
+                                            <span>Hide me from leaderboard</span>
+                                        </label>
+                                        <p class="profile-hint">When checked, you won't appear on the public leaderboard</p>
+                                    </div>
+                                ` : ''}
                             </div>
                             
                             <!-- Stats Section -->
@@ -1801,6 +1813,7 @@ class App {
             user.favoritePutter = document.getElementById('profilePutter').value;
             user.favoriteMidrange = document.getElementById('profileMidrange').value;
             user.favoriteDriver = document.getElementById('profileDriver').value;
+            user.hideFromLeaderboard = document.getElementById('profileHideFromLeaderboard').checked;
             
             // Save to database
             await storageManager.saveUser(user);

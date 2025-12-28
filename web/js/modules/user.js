@@ -46,6 +46,7 @@ class UserManager {
                 favoritePutter: null,
                 favoriteMidrange: null,
                 favoriteDriver: null,
+                hideFromLeaderboard: false,
                 totalPoints: 0,
                 totalSessions: 0,
                 totalRoutines: 0,
@@ -76,6 +77,7 @@ class UserManager {
             if (user.favoritePutter === undefined) user.favoritePutter = null;
             if (user.favoriteMidrange === undefined) user.favoriteMidrange = null;
             if (user.favoriteDriver === undefined) user.favoriteDriver = null;
+            if (user.hideFromLeaderboard === undefined) user.hideFromLeaderboard = false;
             
             await storageManager.saveUser(user);
             console.log('✅ User loaded:', user.email);
