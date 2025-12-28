@@ -213,6 +213,24 @@
     font-size: 0.95rem;
 }
 
+/* Bulk Quick Actions */
+.bulk-quick-actions {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+    margin-bottom: 1rem;
+    padding: 0.75rem;
+    background: #f3f4f6;
+    border-radius: 8px;
+}
+
+.selected-count {
+    margin-left: auto;
+    font-weight: 600;
+    color: #FF6B35;
+    font-size: 0.875rem;
+}
+
 /* Bulk Players List */
 .bulk-players-list {
     display: flex;

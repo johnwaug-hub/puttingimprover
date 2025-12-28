@@ -69,6 +69,7 @@ class App {
             },
             otherPlayerStats: null, // Cache for other player's calculated stats
             showBulkLogModal: false,
+            bulkActivityType: 'session', // session, routine, or game
             showPermissionsModal: false,
             bulkLogPlayers: [], // Players selected for bulk logging
             permissionRequests: [] // Pending permission requests
@@ -2312,6 +2313,17 @@ class App {
      * Attach bulk log modal event listeners
      */
     attachBulkLogModalListeners() {
+        // Activity type selector
+        const activityTypeSelect = document.getElementById('bulkActivityType');
+        if (activityTypeSelect) {
+            activityTypeSelect.addEventListener('change', (e) => {
+                this.state.bulkActivityType = e.target.value;
+                this.render();
+                // Re-attach listeners after re-render
+                setTimeout(() => this.attachBulkLogModalListeners(), 100);
+            });
+        }
+        
         // Close button
         const closeBtn = document.getElementById('closeBulkLogModal');
         if (closeBtn) {
@@ -2330,6 +2342,60 @@ class App {
             });
         }
         
+        // Search/filter players
+        const searchInput = document.getElementById('bulkPlayerSearch');
+        if (searchInput) {
+            searchInput.addEventListener('input', (e) => {
+                const searchTerm = e.target.value.toLowerCase();
+                const playerCards = document.querySelectorAll('.bulk-player-card');
+                
+                playerCards.forEach(card => {
+                    const playerName = card.dataset.playerName;
+                    if (playerName.includes(searchTerm)) {
+                        card.style.display = '';
+                    } else {
+                        card.style.display = 'none';
+                    }
+                });
+                
+                this.updateSelectedCount();
+            });
+        }
+        
+        // Select all button
+        const selectAllBtn = document.getElementById('selectAllPlayers');
+        if (selectAllBtn) {
+            selectAllBtn.addEventListener('click', () => {
+                const visibleCheckboxes = document.querySelectorAll('.bulk-player-card:not([style*="display: none"]) .bulk-player-checkbox');
+                visibleCheckboxes.forEach(checkbox => {
+                    if (!checkbox.checked) {
+                        checkbox.checked = true;
+                        // Trigger change event to enable inputs
+                        const event = new Event('change', { bubbles: true });
+                        checkbox.dispatchEvent(event);
+                    }
+                });
+                this.updateSelectedCount();
+            });
+        }
+        
+        // Deselect all button
+        const deselectAllBtn = document.getElementById('deselectAllPlayers');
+        if (deselectAllBtn) {
+            deselectAllBtn.addEventListener('click', () => {
+                const checkboxes = document.querySelectorAll('.bulk-player-checkbox');
+                checkboxes.forEach(checkbox => {
+                    if (checkbox.checked) {
+                        checkbox.checked = false;
+                        // Trigger change event to disable inputs
+                        const event = new Event('change', { bubbles: true });
+                        checkbox.dispatchEvent(event);
+                    }
+                });
+                this.updateSelectedCount();
+            });
+        }
+        
         // Checkbox toggle for enabling/disabling inputs
         const checkboxes = document.querySelectorAll('.bulk-player-checkbox');
         checkboxes.forEach(checkbox => {
@@ -2344,6 +2410,7 @@ class App {
                         if (input.dataset.field === 'attempts') input.value = '20';
                     }
                 });
+                this.updateSelectedCount();
             });
         });
         
@@ -2366,6 +2433,20 @@ class App {
                 }
             });
         }
+        
+        // Initial count update
+        this.updateSelectedCount();
+    }
+    
+    /**
+     * Update selected player count
+     */
+    updateSelectedCount() {
+        const selectedCountSpan = document.querySelector('.selected-count');
+        if (selectedCountSpan) {
+            const checkedCount = document.querySelectorAll('.bulk-player-checkbox:checked').length;
+            selectedCountSpan.textContent = `${checkedCount} selected`;
+        }
     }
     
     /**
@@ -2380,41 +2461,141 @@ class App {
                 return;
             }
             
+            const activityType = this.state.bulkActivityType || 'session';
             const requireApproval = document.getElementById('requireApproval')?.checked || false;
             let successCount = 0;
             
             for (const checkbox of checkedBoxes) {
                 const playerId = checkbox.dataset.playerId;
                 
-                // Get individual stats for this player
-                const distance = parseInt(document.querySelector(`.bulk-input[data-player-id="${playerId}"][data-field="distance"]`).value);
-                const makes = parseInt(document.querySelector(`.bulk-input[data-player-id="${playerId}"][data-field="makes"]`).value);
-                const attempts = parseInt(document.querySelector(`.bulk-input[data-player-id="${playerId}"][data-field="attempts"]`).value);
-                
-                if (makes > attempts) {
-                    this.showCustomAlert(`Invalid stats for ${checkbox.parentElement.querySelector('strong').textContent}: Makes cannot exceed attempts`, 'error');
-                    continue;
+                try {
+                    if (activityType === 'session') {
+                        // Get individual stats for this player
+                        const distance = parseInt(document.querySelector(`.bulk-input[data-player-id="${playerId}"][data-field="distance"]`).value);
+                        const makes = parseInt(document.querySelector(`.bulk-input[data-player-id="${playerId}"][data-field="makes"]`).value);
+                        const attempts = parseInt(document.querySelector(`.bulk-input[data-player-id="${playerId}"][data-field="attempts"]`).value);
+                        
+                        if (makes > attempts) {
+                            this.showCustomAlert(`Invalid stats for ${checkbox.dataset.playerName}: Makes cannot exceed attempts`, 'error');
+                            continue;
+                        }
+                        
+                        await this.addSessionForUser(playerId, { distance, makes, attempts }, requireApproval);
+                    } 
+                    else if (activityType === 'routine') {
+                        const routineId = document.getElementById('bulkRoutineSelect').value;
+                        const duration = parseInt(document.querySelector(`.bulk-input[data-player-id="${playerId}"][data-field="duration"]`)?.value || 20);
+                        
+                        await this.addRoutineForUser(playerId, routineId, duration, requireApproval);
+                    }
+                    else if (activityType === 'game') {
+                        const gameId = document.getElementById('bulkGameSelect').value;
+                        const score = parseInt(document.querySelector(`.bulk-input[data-player-id="${playerId}"][data-field="score"]`).value);
+                        
+                        await this.addGameForUser(playerId, gameId, score, requireApproval);
+                    }
+                    
+                    successCount++;
+                } catch (error) {
+                    console.error(`Error logging for player ${playerId}:`, error);
                 }
-                
-                // Log session for this player
-                await this.addSessionForUser(playerId, { distance, makes, attempts }, requireApproval);
-                successCount++;
             }
             
             // Close modal
             this.state.showBulkLogModal = false;
+            this.state.bulkActivityType = 'session'; // Reset to default
             
             // Reload data
             await this.loadLeaderboard();
             await this.loadRecentPractice();
             
             // Show success message
-            this.showCustomAlert(`Successfully logged sessions for ${successCount} player${successCount > 1 ? 's' : ''}!`, 'success');
+            const activityName = activityType === 'session' ? 'sessions' : activityType === 'routine' ? 'routines' : 'games';
+            this.showCustomAlert(`Successfully logged ${activityName} for ${successCount} player${successCount > 1 ? 's' : ''}!`, 'success');
             
         } catch (error) {
             console.error('Error bulk logging:', error);
-            this.showCustomAlert('Failed to bulk log sessions: ' + error.message, 'error');
+            this.showCustomAlert('Failed to bulk log: ' + error.message, 'error');
         }
+    }
+    
+    /**
+     * Add routine for another user
+     */
+    async addRoutineForUser(userId, routineId, duration, requireApproval = false) {
+        const routine = SUGGESTED_ROUTINES.find(r => r.id === routineId);
+        if (!routine) return;
+        
+        // Calculate points based on routine
+        const points = routine.drills.length * 50; // Simplified calculation
+        
+        const routineCompletion = {
+            id: `routine_${Date.now()}_${userId}`,
+            routineId: routine.id,
+            routineName: routine.name,
+            duration: duration,
+            date: new Date().toISOString().split('T')[0],
+            timestamp: new Date().toISOString(),
+            points: points,
+            loggedBy: userManager.getCurrentUser().id,
+            loggedByName: userManager.getCurrentUser().displayName,
+            pending: requireApproval
+        };
+        
+        // Save routine for target user
+        await storageManager.saveRoutineCompletion(userId, routineCompletion);
+        
+        // Update user stats if not pending
+        if (!requireApproval) {
+            const targetUser = await storageManager.getUser(userId);
+            if (targetUser) {
+                targetUser.totalPoints = (targetUser.totalPoints || 0) + points;
+                targetUser.totalRoutines = (targetUser.totalRoutines || 0) + 1;
+                await storageManager.saveUser(targetUser);
+            }
+        }
+        
+        return routineCompletion;
+    }
+    
+    /**
+     * Add game for another user
+     */
+    async addGameForUser(userId, gameId, score, requireApproval = false) {
+        const game = PUTTING_GAMES.find(g => g.id === gameId);
+        if (!game) return;
+        
+        // Calculate points based on score (simplified)
+        const { calculateGamePoints } = await import('./modules/gameTracker.js');
+        const points = Math.round(score * 10); // Simplified
+        
+        const gameCompletion = {
+            id: `game_${Date.now()}_${userId}`,
+            gameId: game.id,
+            gameName: game.name,
+            score: score,
+            points: points,
+            date: new Date().toISOString().split('T')[0],
+            endTime: new Date().toISOString(),
+            loggedBy: userManager.getCurrentUser().id,
+            loggedByName: userManager.getCurrentUser().displayName,
+            pending: requireApproval
+        };
+        
+        // Save game for target user
+        await storageManager.saveGameCompletion(userId, gameCompletion);
+        
+        // Update user stats if not pending
+        if (!requireApproval) {
+            const targetUser = await storageManager.getUser(userId);
+            if (targetUser) {
+                targetUser.totalPoints = (targetUser.totalPoints || 0) + points;
+                targetUser.totalGames = (targetUser.totalGames || 0) + 1;
+                await storageManager.saveUser(targetUser);
+            }
+        }
+        
+        return gameCompletion;
     }
     
     /**
@@ -2881,69 +3062,78 @@ class App {
             p.id !== userManager.getCurrentUser()?.id && !p.optOutSharedLogging
         );
         
+        const activityType = this.state.bulkActivityType || 'session';
+        
         return `
             <div class="modal-overlay" id="bulkLogModal">
                 <div class="modal bulk-log-modal">
                     <div class="modal-header">
-                        <h3>📋 Bulk Log Sessions</h3>
+                        <h3>📋 Bulk Log Activities</h3>
                         <button type="button" class="close-modal-btn" id="closeBulkLogModal">✕</button>
                     </div>
                     <div class="modal-body">
-                        <p class="modal-description">Log practice sessions for multiple players with individual stats</p>
+                        <p class="modal-description">Log activities for multiple players with individual stats</p>
                         
                         <form id="bulkLogForm">
-                            <!-- Player List with Individual Stats -->
-                            <div class="bulk-players-list">
-                                ${availablePlayers.length > 0 ? availablePlayers.map(player => `
-                                    <div class="bulk-player-card">
-                                        <div class="bulk-player-header">
-                                            <label class="checkbox-label">
-                                                <input type="checkbox" 
-                                                       class="bulk-player-checkbox" 
-                                                       data-player-id="${player.id}"
-                                                       value="${player.id}">
-                                                <strong>${player.displayName}</strong>
-                                            </label>
-                                        </div>
-                                        <div class="bulk-player-stats">
-                                            <div class="form-group-inline">
-                                                <label>Distance (ft)</label>
-                                                <input type="number" 
-                                                       class="bulk-input" 
-                                                       data-player-id="${player.id}"
-                                                       data-field="distance"
-                                                       min="5" 
-                                                       max="100" 
-                                                       value="20"
-                                                       disabled>
-                                            </div>
-                                            <div class="form-group-inline">
-                                                <label>Makes</label>
-                                                <input type="number" 
-                                                       class="bulk-input" 
-                                                       data-player-id="${player.id}"
-                                                       data-field="makes"
-                                                       min="0" 
-                                                       max="100"
-                                                       disabled>
-                                            </div>
-                                            <div class="form-group-inline">
-                                                <label>Attempts</label>
-                                                <input type="number" 
-                                                       class="bulk-input" 
-                                                       data-player-id="${player.id}"
-                                                       data-field="attempts"
-                                                       min="1" 
-                                                       max="100" 
-                                                       value="20"
-                                                       disabled>
-                                            </div>
-                                        </div>
-                                    </div>
-                                `).join('') : '<p class="empty-state">No players available for bulk logging. Players can opt out in their profile settings.</p>'}
+                            ${availablePlayers.length > 0 ? `
+                            <!-- Activity Type Selection -->
+                            <div class="form-group">
+                                <label for="bulkActivityType">Activity Type</label>
+                                <select id="bulkActivityType" class="form-input">
+                                    <option value="session" ${activityType === 'session' ? 'selected' : ''}>Practice Session</option>
+                                    <option value="routine" ${activityType === 'routine' ? 'selected' : ''}>Routine</option>
+                                    <option value="game" ${activityType === 'game' ? 'selected' : ''}>Game</option>
+                                </select>
                             </div>
                             
-                            ${availablePlayers.length > 0 ? `
+                            <!-- Routine/Game Selection (shown when applicable) -->
+                            ${activityType === 'routine' ? `
+                            <div class="form-group">
+                                <label for="bulkRoutineSelect">Select Routine</label>
+                                <select id="bulkRoutineSelect" class="form-input">
+                                    ${SUGGESTED_ROUTINES.map(r => `
+                                        <option value="${r.id}">${r.name} (${r.level})</option>
+                                    `).join('')}
+                                </select>
+                            </div>
+                            ` : ''}
+                            
+                            ${activityType === 'game' ? `
+                            <div class="form-group">
+                                <label for="bulkGameSelect">Select Game</label>
+                                <select id="bulkGameSelect" class="form-input">
+                                    ${PUTTING_GAMES.map(g => `
+                                        <option value="${g.id}">${g.name}</option>
+                                    `).join('')}
+                                </select>
+                            </div>
+                            ` : ''}
+                            
+                            <!-- Search/Filter Players -->
+                            <div class="form-group">
+                                <label for="bulkPlayerSearch">Search Players</label>
+                                <input type="text" 
+                                       id="bulkPlayerSearch" 
+                                       class="form-input" 
+                                       placeholder="Type to filter players...">
+                            </div>
+                            
+                            <!-- Quick Select Actions -->
+                            <div class="bulk-quick-actions">
+                                <button type="button" class="btn btn-secondary btn-small" id="selectAllPlayers">
+                                    ✓ Select All
+                                </button>
+                                <button type="button" class="btn btn-secondary btn-small" id="deselectAllPlayers">
+                                    ✕ Deselect All
+                                </button>
+                                <span class="selected-count">0 selected</span>
+                            </div>
+                            
+                            <!-- Player List with Individual Stats -->
+                            <div class="bulk-players-list" id="bulkPlayersList">
+                                ${availablePlayers.map(player => this.renderBulkPlayerCard(player, activityType)).join('')}
+                            </div>
+                            
                             <div class="form-group">
                                 <label>
                                     <input type="checkbox" id="requireApproval" checked>
@@ -2956,6 +3146,7 @@ class App {
                                 <button type="button" class="btn btn-secondary" id="cancelBulkLog">Cancel</button>
                             </div>
                             ` : `
+                            <p class="empty-state">No players available for bulk logging. Players can opt out in their profile settings.</p>
                             <div class="form-actions">
                                 <button type="button" class="btn btn-secondary" id="cancelBulkLog">Close</button>
                             </div>
@@ -2965,6 +3156,116 @@ class App {
                 </div>
             </div>
         `;
+    }
+    
+    /**
+     * Render individual player card for bulk logging
+     */
+    renderBulkPlayerCard(player, activityType) {
+        if (activityType === 'session') {
+            return `
+                <div class="bulk-player-card" data-player-name="${player.displayName.toLowerCase()}">
+                    <div class="bulk-player-header">
+                        <label class="checkbox-label">
+                            <input type="checkbox" 
+                                   class="bulk-player-checkbox" 
+                                   data-player-id="${player.id}"
+                                   data-player-name="${player.displayName}"
+                                   value="${player.id}">
+                            <strong>${player.displayName}</strong>
+                        </label>
+                    </div>
+                    <div class="bulk-player-stats">
+                        <div class="form-group-inline">
+                            <label>Distance (ft)</label>
+                            <input type="number" 
+                                   class="bulk-input" 
+                                   data-player-id="${player.id}"
+                                   data-field="distance"
+                                   min="5" 
+                                   max="100" 
+                                   value="20"
+                                   disabled>
+                        </div>
+                        <div class="form-group-inline">
+                            <label>Makes</label>
+                            <input type="number" 
+                                   class="bulk-input" 
+                                   data-player-id="${player.id}"
+                                   data-field="makes"
+                                   min="0" 
+                                   max="100"
+                                   disabled>
+                        </div>
+                        <div class="form-group-inline">
+                            <label>Attempts</label>
+                            <input type="number" 
+                                   class="bulk-input" 
+                                   data-player-id="${player.id}"
+                                   data-field="attempts"
+                                   min="1" 
+                                   max="100" 
+                                   value="20"
+                                   disabled>
+                        </div>
+                    </div>
+                </div>
+            `;
+        } else if (activityType === 'routine') {
+            return `
+                <div class="bulk-player-card" data-player-name="${player.displayName.toLowerCase()}">
+                    <div class="bulk-player-header">
+                        <label class="checkbox-label">
+                            <input type="checkbox" 
+                                   class="bulk-player-checkbox" 
+                                   data-player-id="${player.id}"
+                                   data-player-name="${player.displayName}"
+                                   value="${player.id}">
+                            <strong>${player.displayName}</strong>
+                        </label>
+                    </div>
+                    <div class="bulk-player-stats">
+                        <div class="form-group-inline">
+                            <label>Duration (min)</label>
+                            <input type="number" 
+                                   class="bulk-input" 
+                                   data-player-id="${player.id}"
+                                   data-field="duration"
+                                   min="1" 
+                                   max="120"
+                                   disabled>
+                        </div>
+                    </div>
+                </div>
+            `;
+        } else if (activityType === 'game') {
+            return `
+                <div class="bulk-player-card" data-player-name="${player.displayName.toLowerCase()}">
+                    <div class="bulk-player-header">
+                        <label class="checkbox-label">
+                            <input type="checkbox" 
+                                   class="bulk-player-checkbox" 
+                                   data-player-id="${player.id}"
+                                   data-player-name="${player.displayName}"
+                                   value="${player.id}">
+                            <strong>${player.displayName}</strong>
+                        </label>
+                    </div>
+                    <div class="bulk-player-stats">
+                        <div class="form-group-inline">
+                            <label>Score</label>
+                            <input type="number" 
+                                   class="bulk-input" 
+                                   data-player-id="${player.id}"
+                                   data-field="score"
+                                   min="0" 
+                                   max="1000"
+                                   disabled>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
     }
     
     /**
