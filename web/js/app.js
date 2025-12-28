@@ -2777,6 +2777,18 @@ class App {
                                 scoreData.attempts = parseInt(document.querySelector(`.bulk-input[data-player-id="${playerId}"][data-field="attempts"]`)?.value || 0);
                                 scoreData.score = scoreData.streak;
                                 break;
+                            case 'elimination':
+                                const wonValue = document.querySelector(`.bulk-input[data-player-id="${playerId}"][data-field="won"]`)?.value;
+                                scoreData.won = wonValue === 'true';
+                                scoreData.score = scoreData.won ? 1 : 0;
+                                break;
+                            case 'rotations':
+                                scoreData.totalMakes = parseInt(document.querySelector(`.bulk-input[data-player-id="${playerId}"][data-field="totalMakes"]`)?.value || 0);
+                                scoreData.totalAttempts = parseInt(document.querySelector(`.bulk-input[data-player-id="${playerId}"][data-field="totalAttempts"]`)?.value || 0);
+                                scoreData.distance = parseInt(document.querySelector(`.bulk-input[data-player-id="${playerId}"][data-field="distance"]`)?.value || 20);
+                                scoreData.percentage = scoreData.totalAttempts > 0 ? (scoreData.totalMakes / scoreData.totalAttempts * 100) : 0;
+                                scoreData.score = scoreData.totalMakes;
+                                break;
                             default:
                                 scoreData.score = parseInt(document.querySelector(`.bulk-input[data-player-id="${playerId}"][data-field="score"]`)?.value || 0);
                         }
@@ -3762,6 +3774,56 @@ class App {
                                    data-field="attempts"
                                    min="10" 
                                    max="200"
+                                   disabled>
+                        </div>
+                    `;
+                    break;
+                case 'elimination':
+                    gameFields = `
+                        <div class="form-group-inline">
+                            <label>Result</label>
+                            <select class="bulk-input"
+                                   data-player-id="${player.id}"
+                                   data-field="won"
+                                   disabled>
+                                <option value="">Select...</option>
+                                <option value="true">Won</option>
+                                <option value="false">Lost</option>
+                            </select>
+                        </div>
+                    `;
+                    break;
+                case 'rotations':
+                    gameFields = `
+                        <div class="form-group-inline full-width">
+                            <label>Total Makes</label>
+                            <input type="number" 
+                                   class="bulk-input" 
+                                   data-player-id="${player.id}"
+                                   data-field="totalMakes"
+                                   min="0" 
+                                   max="200"
+                                   disabled>
+                        </div>
+                        <div class="form-group-inline full-width">
+                            <label>Total Attempts</label>
+                            <input type="number" 
+                                   class="bulk-input" 
+                                   data-player-id="${player.id}"
+                                   data-field="totalAttempts"
+                                   min="1" 
+                                   max="200"
+                                   disabled>
+                        </div>
+                        <div class="form-group-inline full-width">
+                            <label>Distance (ft)</label>
+                            <input type="number" 
+                                   class="bulk-input" 
+                                   data-player-id="${player.id}"
+                                   data-field="distance"
+                                   min="10" 
+                                   max="100"
+                                   value="20"
                                    disabled>
                         </div>
                     `;
