@@ -40,7 +40,12 @@ class UserManager {
                 email: firebaseUser.email,
                 displayName: firebaseUser.displayName || firebaseUser.email?.split('@')[0] || 'User',
                 photoURL: firebaseUser.photoURL,
+                profilePictureURL: firebaseUser.photoURL || null,
                 gender: validGender,
+                birthday: null,
+                favoritePutter: null,
+                favoriteMidrange: null,
+                favoriteDriver: null,
                 totalPoints: 0,
                 totalSessions: 0,
                 totalRoutines: 0,
@@ -64,6 +69,13 @@ class UserManager {
             if (!user.gender) {
                 user.gender = 'male'; // Default for existing users
             }
+            
+            // Initialize profile fields if they don't exist
+            if (user.profilePictureURL === undefined) user.profilePictureURL = user.photoURL || null;
+            if (user.birthday === undefined) user.birthday = null;
+            if (user.favoritePutter === undefined) user.favoritePutter = null;
+            if (user.favoriteMidrange === undefined) user.favoriteMidrange = null;
+            if (user.favoriteDriver === undefined) user.favoriteDriver = null;
             
             await storageManager.saveUser(user);
             console.log('✅ User loaded:', user.email);

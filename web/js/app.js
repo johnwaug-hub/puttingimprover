@@ -33,7 +33,9 @@ class App {
             showGameScoreModal: false,
             selectedGameForScore: null,
             showRoutineCompletionModal: false,
-            selectedRoutineForCompletion: null
+            selectedRoutineForCompletion: null,
+            showProfileModal: false,
+            selectedUserProfile: null
         };
 
         this.newSession = {
@@ -546,6 +548,9 @@ class App {
             
             <!-- Routine Completion Modal -->
             ${this.state.showRoutineCompletionModal ? this.renderRoutineCompletionModal() : ''}
+            
+            <!-- Profile Modal -->
+            ${this.state.showProfileModal ? this.renderProfileModal() : ''}
         `;
     }
     
@@ -689,7 +694,12 @@ class App {
             <div class="leaderboard-item ${isCurrentUser ? 'current-user' : ''}">
                 <div class="rank ${rankClass}">#${rank}</div>
                 <div class="player-info">
-                    <div class="player-name">${player.displayName || 'Unknown Player'}${isCurrentUser ? ' (You)' : ''}</div>
+                    <div class="player-name-wrapper">
+                        <span class="player-name clickable" data-user-id="${player.id}">
+                            ${player.displayName || 'Unknown Player'}
+                        </span>
+                        ${isCurrentUser ? '<span class="you-badge">(You)</span>' : ''}
+                    </div>
                 </div>
                 <div class="player-stats">
                     <div class="stat-item">
@@ -1088,6 +1098,15 @@ class App {
                 e.stopPropagation();
                 const gameId = e.target.dataset.game;
                 this.openGameScoreModal(gameId);
+            });
+        });
+        
+        // Player name clicks (open profile)
+        const playerNames = document.querySelectorAll('.player-name.clickable');
+        playerNames.forEach(name => {
+            name.addEventListener('click', (e) => {
+                const userId = e.target.dataset.userId;
+                this.openProfileModal(userId);
             });
         });
         
@@ -1543,6 +1562,241 @@ class App {
         } catch (error) {
             console.error('Error logging routine completion:', error);
             alert('Failed to log routine completion: ' + error.message);
+        }
+    }
+    
+    /**
+     * Render profile modal
+     */
+    renderProfileModal() {
+        const user = this.state.selectedUserProfile;
+        if (!user) return '';
+        
+        const currentUser = userManager.getCurrentUser();
+        const isOwnProfile = currentUser && (user.id === currentUser.id);
+        
+        // Format birthday
+        const birthday = user.birthday ? new Date(user.birthday).toLocaleDateString() : 'Not set';
+        
+        return `
+            <div class="modal-overlay" id="profileModal">
+                <div class="modal profile-modal">
+                    <div class="modal-header">
+                        <h3>👤 Player Profile</h3>
+                        <button type="button" class="close-modal-btn" id="closeProfileModal">✕</button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="profile-content">
+                            <!-- Profile Picture -->
+                            <div class="profile-picture-section">
+                                <div class="profile-picture">
+                                    ${user.profilePictureURL 
+                                        ? `<img src="${user.profilePictureURL}" alt="${user.displayName}">` 
+                                        : `<div class="profile-placeholder">${(user.displayName || 'U')[0].toUpperCase()}</div>`
+                                    }
+                                </div>
+                                ${isOwnProfile ? '<button class="btn btn-secondary btn-small" id="changeProfilePicBtn">Change Photo</button>' : ''}
+                            </div>
+                            
+                            <!-- Profile Info -->
+                            <div class="profile-info-section">
+                                <div class="profile-field">
+                                    <label>Display Name</label>
+                                    ${isOwnProfile 
+                                        ? `<input type="text" id="profileDisplayName" value="${user.displayName || ''}" class="profile-input">`
+                                        : `<div class="profile-value">${user.displayName || 'Unknown'}</div>`
+                                    }
+                                </div>
+                                
+                                <div class="profile-field">
+                                    <label>Gender</label>
+                                    ${isOwnProfile 
+                                        ? `<select id="profileGender" class="profile-input">
+                                            <option value="male" ${user.gender === 'male' ? 'selected' : ''}>Male</option>
+                                            <option value="female" ${user.gender === 'female' ? 'selected' : ''}>Female</option>
+                                           </select>`
+                                        : `<div class="profile-value">${user.gender === 'male' ? '♂️ Male' : '♀️ Female'}</div>`
+                                    }
+                                </div>
+                                
+                                <div class="profile-field">
+                                    <label>Birthday</label>
+                                    ${isOwnProfile 
+                                        ? `<input type="date" id="profileBirthday" value="${user.birthday || ''}" class="profile-input">`
+                                        : `<div class="profile-value">${birthday}</div>`
+                                    }
+                                </div>
+                                
+                                <div class="profile-field">
+                                    <label>Favorite Putter</label>
+                                    ${isOwnProfile 
+                                        ? `<input type="text" id="profilePutter" value="${user.favoritePutter || ''}" placeholder="e.g., Aviar, Luna, Berg" class="profile-input">`
+                                        : `<div class="profile-value">${user.favoritePutter || 'Not set'}</div>`
+                                    }
+                                </div>
+                                
+                                <div class="profile-field">
+                                    <label>Favorite Midrange</label>
+                                    ${isOwnProfile 
+                                        ? `<input type="text" id="profileMidrange" value="${user.favoriteMidrange || ''}" placeholder="e.g., Buzzz, Roc, Mako3" class="profile-input">`
+                                        : `<div class="profile-value">${user.favoriteMidrange || 'Not set'}</div>`
+                                    }
+                                </div>
+                                
+                                <div class="profile-field">
+                                    <label>Favorite Driver</label>
+                                    ${isOwnProfile 
+                                        ? `<input type="text" id="profileDriver" value="${user.favoriteDriver || ''}" placeholder="e.g., Destroyer, Teebird, Wraith" class="profile-input">`
+                                        : `<div class="profile-value">${user.favoriteDriver || 'Not set'}</div>`
+                                    }
+                                </div>
+                            </div>
+                            
+                            <!-- Stats Section -->
+                            <div class="profile-stats-section">
+                                <h4>📊 Stats</h4>
+                                <div class="profile-stats-grid">
+                                    <div class="profile-stat">
+                                        <div class="profile-stat-value">${user.totalPoints || 0}</div>
+                                        <div class="profile-stat-label">Points</div>
+                                    </div>
+                                    <div class="profile-stat">
+                                        <div class="profile-stat-value">${user.totalSessions || 0}</div>
+                                        <div class="profile-stat-label">Sessions</div>
+                                    </div>
+                                    <div class="profile-stat">
+                                        <div class="profile-stat-value">${user.totalRoutines || 0}</div>
+                                        <div class="profile-stat-label">Routines</div>
+                                    </div>
+                                    <div class="profile-stat">
+                                        <div class="profile-stat-value">${user.totalGames || 0}</div>
+                                        <div class="profile-stat-label">Games</div>
+                                    </div>
+                                </div>
+                                <div class="profile-member-since">
+                                    Member since: ${new Date(user.createdAt || Date.now()).toLocaleDateString()}
+                                </div>
+                            </div>
+                            
+                            ${isOwnProfile ? `
+                                <div class="profile-actions">
+                                    <button type="button" class="btn btn-primary" id="saveProfileBtn">💾 Save Changes</button>
+                                    <button type="button" class="btn btn-secondary" id="cancelProfileBtn">Cancel</button>
+                                </div>
+                            ` : ''}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+    }
+    
+    /**
+     * Open profile modal
+     */
+    async openProfileModal(userId) {
+        try {
+            // Fetch user data
+            const user = await storageManager.getUser(userId);
+            if (!user) {
+                alert('User not found');
+                return;
+            }
+            
+            this.state.selectedUserProfile = user;
+            this.state.showProfileModal = true;
+            this.render();
+            
+            // Attach event listeners after render
+            setTimeout(() => {
+                const closeBtn = document.getElementById('closeProfileModal');
+                if (closeBtn) {
+                    closeBtn.addEventListener('click', () => this.closeProfileModal());
+                }
+                
+                const cancelBtn = document.getElementById('cancelProfileBtn');
+                if (cancelBtn) {
+                    cancelBtn.addEventListener('click', () => this.closeProfileModal());
+                }
+                
+                const saveBtn = document.getElementById('saveProfileBtn');
+                if (saveBtn) {
+                    saveBtn.addEventListener('click', () => this.handleProfileSave());
+                }
+                
+                const changePhotoBtn = document.getElementById('changeProfilePicBtn');
+                if (changePhotoBtn) {
+                    changePhotoBtn.addEventListener('click', () => this.handleProfilePictureChange());
+                }
+                
+                // Close on overlay click
+                const overlay = document.getElementById('profileModal');
+                if (overlay) {
+                    overlay.addEventListener('click', (e) => {
+                        if (e.target === overlay) {
+                            this.closeProfileModal();
+                        }
+                    });
+                }
+            }, 100);
+        } catch (error) {
+            console.error('Error opening profile:', error);
+            alert('Failed to load profile');
+        }
+    }
+    
+    /**
+     * Close profile modal
+     */
+    closeProfileModal() {
+        this.state.showProfileModal = false;
+        this.state.selectedUserProfile = null;
+        this.render();
+    }
+    
+    /**
+     * Handle profile save
+     */
+    async handleProfileSave() {
+        try {
+            const user = this.state.selectedUserProfile;
+            
+            // Update user data
+            user.displayName = document.getElementById('profileDisplayName').value;
+            user.gender = document.getElementById('profileGender').value;
+            user.birthday = document.getElementById('profileBirthday').value;
+            user.favoritePutter = document.getElementById('profilePutter').value;
+            user.favoriteMidrange = document.getElementById('profileMidrange').value;
+            user.favoriteDriver = document.getElementById('profileDriver').value;
+            
+            // Save to database
+            await storageManager.saveUser(user);
+            
+            // Update current user if it's own profile
+            const currentUser = userManager.getCurrentUser();
+            if (currentUser && user.id === currentUser.id) {
+                Object.assign(currentUser, user);
+            }
+            
+            // Reload leaderboard to reflect changes
+            await this.loadLeaderboard();
+            
+            alert('✅ Profile updated successfully!');
+            this.closeProfileModal();
+        } catch (error) {
+            console.error('Error saving profile:', error);
+            alert('Failed to save profile: ' + error.message);
+        }
+    }
+    
+    /**
+     * Handle profile picture change
+     */
+    async handleProfilePictureChange() {
+        const url = prompt('Enter image URL for your profile picture:');
+        if (url) {
+            this.state.selectedUserProfile.profilePictureURL = url;
+            this.render();
         }
     }
 }
