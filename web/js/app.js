@@ -849,6 +849,19 @@ class App {
             <div class="card add-session-form">
                 <h3>${isEditing ? '✏️ Edit Practice Session' : 'Add Practice Session'}</h3>
                 <form id="sessionForm">
+                    ${!isEditing ? `
+                    <div class="form-group">
+                        <label for="logForUser">Log Session For</label>
+                        <select id="logForUser" class="form-input">
+                            <option value="${this.state.user?.id || ''}">Myself</option>
+                            ${this.state.leaderboard
+                                .filter(p => p.id !== (this.state.user?.id || ''))
+                                .map(p => `<option value="${p.id}">${p.displayName}</option>`)
+                                .join('')}
+                        </select>
+                        <p class="form-hint">Choose who this session is for</p>
+                    </div>
+                    ` : ''}
                     <div class="form-row">
                         <div class="form-group">
                             <label for="distance">Distance (feet)</label>
@@ -1661,6 +1674,17 @@ class App {
                     </div>
                     <div class="modal-body">
                         <form id="gameScoreForm" class="game-score-form">
+                            <div class="form-group">
+                                <label for="logGameForUser">Log Game For</label>
+                                <select id="logGameForUser" class="form-input">
+                                    <option value="${this.state.user?.id || ''}">Myself</option>
+                                    ${this.state.leaderboard
+                                        .filter(p => p.id !== (this.state.user?.id || ''))
+                                        .map(p => `<option value="${p.id}">${p.displayName}</option>`)
+                                        .join('')}
+                                </select>
+                            </div>
+                            
                             ${formHTML}
                             
                             <div class="form-group">
@@ -2090,7 +2114,7 @@ class App {
             const isEditing = this.state.editingSession !== null;
             
             if (isEditing) {
-                // Update existing session
+                // Update existing session (always for current user)
                 await userManager.updateSession(this.state.editingSession, {
                     distance,
                     makes,
@@ -2098,13 +2122,25 @@ class App {
                 });
                 this.showCustomAlert('Session updated successfully!', 'success');
             } else {
-                // Add new session
-                await userManager.addSession({
-                    distance,
-                    makes,
-                    attempts
-                });
-                this.showCustomAlert('Session added successfully!', 'success');
+                // Check if logging for another user
+                const logForUserSelect = document.getElementById('logForUser');
+                const targetUserId = logForUserSelect ? logForUserSelect.value : userManager.getCurrentUser().id;
+                const currentUser = userManager.getCurrentUser();
+                
+                if (targetUserId !== currentUser.id) {
+                    // Logging for another user
+                    await this.addSessionForUser(targetUserId, { distance, makes, attempts });
+                    const targetUser = this.state.leaderboard.find(p => p.id === targetUserId);
+                    this.showCustomAlert(`Session added for ${targetUser?.displayName || 'user'}!`, 'success');
+                } else {
+                    // Logging for self
+                    await userManager.addSession({
+                        distance,
+                        makes,
+                        attempts
+                    });
+                    this.showCustomAlert('Session added successfully!', 'success');
+                }
             }
             
             // Reset form and hide
@@ -2122,7 +2158,7 @@ class App {
             await this.loadLeaderboard();
             await this.loadRecentPractice();
             
-            // Check achievements and show splash
+            // Check achievements and show splash (only for current user's sessions)
             const newAchievements = await achievementManager.checkAchievements();
             if (newAchievements && newAchievements.length > 0) {
                 this.showAchievementSplash(newAchievements[0]);
@@ -2135,6 +2171,64 @@ class App {
             console.error('Error saving session:', error);
             this.showCustomAlert('Failed to save session: ' + error.message, 'error');
         }
+    }
+    
+    /**
+     * Add session for another user
+     */
+    async addSessionForUser(userId, sessionData) {
+        const { makes, attempts, distance } = sessionData;
+        
+        // Calculate points and percentage
+        const { calculateSessionPoints } = await import('./utils/calculations.js');
+        const { points, percentage } = calculateSessionPoints(makes, attempts, distance);
+        
+        // Create session object
+        const session = {
+            id: `session_${Date.now()}`,
+            date: new Date().toISOString().split('T')[0],
+            timestamp: new Date().toISOString(),
+            distance,
+            makes,
+            attempts,
+            percentage,
+            points,
+            loggedBy: userManager.getCurrentUser().id, // Track who logged it
+            loggedByName: userManager.getCurrentUser().displayName
+        };
+        
+        // Save session for target user
+        await storageManager.saveSession(userId, session);
+        
+        // Update target user's stats
+        const targetUser = await storageManager.getUser(userId);
+        if (targetUser) {
+            targetUser.totalPoints = (targetUser.totalPoints || 0) + points;
+            targetUser.totalSessions = (targetUser.totalSessions || 0) + 1;
+            targetUser.totalPutts = (targetUser.totalPutts || 0) + attempts;
+            targetUser.totalMakes = (targetUser.totalMakes || 0) + makes;
+            
+            // Update best session if needed
+            if (!targetUser.bestSession || points > (targetUser.bestSession.points || 0)) {
+                targetUser.bestSession = {
+                    distance,
+                    makes,
+                    attempts,
+                    percentage,
+                    points,
+                    date: session.date
+                };
+            }
+            
+            // Update best accuracy
+            if (!targetUser.bestAccuracy || percentage > targetUser.bestAccuracy) {
+                targetUser.bestAccuracy = percentage;
+            }
+            
+            await storageManager.saveUser(targetUser);
+        }
+        
+        return session;
     }
     
     /**
@@ -2544,6 +2638,17 @@ class App {
                     <div class="modal-body">
                         <p class="modal-description">Log your performance for each drill in this routine:</p>
                         <form id="routineCompletionForm" class="routine-completion-form">
+                            <div class="form-group">
+                                <label for="logRoutineForUser">Log Routine For</label>
+                                <select id="logRoutineForUser" class="form-input">
+                                    <option value="${this.state.user?.id || ''}">Myself</option>
+                                    ${this.state.leaderboard
+                                        .filter(p => p.id !== (this.state.user?.id || ''))
+                                        .map(p => `<option value="${p.id}">${p.displayName}</option>`)
+                                        .join('')}
+                                </select>
+                            </div>
+                            
                             ${routine.drills.map((drill, idx) => `
                                 <div class="drill-completion-group">
                                     <h4>Drill ${idx + 1}: ${drill.distance}ft - ${drill.attempts} attempts</h4>
