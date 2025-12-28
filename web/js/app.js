@@ -698,6 +698,9 @@ class App {
                 break;
         }
         
+        // Count achievements
+        const achievementsCount = player.achievements ? player.achievements.length : 0;
+        
         return `
             <div class="leaderboard-item ${isCurrentUser ? 'current-user' : ''}">
                 <div class="rank ${rankClass}">#${rank}</div>
@@ -713,6 +716,11 @@ class App {
                             ${player.displayName || 'Unknown Player'}
                         </span>
                     </div>
+                    ${achievementsCount > 0 ? `
+                        <div class="player-achievements">
+                            🏅 ${achievementsCount} achievement${achievementsCount !== 1 ? 's' : ''}
+                        </div>
+                    ` : ''}
                 </div>
                 <div class="player-stats">
                     <div class="stat-item">

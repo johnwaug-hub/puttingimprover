@@ -697,6 +697,11 @@
                 width: 40px;
                 height: 40px;
             }
+            
+            /* Achievements on mobile */
+            .player-achievements {
+                font-size: 0.75rem;
+            }
         }
     </style>
 
@@ -1097,11 +1102,32 @@
 
 .player-info {
     flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
 }
 
 .player-name {
     font-weight: 600;
     font-size: 1.1rem;
+}
+
+.player-name-wrapper {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.player-achievements {
+    font-size: 0.875rem;
+    color: #6b7280;
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+}
+
+.leaderboard-item.current-user .player-achievements {
+    color: #8B6F47;
 }
 
 .player-stats {
