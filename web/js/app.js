@@ -66,7 +66,8 @@ class App {
                 'routine-Intermediate': true,
                 'routine-Advanced': true,
                 'routine-Expert': true
-            }
+            },
+            otherPlayerStats: null // Cache for other player's calculated stats
         };
 
         this.newSession = {
@@ -1229,19 +1230,28 @@ class App {
         if (this.state.searchedPlayer && this.state.searchedPlayer !== user.id) {
             displayPlayer = this.state.leaderboard.find(p => p.id === this.state.searchedPlayer);
             if (displayPlayer) {
-                // For other players, show their stored stats
-                displaySessions = []; // Don't show individual sessions for privacy
-                displayStats = {
-                    totalSessions: displayPlayer.totalSessions || 0,
-                    totalPutts: displayPlayer.totalPutts || 0,
-                    totalMakes: displayPlayer.totalMakes || 0,
-                    accuracy: displayPlayer.totalPutts > 0 ? ((displayPlayer.totalMakes / displayPlayer.totalPutts) * 100).toFixed(1) : 0,
-                    bestSession: displayPlayer.bestSession || null,
-                    currentStreak: displayPlayer.currentStreak || 0,
-                    longestStreak: displayPlayer.longestStreak || 0,
-                    avgDistance: displayPlayer.avgDistance || 0,
-                    bestAccuracy: displayPlayer.bestAccuracy || 0
-                };
+                // Load their sessions to calculate stats
+                this.loadOtherPlayerStats(displayPlayer.id);
+                
+                // Use cached data if available
+                if (this.state.otherPlayerStats && this.state.otherPlayerStats.playerId === displayPlayer.id) {
+                    displaySessions = [];
+                    displayStats = this.state.otherPlayerStats.stats;
+                } else {
+                    // Show loading state or stored aggregate stats
+                    displaySessions = [];
+                    displayStats = {
+                        totalSessions: displayPlayer.totalSessions || 0,
+                        totalPutts: displayPlayer.totalPutts || 0,
+                        totalMakes: displayPlayer.totalMakes || 0,
+                        accuracy: displayPlayer.totalPutts > 0 ? ((displayPlayer.totalMakes / displayPlayer.totalPutts) * 100).toFixed(1) : 0,
+                        bestSession: displayPlayer.bestSession || null,
+                        currentStreak: displayPlayer.currentStreak || 0,
+                        longestStreak: displayPlayer.longestStreak || 0,
+                        avgDistance: displayPlayer.avgDistance || 0,
+                        bestAccuracy: displayPlayer.bestAccuracy || 0
+                    };
+                }
             }
         }
         
@@ -2241,6 +2251,64 @@ class App {
     }
     
     /**
+     * Load and calculate stats for another player
+     */
+    async loadOtherPlayerStats(playerId) {
+        try {
+            // Check if already loaded for this player
+            if (this.state.otherPlayerStats && this.state.otherPlayerStats.playerId === playerId) {
+                return;
+            }
+            
+            // Fetch their sessions
+            const sessions = await storageManager.getSessions(playerId);
+            
+            // Calculate stats from sessions
+            const totalPutts = sessions.reduce((sum, s) => sum + s.attempts, 0);
+            const totalMakes = sessions.reduce((sum, s) => sum + s.makes, 0);
+            const accuracy = totalPutts > 0 ? ((totalMakes / totalPutts) * 100).toFixed(1) : 0;
+            
+            // Find best session
+            let bestSession = null;
+            if (sessions.length > 0) {
+                bestSession = sessions.reduce((best, s) => 
+                    !best || s.points > best.points ? s : best
+                , null);
+            }
+            
+            // Find best accuracy
+            const bestAccuracy = sessions.length > 0 
+                ? Math.max(...sessions.map(s => s.percentage)).toFixed(1) 
+                : 0;
+            
+            // Calculate average distance
+            const totalDistance = sessions.reduce((sum, s) => sum + (s.distance * s.attempts), 0);
+            const avgDistance = totalPutts > 0 ? (totalDistance / totalPutts).toFixed(1) : 0;
+            
+            // Cache the calculated stats
+            this.state.otherPlayerStats = {
+                playerId: playerId,
+                stats: {
+                    totalPutts,
+                    totalMakes,
+                    accuracy,
+                    bestSession,
+                    bestAccuracy,
+                    avgDistance,
+                    currentStreak: 0, // Would need date-based calculation
+                    longestStreak: 0  // Would need date-based calculation
+                }
+            };
+            
+            // Re-render with the new stats
+            this.render();
+            
+        } catch (error) {
+            console.error('Error loading other player stats:', error);
+        }
+    }
+    
+    /**
      * Handle player search
      */
     async handlePlayerSearch() {
@@ -2259,6 +2327,10 @@ class App {
         );
         
         if (player) {
+            // Clear cached stats when searching for a new player
+            if (this.state.searchedPlayer !== player.id) {
+                this.state.otherPlayerStats = null;
+            }
             this.state.searchedPlayer = player.id;
             this.render();
         } else {
