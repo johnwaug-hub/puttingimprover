@@ -675,9 +675,6 @@ class App {
                                 <button id="bulkLogBtn" class="btn btn-secondary btn-small">
                                     📋 Bulk Log
                                 </button>
-                                <button id="managePermissionsBtn" class="btn btn-secondary btn-small">
-                                    🔐 Permissions
-                                </button>
                                 <button id="addSessionBtn" class="btn btn-primary">
                                     ➕ Add Practice Session
                                 </button>
@@ -1929,6 +1926,20 @@ class App {
             });
         }
         
+        // Bulk log button
+        const bulkLogBtn = document.getElementById('bulkLogBtn');
+        if (bulkLogBtn) {
+            bulkLogBtn.addEventListener('click', () => {
+                this.state.showBulkLogModal = true;
+                this.render();
+                
+                // Attach modal event listeners after render
+                setTimeout(() => {
+                    this.attachBulkLogModalListeners();
+                }, 100);
+            });
+        }
+        
         // Delete session buttons
         const deleteSessionBtns = document.querySelectorAll('.btn-delete-session');
         deleteSessionBtns.forEach(btn => {
@@ -2295,6 +2306,115 @@ class App {
         }
         
         return session;
+    }
+    
+    /**
+     * Attach bulk log modal event listeners
+     */
+    attachBulkLogModalListeners() {
+        // Close button
+        const closeBtn = document.getElementById('closeBulkLogModal');
+        if (closeBtn) {
+            closeBtn.addEventListener('click', () => {
+                this.state.showBulkLogModal = false;
+                this.render();
+            });
+        }
+        
+        // Cancel button
+        const cancelBtn = document.getElementById('cancelBulkLog');
+        if (cancelBtn) {
+            cancelBtn.addEventListener('click', () => {
+                this.state.showBulkLogModal = false;
+                this.render();
+            });
+        }
+        
+        // Checkbox toggle for enabling/disabling inputs
+        const checkboxes = document.querySelectorAll('.bulk-player-checkbox');
+        checkboxes.forEach(checkbox => {
+            checkbox.addEventListener('change', (e) => {
+                const playerId = e.target.dataset.playerId;
+                const inputs = document.querySelectorAll(`.bulk-input[data-player-id="${playerId}"]`);
+                inputs.forEach(input => {
+                    input.disabled = !e.target.checked;
+                    if (e.target.checked && !input.value) {
+                        // Set default values when enabled
+                        if (input.dataset.field === 'distance') input.value = '20';
+                        if (input.dataset.field === 'attempts') input.value = '20';
+                    }
+                });
+            });
+        });
+        
+        // Form submit
+        const form = document.getElementById('bulkLogForm');
+        if (form) {
+            form.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                await this.handleBulkLog();
+            });
+        }
+        
+        // Close on overlay click
+        const overlay = document.getElementById('bulkLogModal');
+        if (overlay) {
+            overlay.addEventListener('click', (e) => {
+                if (e.target === overlay) {
+                    this.state.showBulkLogModal = false;
+                    this.render();
+                }
+            });
+        }
+    }
+    
+    /**
+     * Handle bulk log submission
+     */
+    async handleBulkLog() {
+        try {
+            const checkedBoxes = document.querySelectorAll('.bulk-player-checkbox:checked');
+            
+            if (checkedBoxes.length === 0) {
+                this.showCustomAlert('Please select at least one player', 'warning');
+                return;
+            }
+            
+            const requireApproval = document.getElementById('requireApproval')?.checked || false;
+            let successCount = 0;
+            
+            for (const checkbox of checkedBoxes) {
+                const playerId = checkbox.dataset.playerId;
+                
+                // Get individual stats for this player
+                const distance = parseInt(document.querySelector(`.bulk-input[data-player-id="${playerId}"][data-field="distance"]`).value);
+                const makes = parseInt(document.querySelector(`.bulk-input[data-player-id="${playerId}"][data-field="makes"]`).value);
+                const attempts = parseInt(document.querySelector(`.bulk-input[data-player-id="${playerId}"][data-field="attempts"]`).value);
+                
+                if (makes > attempts) {
+                    this.showCustomAlert(`Invalid stats for ${checkbox.parentElement.querySelector('strong').textContent}: Makes cannot exceed attempts`, 'error');
+                    continue;
+                }
+                
+                // Log session for this player
+                await this.addSessionForUser(playerId, { distance, makes, attempts }, requireApproval);
+                successCount++;
+            }
+            
+            // Close modal
+            this.state.showBulkLogModal = false;
+            
+            // Reload data
+            await this.loadLeaderboard();
+            await this.loadRecentPractice();
+            
+            // Show success message
+            this.showCustomAlert(`Successfully logged sessions for ${successCount} player${successCount > 1 ? 's' : ''}!`, 'success');
+            
+        } catch (error) {
+            console.error('Error bulk logging:', error);
+            this.showCustomAlert('Failed to bulk log sessions: ' + error.message, 'error');
+        }
     }
     
     /**
@@ -2757,6 +2877,10 @@ class App {
      * Render bulk logging modal
      */
     renderBulkLogModal() {
+        const availablePlayers = this.state.leaderboard.filter(p => 
+            p.id !== userManager.getCurrentUser()?.id && !p.optOutSharedLogging
+        );
+        
         return `
             <div class="modal-overlay" id="bulkLogModal">
                 <div class="modal bulk-log-modal">
@@ -2765,43 +2889,61 @@ class App {
                         <button type="button" class="close-modal-btn" id="closeBulkLogModal">✕</button>
                     </div>
                     <div class="modal-body">
-                        <p class="modal-description">Log the same practice session for multiple players at once</p>
+                        <p class="modal-description">Log practice sessions for multiple players with individual stats</p>
                         
                         <form id="bulkLogForm">
-                            <!-- Player Selection -->
-                            <div class="form-group">
-                                <label>Select Players</label>
-                                <div class="player-checkbox-list">
-                                    ${this.state.leaderboard
-                                        .filter(p => p.id !== userManager.getCurrentUser()?.id)
-                                        .map(player => `
+                            <!-- Player List with Individual Stats -->
+                            <div class="bulk-players-list">
+                                ${availablePlayers.length > 0 ? availablePlayers.map(player => `
+                                    <div class="bulk-player-card">
+                                        <div class="bulk-player-header">
                                             <label class="checkbox-label">
                                                 <input type="checkbox" 
-                                                       name="bulkPlayers" 
-                                                       value="${player.id}"
-                                                       class="bulk-player-checkbox">
-                                                <span>${player.displayName}</span>
+                                                       class="bulk-player-checkbox" 
+                                                       data-player-id="${player.id}"
+                                                       value="${player.id}">
+                                                <strong>${player.displayName}</strong>
                                             </label>
-                                        `).join('')}
-                                </div>
+                                        </div>
+                                        <div class="bulk-player-stats">
+                                            <div class="form-group-inline">
+                                                <label>Distance (ft)</label>
+                                                <input type="number" 
+                                                       class="bulk-input" 
+                                                       data-player-id="${player.id}"
+                                                       data-field="distance"
+                                                       min="5" 
+                                                       max="100" 
+                                                       value="20"
+                                                       disabled>
+                                            </div>
+                                            <div class="form-group-inline">
+                                                <label>Makes</label>
+                                                <input type="number" 
+                                                       class="bulk-input" 
+                                                       data-player-id="${player.id}"
+                                                       data-field="makes"
+                                                       min="0" 
+                                                       max="100"
+                                                       disabled>
+                                            </div>
+                                            <div class="form-group-inline">
+                                                <label>Attempts</label>
+                                                <input type="number" 
+                                                       class="bulk-input" 
+                                                       data-player-id="${player.id}"
+                                                       data-field="attempts"
+                                                       min="1" 
+                                                       max="100" 
+                                                       value="20"
+                                                       disabled>
+                                            </div>
+                                        </div>
+                                    </div>
+                                `).join('') : '<p class="empty-state">No players available for bulk logging. Players can opt out in their profile settings.</p>'}
                             </div>
                             
-                            <!-- Session Data -->
-                            <div class="form-row">
-                                <div class="form-group">
-                                    <label for="bulkDistance">Distance (feet)</label>
-                                    <input type="number" id="bulkDistance" min="5" max="100" value="20" required>
-                                </div>
-                                <div class="form-group">
-                                    <label for="bulkMakes">Makes</label>
-                                    <input type="number" id="bulkMakes" min="0" max="100" required>
-                                </div>
-                                <div class="form-group">
-                                    <label for="bulkAttempts">Attempts</label>
-                                    <input type="number" id="bulkAttempts" min="1" max="100" value="20" required>
-                                </div>
-                            </div>
-                            
+                            ${availablePlayers.length > 0 ? `
                             <div class="form-group">
                                 <label>
                                     <input type="checkbox" id="requireApproval" checked>
@@ -2813,6 +2955,11 @@ class App {
                                 <button type="submit" class="btn btn-primary">Log for All Selected</button>
                                 <button type="button" class="btn btn-secondary" id="cancelBulkLog">Cancel</button>
                             </div>
+                            ` : `
+                            <div class="form-actions">
+                                <button type="button" class="btn btn-secondary" id="cancelBulkLog">Close</button>
+                            </div>
+                            `}
                         </form>
                     </div>
                 </div>
@@ -3114,6 +3261,14 @@ class App {
                                             <span>Hide me from leaderboard</span>
                                         </label>
                                         <p class="profile-hint">When checked, you won't appear on the public leaderboard</p>
+                                    </div>
+                                    
+                                    <div class="profile-field">
+                                        <label class="checkbox-label">
+                                            <input type="checkbox" id="profileOptOutSharedLogging" ${user.optOutSharedLogging ? 'checked' : ''} class="profile-checkbox">
+                                            <span>Opt out of shared logging</span>
+                                        </label>
+                                        <p class="profile-hint">When checked, others cannot log sessions on your behalf</p>
                                     </div>
                                 ` : ''}
                             </div>
@@ -3440,6 +3595,7 @@ class App {
             user.favoriteMidrange = document.getElementById('profileMidrange').value;
             user.favoriteDriver = document.getElementById('profileDriver').value;
             user.hideFromLeaderboard = document.getElementById('profileHideFromLeaderboard').checked;
+            user.optOutSharedLogging = document.getElementById('profileOptOutSharedLogging')?.checked || false;
             
             // Update goals
             user.goals = {
