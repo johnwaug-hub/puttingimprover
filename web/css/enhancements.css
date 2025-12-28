@@ -248,9 +248,23 @@
     background: #f9fafb;
 }
 
+.bulk-player-card.current-user-card {
+    border: 2px solid #10B981;
+    background: #ECFDF5;
+}
+
+.bulk-player-card.current-user-card .checkbox-label strong {
+    color: #10B981;
+}
+
 .bulk-player-card:has(.bulk-player-checkbox:checked) {
     border-color: #FF6B35;
     background: #FFF7ED;
+}
+
+.bulk-player-card.current-user-card:has(.bulk-player-checkbox:checked) {
+    border-color: #10B981;
+    background: #D1FAE5;
 }
 
 .bulk-player-header {

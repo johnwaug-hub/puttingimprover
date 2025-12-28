@@ -2508,10 +2508,12 @@ class App {
             
             const activityType = this.state.bulkActivityType || 'session';
             const requireApproval = document.getElementById('requireApproval')?.checked || false;
+            const currentUserId = userManager.getCurrentUser()?.id;
             let successCount = 0;
             
             for (const checkbox of checkedBoxes) {
                 const playerId = checkbox.dataset.playerId;
+                const isCurrentUser = playerId === currentUserId;
                 
                 try {
                     if (activityType === 'session') {
@@ -2525,19 +2527,35 @@ class App {
                             continue;
                         }
                         
-                        await this.addSessionForUser(playerId, { distance, makes, attempts }, requireApproval);
+                        if (isCurrentUser) {
+                            // Log for self using normal method (no approval needed, no loggedBy)
+                            await userManager.addSession({ distance, makes, attempts });
+                        } else {
+                            // Log for others with approval system
+                            await this.addSessionForUser(playerId, { distance, makes, attempts }, requireApproval);
+                        }
                     } 
                     else if (activityType === 'routine') {
                         const routineId = document.getElementById('bulkRoutineSelect').value;
                         const duration = parseInt(document.querySelector(`.bulk-input[data-player-id="${playerId}"][data-field="duration"]`)?.value || 20);
                         
-                        await this.addRoutineForUser(playerId, routineId, duration, requireApproval);
+                        if (isCurrentUser) {
+                            // Log for self - simplified for now
+                            await this.addRoutineForUser(playerId, routineId, duration, false);
+                        } else {
+                            await this.addRoutineForUser(playerId, routineId, duration, requireApproval);
+                        }
                     }
                     else if (activityType === 'game') {
                         const gameId = document.getElementById('bulkGameSelect').value;
                         const score = parseInt(document.querySelector(`.bulk-input[data-player-id="${playerId}"][data-field="score"]`).value);
                         
-                        await this.addGameForUser(playerId, gameId, score, requireApproval);
+                        if (isCurrentUser) {
+                            // Log for self - simplified for now
+                            await this.addGameForUser(playerId, gameId, score, false);
+                        } else {
+                            await this.addGameForUser(playerId, gameId, score, requireApproval);
+                        }
                     }
                     
                     successCount++;
@@ -2553,6 +2571,14 @@ class App {
             // Reload data
             await this.loadLeaderboard();
             await this.loadRecentPractice();
+            
+            // Check achievements (only for current user's activities)
+            const newAchievements = await achievementManager.checkAchievements();
+            if (newAchievements && newAchievements.length > 0) {
+                // Show first achievement splash
+                this.state.achievementSplash = newAchievements[0];
+                this.render();
+            }
             
             // Show success message
             const activityName = activityType === 'session' ? 'sessions' : activityType === 'routine' ? 'routines' : 'games';
@@ -3103,8 +3129,11 @@ class App {
      * Render bulk logging modal
      */
     renderBulkLogModal() {
+        const currentUser = userManager.getCurrentUser();
+        
+        // Include current user + all other players who haven't opted out
         const availablePlayers = this.state.leaderboard.filter(p => 
-            p.id !== userManager.getCurrentUser()?.id && !p.optOutSharedLogging
+            !p.optOutSharedLogging
         );
         
         const activityType = this.state.bulkActivityType || 'session';
@@ -3207,9 +3236,13 @@ class App {
      * Render individual player card for bulk logging
      */
     renderBulkPlayerCard(player, activityType) {
+        const currentUserId = userManager.getCurrentUser()?.id;
+        const isCurrentUser = player.id === currentUserId;
+        const playerLabel = isCurrentUser ? `${player.displayName} (You)` : player.displayName;
+        
         if (activityType === 'session') {
             return `
-                <div class="bulk-player-card" data-player-name="${player.displayName.toLowerCase()}">
+                <div class="bulk-player-card ${isCurrentUser ? 'current-user-card' : ''}" data-player-name="${player.displayName.toLowerCase()}">
                     <div class="bulk-player-header">
                         <label class="checkbox-label">
                             <input type="checkbox" 
@@ -3217,7 +3250,7 @@ class App {
                                    data-player-id="${player.id}"
                                    data-player-name="${player.displayName}"
                                    value="${player.id}">
-                            <strong>${player.displayName}</strong>
+                            <strong>${playerLabel}</strong>
                         </label>
                     </div>
                     <div class="bulk-player-stats">
@@ -3258,7 +3291,7 @@ class App {
             `;
         } else if (activityType === 'routine') {
             return `
-                <div class="bulk-player-card" data-player-name="${player.displayName.toLowerCase()}">
+                <div class="bulk-player-card ${isCurrentUser ? 'current-user-card' : ''}" data-player-name="${player.displayName.toLowerCase()}">
                     <div class="bulk-player-header">
                         <label class="checkbox-label">
                             <input type="checkbox" 
@@ -3266,7 +3299,7 @@ class App {
                                    data-player-id="${player.id}"
                                    data-player-name="${player.displayName}"
                                    value="${player.id}">
-                            <strong>${player.displayName}</strong>
+                            <strong>${playerLabel}</strong>
                         </label>
                     </div>
                     <div class="bulk-player-stats">
@@ -3285,7 +3318,7 @@ class App {
             `;
         } else if (activityType === 'game') {
             return `
-                <div class="bulk-player-card" data-player-name="${player.displayName.toLowerCase()}">
+                <div class="bulk-player-card ${isCurrentUser ? 'current-user-card' : ''}" data-player-name="${player.displayName.toLowerCase()}">
                     <div class="bulk-player-header">
                         <label class="checkbox-label">
                             <input type="checkbox" 
@@ -3293,7 +3326,7 @@ class App {
                                    data-player-id="${player.id}"
                                    data-player-name="${player.displayName}"
                                    value="${player.id}">
-                            <strong>${player.displayName}</strong>
+                            <strong>${playerLabel}</strong>
                         </label>
                     </div>
                     <div class="bulk-player-stats">
