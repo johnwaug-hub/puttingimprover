@@ -20,6 +20,7 @@ class App {
             error: null,
             currentView: 'practice', // practice, leaderboard, friends, achievements, games
             leaderboardCategory: 'points', // points, sessions, routines, games
+            leaderboardGenderFilter: 'both', // male, female, both
             showAddSession: false,
             showRoutines: false,
             currentQuote: this.getRandomQuote(),
@@ -485,6 +486,25 @@ class App {
                             </button>
                         </div>
                         
+                        <!-- Gender Filter Toggles -->
+                        <div class="gender-filter-container">
+                            <span class="filter-label">Filter by gender:</span>
+                            <div class="gender-toggles">
+                                <button class="gender-toggle ${this.state.leaderboardGenderFilter === 'male' ? 'active' : ''}" 
+                                        data-gender="male">
+                                    ♂️ Male
+                                </button>
+                                <button class="gender-toggle ${this.state.leaderboardGenderFilter === 'female' ? 'active' : ''}" 
+                                        data-gender="female">
+                                    ♀️ Female
+                                </button>
+                                <button class="gender-toggle ${this.state.leaderboardGenderFilter === 'both' ? 'active' : ''}" 
+                                        data-gender="both">
+                                    👥 Both
+                                </button>
+                            </div>
+                        </div>
+                        
                         <div class="leaderboard-list">
                             ${this.renderLeaderboardList()}
                         </div>
@@ -593,9 +613,21 @@ class App {
         }
         
         const category = this.state.leaderboardCategory || 'points';
+        const genderFilter = this.state.leaderboardGenderFilter || 'both';
+        
+        // Filter by gender first
+        let filteredPlayers = [...this.state.leaderboard];
+        if (genderFilter !== 'both') {
+            filteredPlayers = filteredPlayers.filter(player => player.gender === genderFilter);
+        }
+        
+        // Check if any players after filtering
+        if (filteredPlayers.length === 0) {
+            return `<p class="empty-state">No ${genderFilter === 'male' ? 'male' : 'female'} players yet</p>`;
+        }
         
         // Sort based on category
-        let sortedPlayers = [...this.state.leaderboard];
+        let sortedPlayers = [...filteredPlayers];
         switch(category) {
             case 'sessions':
                 sortedPlayers.sort((a, b) => (b.totalSessions || 0) - (a.totalSessions || 0));
@@ -968,6 +1000,15 @@ class App {
         leaderboardTabs.forEach(tab => {
             tab.addEventListener('click', (e) => {
                 this.state.leaderboardCategory = e.target.dataset.category;
+                this.render();
+            });
+        });
+        
+        // Gender filter toggles
+        const genderToggles = document.querySelectorAll('.gender-toggle');
+        genderToggles.forEach(toggle => {
+            toggle.addEventListener('click', (e) => {
+                this.state.leaderboardGenderFilter = e.target.dataset.gender;
                 this.render();
             });
         });

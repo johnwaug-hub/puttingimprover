@@ -663,6 +663,24 @@
                 width: 100%;
                 justify-content: space-between;
             }
+
+            /* Gender filter on mobile */
+            .gender-filter-container {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 0.75rem;
+                padding: 0.75rem;
+            }
+
+            .gender-toggles {
+                width: 100%;
+                justify-content: center;
+            }
+
+            .gender-toggle {
+                flex: 1;
+                min-width: 80px;
+            }
         }
     </style>
 
@@ -900,6 +918,54 @@
     background: linear-gradient(135deg, #FF6B35 0%, #D9534F 100%);
     color: white;
     border-color: #FF6B35;
+}
+
+/* Gender Filter */
+.gender-filter-container {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+    padding: 1rem;
+    background: #f9fafb;
+    border-radius: 8px;
+    border: 2px solid #e5e7eb;
+}
+
+.filter-label {
+    font-weight: 600;
+    color: #374151;
+    font-size: 0.95rem;
+}
+
+.gender-toggles {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+
+.gender-toggle {
+    padding: 0.5rem 1rem;
+    border: 2px solid #d1d5db;
+    background: white;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 0.875rem;
+    transition: all 0.2s;
+    min-width: 90px;
+    text-align: center;
+}
+
+.gender-toggle:hover {
+    border-color: #9ca3af;
+    background: #f3f4f6;
+}
+
+.gender-toggle.active {
+    background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+    color: white;
+    border-color: #3b82f6;
 }
 
 .leaderboard-list {

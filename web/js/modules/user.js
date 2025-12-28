@@ -29,11 +29,18 @@ class UserManager {
 
         // Create new user if doesn't exist
         if (!user) {
+            // Prompt for gender
+            const gender = prompt('Please select your gender:\nType "male" or "female":', 'male');
+            const validGender = (gender && (gender.toLowerCase() === 'male' || gender.toLowerCase() === 'female')) 
+                ? gender.toLowerCase() 
+                : 'male'; // Default to male if invalid input
+            
             user = {
                 id: firebaseUser.uid,
                 email: firebaseUser.email,
                 displayName: firebaseUser.displayName || firebaseUser.email?.split('@')[0] || 'User',
                 photoURL: firebaseUser.photoURL,
+                gender: validGender,
                 totalPoints: 0,
                 totalSessions: 0,
                 totalRoutines: 0,
@@ -44,7 +51,7 @@ class UserManager {
             };
 
             await storageManager.saveUser(user);
-            console.log('✅ New user created:', user.email);
+            console.log('✅ New user created:', user.email, 'Gender:', user.gender);
         } else {
             // Update last login
             user.lastLogin = new Date().toISOString();
@@ -52,6 +59,11 @@ class UserManager {
             // Initialize counters if they don't exist
             if (user.totalRoutines === undefined) user.totalRoutines = 0;
             if (user.totalGames === undefined) user.totalGames = 0;
+            
+            // Initialize gender if it doesn't exist (for existing users)
+            if (!user.gender) {
+                user.gender = 'male'; // Default for existing users
+            }
             
             await storageManager.saveUser(user);
             console.log('✅ User loaded:', user.email);
