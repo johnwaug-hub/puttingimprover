@@ -603,14 +603,14 @@ class App {
                     <button class="tab ${this.state.currentView === 'routines' ? 'active' : ''}" data-view="routines">
                         📋 Routines
                     </button>
-                    <button class="tab ${this.state.currentView === 'leaderboard' ? 'active' : ''}" data-view="leaderboard">
-                        🏆 Leaderboard
-                    </button>
                     <button class="tab ${this.state.currentView === 'games' ? 'active' : ''}" data-view="games">
                         🎮 Games
                     </button>
                     <button class="tab ${this.state.currentView === 'achievements' ? 'active' : ''}" data-view="achievements">
                         🏅 Achievements
+                    </button>
+                    <button class="tab ${this.state.currentView === 'leaderboard' ? 'active' : ''}" data-view="leaderboard">
+                        🏆 Leaderboard
                     </button>
                     <button class="tab ${this.state.currentView === 'stats' ? 'active' : ''}" data-view="stats">
                         📈 Stats
@@ -644,16 +644,10 @@ class App {
                         <button id="addSessionBtn" class="btn btn-primary btn-large">
                             ➕ Add Practice Session
                         </button>
-                        <button id="viewRoutinesBtn" class="btn btn-secondary btn-large">
-                            📋 View Routines
-                        </button>
                     </div>
 
                     <!-- Add Session Form (Hidden by default) -->
                     ${this.state.showAddSession ? this.renderAddSessionForm() : ''}
-                    
-                    <!-- Routines Panel (Hidden by default) -->
-                    ${this.state.showRoutines ? this.renderRoutines() : ''}
 
                     <!-- Recent Sessions -->
                     <div class="card">
@@ -662,6 +656,11 @@ class App {
                             ${this.renderRecentPractice()}
                         </div>
                     </div>
+                </div>
+
+                <!-- Routines View -->
+                <div class="view ${this.state.currentView === 'routines' ? 'active' : ''}" id="routines-view">
+                    ${this.renderRoutines()}
                 </div>
 
                 <!-- Stats View -->
@@ -1600,10 +1599,7 @@ class App {
     renderRoutines() {
         return `
             <div class="card routines-panel">
-                <div class="header-flex">
-                    <h3>📋 Suggested Putting Routines</h3>
-                    <button id="closeRoutinesBtn" class="btn btn-secondary">Close</button>
-                </div>
+                <h3>📋 Suggested Putting Routines</h3>
                 <p style="margin-bottom: 1.5rem; color: #6b7280;">Choose a routine to structure your practice session</p>
                 <div class="routines-grid">
                     ${SUGGESTED_ROUTINES.map(routine => `
@@ -1732,24 +1728,6 @@ class App {
         if (addSessionBtn) {
             addSessionBtn.addEventListener('click', () => {
                 this.state.showAddSession = true;
-                this.render();
-            });
-        }
-        
-        // View routines button
-        const viewRoutinesBtn = document.getElementById('viewRoutinesBtn');
-        if (viewRoutinesBtn) {
-            viewRoutinesBtn.addEventListener('click', () => {
-                this.state.showRoutines = true;
-                this.render();
-            });
-        }
-        
-        // Close routines button
-        const closeRoutinesBtn = document.getElementById('closeRoutinesBtn');
-        if (closeRoutinesBtn) {
-            closeRoutinesBtn.addEventListener('click', () => {
-                this.state.showRoutines = false;
                 this.render();
             });
         }
