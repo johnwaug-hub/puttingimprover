@@ -45,7 +45,8 @@ class App {
             editingRoutine: null,
             editingGame: null,
             showEditRoutineModal: false,
-            showEditGameModal: false
+            showEditGameModal: false,
+            achievementSplash: null // { id, name, icon, desc, points }
         };
 
         this.newSession = {
@@ -599,8 +600,8 @@ class App {
                     <button class="tab ${this.state.currentView === 'practice' ? 'active' : ''}" data-view="practice">
                         📊 Practice
                     </button>
-                    <button class="tab ${this.state.currentView === 'stats' ? 'active' : ''}" data-view="stats">
-                        📈 Stats
+                    <button class="tab ${this.state.currentView === 'routines' ? 'active' : ''}" data-view="routines">
+                        📋 Routines
                     </button>
                     <button class="tab ${this.state.currentView === 'leaderboard' ? 'active' : ''}" data-view="leaderboard">
                         🏆 Leaderboard
@@ -610,6 +611,9 @@ class App {
                     </button>
                     <button class="tab ${this.state.currentView === 'achievements' ? 'active' : ''}" data-view="achievements">
                         🏅 Achievements
+                    </button>
+                    <button class="tab ${this.state.currentView === 'stats' ? 'active' : ''}" data-view="stats">
+                        📈 Stats
                     </button>
                 </div>
 
@@ -760,8 +764,44 @@ class App {
             <!-- Edit Game Modal -->
             ${this.state.showEditGameModal ? this.renderEditGameModal() : ''}
             
+            <!-- Achievement Splash -->
+            ${this.state.achievementSplash ? this.renderAchievementSplash() : ''}
+            
             <!-- Custom Alert -->
             ${this.state.customAlert ? this.renderCustomAlert() : ''}
+        `;
+    }
+    
+    /**
+     * Render achievement splash screen
+     */
+    renderAchievementSplash() {
+        const { icon, name, desc, points } = this.state.achievementSplash;
+        
+        return `
+            <div class="achievement-splash-overlay">
+                <div class="achievement-splash">
+                    <div class="achievement-splash-glow"></div>
+                    <div class="achievement-splash-content">
+                        <div class="achievement-splash-header">
+                            <div class="achievement-splash-badge">🏆</div>
+                            <h2 class="achievement-splash-title">Achievement Unlocked!</h2>
+                        </div>
+                        <div class="achievement-splash-icon">${icon}</div>
+                        <h3 class="achievement-splash-name">${name}</h3>
+                        <p class="achievement-splash-desc">${desc}</p>
+                        <div class="achievement-splash-points">+${points} points</div>
+                    </div>
+                    <div class="achievement-splash-sparkles">
+                        <span class="sparkle">✨</span>
+                        <span class="sparkle">✨</span>
+                        <span class="sparkle">✨</span>
+                        <span class="sparkle">✨</span>
+                        <span class="sparkle">✨</span>
+                        <span class="sparkle">✨</span>
+                    </div>
+                </div>
+            </div>
         `;
     }
     
@@ -1223,32 +1263,44 @@ class App {
         
         // Distance breakdown with accuracy
         const distanceRanges = {
-            '0-15ft': {
-                sessions: sessions.filter(s => s.distance < 15),
+            '0-5ft': {
+                sessions: sessions.filter(s => s.distance >= 0 && s.distance < 5),
                 get makes() { return this.sessions.reduce((sum, s) => sum + s.makes, 0); },
                 get attempts() { return this.sessions.reduce((sum, s) => sum + s.attempts, 0); },
                 get percentage() { return this.attempts > 0 ? (this.makes / this.attempts * 100).toFixed(1) : 0; }
             },
-            '15-25ft': {
-                sessions: sessions.filter(s => s.distance >= 15 && s.distance < 25),
+            '5-10ft': {
+                sessions: sessions.filter(s => s.distance >= 5 && s.distance < 10),
                 get makes() { return this.sessions.reduce((sum, s) => sum + s.makes, 0); },
                 get attempts() { return this.sessions.reduce((sum, s) => sum + s.attempts, 0); },
                 get percentage() { return this.attempts > 0 ? (this.makes / this.attempts * 100).toFixed(1) : 0; }
             },
-            '25-35ft': {
-                sessions: sessions.filter(s => s.distance >= 25 && s.distance < 35),
+            '10-15ft': {
+                sessions: sessions.filter(s => s.distance >= 10 && s.distance < 15),
                 get makes() { return this.sessions.reduce((sum, s) => sum + s.makes, 0); },
                 get attempts() { return this.sessions.reduce((sum, s) => sum + s.attempts, 0); },
                 get percentage() { return this.attempts > 0 ? (this.makes / this.attempts * 100).toFixed(1) : 0; }
             },
-            '35-50ft': {
-                sessions: sessions.filter(s => s.distance >= 35 && s.distance <= 50),
+            '15-20ft': {
+                sessions: sessions.filter(s => s.distance >= 15 && s.distance < 20),
                 get makes() { return this.sessions.reduce((sum, s) => sum + s.makes, 0); },
                 get attempts() { return this.sessions.reduce((sum, s) => sum + s.attempts, 0); },
                 get percentage() { return this.attempts > 0 ? (this.makes / this.attempts * 100).toFixed(1) : 0; }
             },
-            '50ft+': {
-                sessions: sessions.filter(s => s.distance > 50),
+            '20-25ft': {
+                sessions: sessions.filter(s => s.distance >= 20 && s.distance < 25),
+                get makes() { return this.sessions.reduce((sum, s) => sum + s.makes, 0); },
+                get attempts() { return this.sessions.reduce((sum, s) => sum + s.attempts, 0); },
+                get percentage() { return this.attempts > 0 ? (this.makes / this.attempts * 100).toFixed(1) : 0; }
+            },
+            '25-30ft': {
+                sessions: sessions.filter(s => s.distance >= 25 && s.distance < 30),
+                get makes() { return this.sessions.reduce((sum, s) => sum + s.makes, 0); },
+                get attempts() { return this.sessions.reduce((sum, s) => sum + s.attempts, 0); },
+                get percentage() { return this.attempts > 0 ? (this.makes / this.attempts * 100).toFixed(1) : 0; }
+            },
+            '30ft+': {
+                sessions: sessions.filter(s => s.distance >= 30),
                 get makes() { return this.sessions.reduce((sum, s) => sum + s.makes, 0); },
                 get attempts() { return this.sessions.reduce((sum, s) => sum + s.attempts, 0); },
                 get percentage() { return this.attempts > 0 ? (this.makes / this.attempts * 100).toFixed(1) : 0; }
@@ -1621,7 +1673,7 @@ class App {
                     <button class="btn btn-primary btn-small toggle-game-btn" data-game="${game.id}">
                         ${this.state.selectedGame === game.id ? 'Hide Details' : 'View Details'}
                     </button>
-                    <button class="btn btn-secondary btn-small log-score-btn" data-game="${game.id}">
+                    <button class="btn btn-primary btn-small log-score-btn" data-game="${game.id}">
                         📊 Log Score
                     </button>
                 </div>
@@ -1965,7 +2017,12 @@ class App {
             // Reload data
             await this.loadLeaderboard();
             await this.loadRecentPractice();
-            await achievementManager.checkAchievements();
+            
+            // Check achievements and show splash
+            const newAchievements = await achievementManager.checkAchievements();
+            if (newAchievements && newAchievements.length > 0) {
+                this.showAchievementSplash(newAchievements[0]);
+            }
             
             // Re-render
             this.render();
@@ -1974,6 +2031,30 @@ class App {
             console.error('Error saving session:', error);
             this.showCustomAlert('Failed to save session: ' + error.message, 'error');
         }
+    }
+    
+    /**
+     * Show achievement unlock splash screen
+     */
+    showAchievementSplash(achievementId) {
+        const achievement = ACHIEVEMENTS_CONFIG.find(a => a.id === achievementId);
+        if (!achievement) return;
+        
+        this.state.achievementSplash = {
+            id: achievement.id,
+            name: achievement.name,
+            icon: achievement.icon,
+            desc: achievement.desc,
+            points: achievement.points
+        };
+        
+        this.render();
+        
+        // Auto-hide after 4 seconds
+        setTimeout(() => {
+            this.state.achievementSplash = null;
+            this.render();
+        }, 4000);
     }
     
     /**
@@ -2178,8 +2259,8 @@ class App {
             gameTracker.startGame(game);
             const completedGame = await gameTracker.completeGame(scoreData);
             
-            // Check achievements
-            await achievementManager.checkAchievements();
+            // Check achievements and show splash
+            const newAchievements = await achievementManager.checkAchievements();
             
             // Reload leaderboard and recent practice
             await this.loadLeaderboard();
@@ -2190,6 +2271,11 @@ class App {
             
             // Re-render to show new data
             this.render();
+            
+            // Show achievement splash if any
+            if (newAchievements && newAchievements.length > 0) {
+                this.showAchievementSplash(newAchievements[0]);
+            }
             
             // Show success with points
             alert(`✅ Score logged for ${game.name}!\n\n🎯 Points Earned: ${completedGame.points}${scoreData.won !== undefined ? (scoreData.won ? '\n🎉 You won!' : '\n Better luck next time!') : ''}`);
@@ -2370,8 +2456,8 @@ class App {
                 await storageManager.saveUser(user);
             }
             
-            // Check achievements
-            await achievementManager.checkAchievements();
+            // Check achievements and show splash
+            const newAchievements = await achievementManager.checkAchievements();
             
             // Reload leaderboard and recent practice
             await this.loadLeaderboard();
@@ -2382,6 +2468,11 @@ class App {
             
             // Re-render to show new data
             this.render();
+            
+            // Show achievement splash if any
+            if (newAchievements && newAchievements.length > 0) {
+                this.showAchievementSplash(newAchievements[0]);
+            }
             
             // Show success with points
             alert(`✅ Routine completion logged!\n\n${routine.name}\nOverall: ${totalMakes}/${totalAttempts} (${Math.round(overallPercentage)}%)\nDuration: ${duration} minutes\n\n🎯 Points Earned: ${routinePoints}`);
@@ -2780,11 +2871,11 @@ class App {
             // Reload leaderboard to reflect changes
             await this.loadLeaderboard();
             
-            alert('✅ Profile updated successfully!');
+            this.showCustomAlert('Profile updated successfully!', 'success');
             this.closeProfileModal();
         } catch (error) {
             console.error('Error saving profile:', error);
-            alert('Failed to save profile: ' + error.message);
+            this.showCustomAlert('Failed to save profile: ' + error.message, 'error');
         }
     }
     
