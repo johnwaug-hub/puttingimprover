@@ -776,6 +776,49 @@ class App {
                     </div>
                 `;
                 break;
+            case 'rotations':
+                formHTML = `
+                    <p class="form-description">Log each turn's results - enter makes out of attempts for each of the 10 turns</p>
+                    
+                    <div class="rotations-grid-detailed">
+                        ${Array.from({ length: 10 }, (_, i) => `
+                            <div class="turn-input-group">
+                                <label class="turn-label">Turn ${i + 1}</label>
+                                <div class="turn-inputs">
+                                    <div class="turn-field">
+                                        <label for="turn${i + 1}Makes">Makes</label>
+                                        <input type="number" 
+                                               id="turn${i + 1}Makes" 
+                                               class="turn-makes-input"
+                                               min="0" 
+                                               max="100" 
+                                               required 
+                                               placeholder="0">
+                                    </div>
+                                    <span class="turn-separator">/</span>
+                                    <div class="turn-field">
+                                        <label for="turn${i + 1}Attempts">Attempts</label>
+                                        <input type="number" 
+                                               id="turn${i + 1}Attempts" 
+                                               class="turn-attempts-input"
+                                               min="1" 
+                                               max="100" 
+                                               value="10"
+                                               required 
+                                               placeholder="10">
+                                    </div>
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="puttingDistance">Putting Distance (feet)</label>
+                        <input type="number" id="puttingDistance" min="10" max="50" value="20" required>
+                        <p class="form-hint">Goal: ${game.scoring.goal}</p>
+                    </div>
+                `;
+                break;
         }
         
         return `
