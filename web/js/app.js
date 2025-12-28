@@ -639,19 +639,17 @@ class App {
                         </div>
                     </div>
 
-                    <!-- Add Session Button -->
-                    <div class="action-section">
-                        <button id="addSessionBtn" class="btn btn-primary btn-large">
-                            ➕ Add Practice Session
-                        </button>
-                    </div>
-
                     <!-- Add Session Form (Hidden by default) -->
                     ${this.state.showAddSession ? this.renderAddSessionForm() : ''}
 
                     <!-- Recent Sessions -->
                     <div class="card">
-                        <h2>Recent Practice</h2>
+                        <div class="header-flex">
+                            <h2>Recent Practice</h2>
+                            <button id="addSessionBtn" class="btn btn-primary">
+                                ➕ Add Practice Session
+                            </button>
+                        </div>
                         <div class="sessions-list">
                             ${this.renderRecentPractice()}
                         </div>
