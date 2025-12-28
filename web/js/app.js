@@ -386,11 +386,13 @@ class App {
             <header class="app-header">
                 <div class="container">
                     <div class="header-content">
-                        <div class="logo-section">
+                        <div class="header-left">
                             <img src="logo.jpg" alt="Lock Jaw Disc Golf" class="header-logo">
+                        </div>
+                        <div class="header-center">
                             <h1 class="app-title">Putting Improver</h1>
                         </div>
-                        <div class="user-section">
+                        <div class="header-right">
                             <div class="header-user-profile">
                                 <div class="header-profile-pic">
                                     ${user.profilePictureURL 
