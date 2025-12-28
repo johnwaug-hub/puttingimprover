@@ -1318,8 +1318,44 @@ class App {
                 get attempts() { return this.sessions.reduce((sum, s) => sum + s.attempts, 0); },
                 get percentage() { return this.attempts > 0 ? (this.makes / this.attempts * 100).toFixed(1) : 0; }
             },
-            '30ft+': {
-                sessions: sessions.filter(s => s.distance >= 30),
+            '30-35ft': {
+                sessions: sessions.filter(s => s.distance >= 30 && s.distance < 35),
+                get makes() { return this.sessions.reduce((sum, s) => sum + s.makes, 0); },
+                get attempts() { return this.sessions.reduce((sum, s) => sum + s.attempts, 0); },
+                get percentage() { return this.attempts > 0 ? (this.makes / this.attempts * 100).toFixed(1) : 0; }
+            },
+            '35-40ft': {
+                sessions: sessions.filter(s => s.distance >= 35 && s.distance < 40),
+                get makes() { return this.sessions.reduce((sum, s) => sum + s.makes, 0); },
+                get attempts() { return this.sessions.reduce((sum, s) => sum + s.attempts, 0); },
+                get percentage() { return this.attempts > 0 ? (this.makes / this.attempts * 100).toFixed(1) : 0; }
+            },
+            '40-45ft': {
+                sessions: sessions.filter(s => s.distance >= 40 && s.distance < 45),
+                get makes() { return this.sessions.reduce((sum, s) => sum + s.makes, 0); },
+                get attempts() { return this.sessions.reduce((sum, s) => sum + s.attempts, 0); },
+                get percentage() { return this.attempts > 0 ? (this.makes / this.attempts * 100).toFixed(1) : 0; }
+            },
+            '45-50ft': {
+                sessions: sessions.filter(s => s.distance >= 45 && s.distance < 50),
+                get makes() { return this.sessions.reduce((sum, s) => sum + s.makes, 0); },
+                get attempts() { return this.sessions.reduce((sum, s) => sum + s.attempts, 0); },
+                get percentage() { return this.attempts > 0 ? (this.makes / this.attempts * 100).toFixed(1) : 0; }
+            },
+            '50-55ft': {
+                sessions: sessions.filter(s => s.distance >= 50 && s.distance < 55),
+                get makes() { return this.sessions.reduce((sum, s) => sum + s.makes, 0); },
+                get attempts() { return this.sessions.reduce((sum, s) => sum + s.attempts, 0); },
+                get percentage() { return this.attempts > 0 ? (this.makes / this.attempts * 100).toFixed(1) : 0; }
+            },
+            '55-60ft': {
+                sessions: sessions.filter(s => s.distance >= 55 && s.distance < 60),
+                get makes() { return this.sessions.reduce((sum, s) => sum + s.makes, 0); },
+                get attempts() { return this.sessions.reduce((sum, s) => sum + s.attempts, 0); },
+                get percentage() { return this.attempts > 0 ? (this.makes / this.attempts * 100).toFixed(1) : 0; }
+            },
+            '60ft+': {
+                sessions: sessions.filter(s => s.distance >= 60),
                 get makes() { return this.sessions.reduce((sum, s) => sum + s.makes, 0); },
                 get attempts() { return this.sessions.reduce((sum, s) => sum + s.attempts, 0); },
                 get percentage() { return this.attempts > 0 ? (this.makes / this.attempts * 100).toFixed(1) : 0; }
@@ -1378,9 +1414,30 @@ class App {
                 </div>
             </div>
             
+            <!-- Best Session (Moved to Top) -->
+            ${stats.bestSession ? `
+                <div class="stats-section">
+                    <h3 class="stats-section-title">🌟 Best Session</h3>
+                    <div class="best-session-card">
+                        <div class="best-session-stats">
+                            <span>${stats.bestSession.distance}ft</span>
+                            <span>${stats.bestSession.makes}/${stats.bestSession.attempts}</span>
+                            <span>${stats.bestSession.percentage.toFixed(1)}%</span>
+                        </div>
+                        <div class="best-session-points">${stats.bestSession.points} points</div>
+                        <div class="best-session-date">${new Date(stats.bestSession.date).toLocaleDateString()}</div>
+                    </div>
+                </div>
+            ` : ''}
+            
             <!-- Performance Stats -->
             <div class="stats-section">
-                <h3 class="stats-section-title">📈 Performance</h3>
+                <div class="section-header-with-action">
+                    <h3 class="stats-section-title">📈 Performance</h3>
+                    <button class="btn btn-secondary btn-small" id="sharePerformanceBtn">
+                        📤 Share
+                    </button>
+                </div>
                 <div class="stats-grid-detailed">
                     <div class="stat-card-detailed">
                         <div class="stat-icon">💯</div>
@@ -1435,22 +1492,6 @@ class App {
                     `}).join('')}
                 </div>
             </div>
-            
-            <!-- Best Session -->
-            ${stats.bestSession ? `
-                <div class="stats-section">
-                    <h3 class="stats-section-title">🌟 Best Session</h3>
-                    <div class="best-session-card">
-                        <div class="best-session-stats">
-                            <span>${stats.bestSession.distance}ft</span>
-                            <span>${stats.bestSession.makes}/${stats.bestSession.attempts}</span>
-                            <span>${stats.bestSession.percentage.toFixed(1)}%</span>
-                        </div>
-                        <div class="best-session-points">${stats.bestSession.points} points</div>
-                        <div class="best-session-date">${new Date(stats.bestSession.date).toLocaleDateString()}</div>
-                    </div>
-                </div>
-            ` : ''}
         `;
     }
     
@@ -1955,6 +1996,12 @@ class App {
             });
         }
         
+        // Share Performance button
+        const sharePerformanceBtn = document.getElementById('sharePerformanceBtn');
+        if (sharePerformanceBtn) {
+            sharePerformanceBtn.addEventListener('click', () => this.handleSharePerformance());
+        }
+        
         // Achievement category toggles
         const categoryTitles = document.querySelectorAll('.category-title.clickable');
         categoryTitles.forEach(title => {
@@ -2062,6 +2109,81 @@ class App {
         } catch (error) {
             console.error('Error saving session:', error);
             this.showCustomAlert('Failed to save session: ' + error.message, 'error');
+        }
+    }
+    
+    /**
+     * Handle sharing performance stats
+     */
+    async handleSharePerformance() {
+        const user = userManager.getCurrentUser();
+        const stats = userManager.getStatistics();
+        
+        const avgAccuracy = stats.totalPutts > 0 
+            ? Math.round((stats.totalMakes / stats.totalPutts) * 100) 
+            : 0;
+        
+        const shareText = `🎯 My Putting Stats - ${user.displayName}
+        
+📊 Performance:
+• Avg Accuracy: ${avgAccuracy}%
+• Total Makes: ${stats.totalMakes}
+• Total Attempts: ${stats.totalPutts}
+• Best Session: ${stats.bestSession ? `${stats.bestSession.percentage.toFixed(1)}% at ${stats.bestSession.distance}ft` : 'N/A'}
+• Longest Streak: ${stats.longestStreak || 0} days
+
+🎯 Total Sessions: ${user.totalSessions || 0}
+📋 Total Routines: ${user.totalRoutines || 0}
+🎮 Total Games: ${user.totalGames || 0}
+⭐ Points: ${user.totalPoints || 0}
+
+#DiscGolf #PuttingPractice`;
+
+        // Try to use Web Share API if available
+        if (navigator.share) {
+            try {
+                await navigator.share({
+                    title: 'My Putting Stats',
+                    text: shareText
+                });
+                this.showCustomAlert('Stats shared successfully!', 'success');
+            } catch (error) {
+                if (error.name !== 'AbortError') {
+                    // Fall back to clipboard
+                    this.copyToClipboard(shareText);
+                }
+            }
+        } else {
+            // Fall back to clipboard
+            this.copyToClipboard(shareText);
+        }
+    }
+    
+    /**
+     * Copy text to clipboard
+     */
+    copyToClipboard(text) {
+        if (navigator.clipboard) {
+            navigator.clipboard.writeText(text).then(() => {
+                this.showCustomAlert('Stats copied to clipboard!', 'success');
+            }).catch(() => {
+                this.showCustomAlert('Could not copy stats', 'error');
+            });
+        } else {
+            // Fallback for older browsers
+            const textarea = document.createElement('textarea');
+            textarea.value = text;
+            textarea.style.position = 'fixed';
+            textarea.style.opacity = '0';
+            document.body.appendChild(textarea);
+            textarea.select();
+            try {
+                document.execCommand('copy');
+                this.showCustomAlert('Stats copied to clipboard!', 'success');
+            } catch (err) {
+                this.showCustomAlert('Could not copy stats', 'error');
+            }
+            document.body.removeChild(textarea);
         }
     }
     

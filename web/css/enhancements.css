@@ -213,6 +213,18 @@
     font-size: 0.95rem;
 }
 
+/* Section Header with Action Button */
+.section-header-with-action {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+.section-header-with-action .stats-section-title {
+    margin-bottom: 0;
+}
+
 /* Routine Difficulty Sections */
 .routine-difficulty-section {
     margin-bottom: 2rem;
