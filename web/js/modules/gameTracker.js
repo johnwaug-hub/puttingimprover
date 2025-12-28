@@ -5,6 +5,7 @@
 
 import { storageManager } from './storage.js';
 import { userManager } from './user.js';
+import { calculateGamePoints } from '../utils/calculations.js';
 
 class GameTracker {
     constructor() {
@@ -79,14 +80,20 @@ class GameTracker {
         this.currentGame.duration = this.calculateDuration();
         this.currentGame.score = finalScore.score;
         this.currentGame.goalAchieved = this.checkGoalAchieved(finalScore);
+        
+        // Calculate points earned for this game
+        const gameDefinition = { scoring: { type: this.currentGame.scoringType } };
+        const gamePoints = calculateGamePoints(gameDefinition, { ...finalScore, ...this.currentGame });
+        this.currentGame.points = gamePoints;
 
         // Save to database
         const user = userManager.getCurrentUser();
         if (user) {
             await storageManager.saveGameCompletion(user.id, this.currentGame);
             
-            // Increment totalGames counter
+            // Increment totalGames counter and add points
             user.totalGames = (user.totalGames || 0) + 1;
+            user.totalPoints = (user.totalPoints || 0) + gamePoints;
             await storageManager.saveUser(user);
         }
 

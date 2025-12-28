@@ -137,6 +137,68 @@ export function calculateRoutinePoints(drills) {
 }
 
 /**
+ * Calculate points for game completion
+ * @param {Object} game - Game object with scoring info
+ * @param {Object} scoreData - Score data from game
+ * @returns {number} Points earned
+ */
+export function calculateGamePoints(game, scoreData) {
+    // Base points for game completion
+    let basePoints = 50;
+    
+    // Bonus points based on performance
+    let bonusPoints = 0;
+    
+    switch (game.scoring.type) {
+        case 'time':
+            // Faster time = more points
+            if (scoreData.timeInMinutes <= scoreData.targetTime) {
+                bonusPoints = Math.round((scoreData.targetTime - scoreData.timeInMinutes) * 20);
+            }
+            break;
+            
+        case 'strokes':
+            // Under par = more points
+            const underPar = scoreData.par - scoreData.score;
+            if (underPar > 0) {
+                bonusPoints = underPar * 10;
+            }
+            break;
+            
+        case 'points':
+            // Higher score = more points (10% of game score)
+            bonusPoints = Math.round(scoreData.score * 0.1);
+            break;
+            
+        case 'distance':
+            // Longer distance = more points
+            bonusPoints = Math.round(scoreData.maxDistance * 2);
+            break;
+            
+        case 'streak':
+            // Longer streak = more points
+            bonusPoints = scoreData.streak * 5;
+            break;
+            
+        case 'elimination':
+            // Win = big bonus
+            bonusPoints = scoreData.won ? 100 : 0;
+            break;
+            
+        case 'rotations':
+            // Calculate based on makes and distance (like regular session)
+            const { points } = calculateSessionPoints(
+                scoreData.totalMakes, 
+                scoreData.totalAttempts, 
+                scoreData.distance
+            );
+            return points; // Return full session points for Putt 100
+    }
+    
+    return basePoints + bonusPoints;
+}
+
+/**
  * Get user rank from leaderboard
  * @param {Array} leaderboard - Sorted leaderboard array
  * @param {string} userId - User ID to find

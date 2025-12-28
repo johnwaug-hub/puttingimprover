@@ -12,6 +12,7 @@ import { challengeManager } from './modules/challenges.js';
 import { routineTracker } from './modules/routineTracker.js';
 import { gameTracker } from './modules/gameTracker.js';
 import { MOTIVATIONAL_QUOTES, SUGGESTED_ROUTINES, PUTTING_GAMES } from './config/constants.js';
+import { calculateRoutinePoints } from './utils/calculations.js';
 
 class App {
     constructor() {
@@ -35,7 +36,9 @@ class App {
             showRoutineCompletionModal: false,
             selectedRoutineForCompletion: null,
             showProfileModal: false,
-            selectedUserProfile: null
+            selectedUserProfile: null,
+            recentRoutines: [],
+            recentGames: []
         };
 
         this.newSession = {
@@ -85,6 +88,7 @@ class App {
                 await userManager.initializeUser(firebaseUser);
                 await challengeManager.loadWeeklyChallenge();
                 await this.loadLeaderboard();
+                await this.loadRecentPractice();
                 await achievementManager.checkAchievements();
 
                 this.state.error = null;
@@ -115,6 +119,29 @@ class App {
             this.state.leaderboard = await storageManager.getLeaderboard();
         } catch (error) {
             console.error('Error loading leaderboard:', error);
+        }
+    }
+    
+    /**
+     * Load recent practice activities (routines and games)
+     */
+    async loadRecentPractice() {
+        try {
+            const user = userManager.getCurrentUser();
+            if (!user) return;
+            
+            // Load routines
+            const routines = await storageManager.getRoutineCompletions(user.id);
+            this.state.recentRoutines = routines || [];
+            
+            // Load games
+            const games = await storageManager.getGameCompletions(user.id);
+            this.state.recentGames = games || [];
+            
+        } catch (error) {
+            console.error('Error loading recent practice:', error);
+            this.state.recentRoutines = [];
+            this.state.recentGames = [];
         }
     }
 
@@ -466,9 +493,9 @@ class App {
 
                     <!-- Recent Sessions -->
                     <div class="card">
-                        <h2>Recent Sessions</h2>
+                        <h2>Recent Practice</h2>
                         <div class="sessions-list">
-                            ${sessions.length > 0 ? sessions.map(s => this.renderSessionItem(s)).join('') : '<p class="empty-state">No sessions yet. Add your first practice session!</p>'}
+                            ${this.renderRecentPractice()}
                         </div>
                     </div>
                 </div>
@@ -588,6 +615,126 @@ class App {
                         <button type="button" id="cancelSessionBtn" class="btn btn-secondary">Cancel</button>
                     </div>
                 </form>
+            </div>
+        `;
+    }
+    
+    /**
+     * Render combined recent practice (sessions, routines, and games)
+     */
+    renderRecentPractice() {
+        const sessions = userManager.sessions || [];
+        const routines = this.state.recentRoutines || [];
+        const games = this.state.recentGames || [];
+        
+        // Get all practice activities
+        const allActivities = [];
+        
+        // Add sessions
+        sessions.forEach(session => {
+            allActivities.push({
+                type: 'session',
+                data: session,
+                date: new Date(session.date),
+                id: session.id
+            });
+        });
+        
+        // Add routines
+        routines.forEach(routine => {
+            allActivities.push({
+                type: 'routine',
+                data: routine,
+                date: new Date(routine.endTime),
+                id: routine.id
+            });
+        });
+        
+        // Add games
+        games.forEach(game => {
+            allActivities.push({
+                type: 'game',
+                data: game,
+                date: new Date(game.endTime),
+                id: game.id
+            });
+        });
+        
+        // Sort by date (newest first)
+        allActivities.sort((a, b) => b.date - a.date);
+        
+        // Take most recent 20
+        const recent = allActivities.slice(0, 20);
+        
+        if (recent.length === 0) {
+            return '<p class="empty-state">No practice activities yet. Start practicing!</p>';
+        }
+        
+        return recent.map(activity => {
+            switch (activity.type) {
+                case 'session':
+                    return this.renderSessionItem(activity.data);
+                case 'routine':
+                    return this.renderRoutineItem(activity.data);
+                case 'game':
+                    return this.renderGameItem(activity.data);
+                default:
+                    return '';
+            }
+        }).join('');
+    }
+    
+    /**
+     * Render routine item for recent practice list
+     */
+    renderRoutineItem(routine) {
+        const date = new Date(routine.endTime).toLocaleDateString();
+        const time = new Date(routine.endTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        
+        return `
+            <div class="session-item routine-item">
+                <div class="session-header">
+                    <div>
+                        <span class="session-date">${date}</span>
+                        <span class="session-time">${time}</span>
+                        <span class="routine-tag">📋 ${routine.routineName}</span>
+                    </div>
+                    <div class="session-actions">
+                        <span class="session-points">${routine.points || 0} pts</span>
+                    </div>
+                </div>
+                <div class="session-stats">
+                    <span>${routine.duration} min</span>
+                    <span>${routine.totalStats.totalMakes}/${routine.totalStats.totalAttempts}</span>
+                    <span>${routine.totalStats.overallPercentage.toFixed(1)}%</span>
+                </div>
+            </div>
+        `;
+    }
+    
+    /**
+     * Render game item for recent practice list
+     */
+    renderGameItem(game) {
+        const date = new Date(game.endTime).toLocaleDateString();
+        const time = new Date(game.endTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        
+        return `
+            <div class="session-item game-item">
+                <div class="session-header">
+                    <div>
+                        <span class="session-date">${date}</span>
+                        <span class="session-time">${time}</span>
+                        <span class="game-tag">🎮 ${game.gameName}</span>
+                    </div>
+                    <div class="session-actions">
+                        <span class="session-points">${game.points || 0} pts</span>
+                    </div>
+                </div>
+                <div class="session-stats">
+                    <span>Score: ${game.score}</span>
+                    ${game.goalAchieved ? '<span class="goal-badge">🎯 Goal!</span>' : ''}
+                </div>
             </div>
         `;
     }
@@ -1400,16 +1547,23 @@ class App {
             
             // Start and complete game in one go
             gameTracker.startGame(game);
-            await gameTracker.completeGame(scoreData);
+            const completedGame = await gameTracker.completeGame(scoreData);
             
             // Check achievements
             await achievementManager.checkAchievements();
             
+            // Reload leaderboard and recent practice
+            await this.loadLeaderboard();
+            await this.loadRecentPractice();
+            
             // Close modal
             this.closeGameScoreModal();
             
-            // Show success
-            alert(`✅ Score logged for ${game.name}!${scoreData.won !== undefined ? (scoreData.won ? ' You won! 🎉' : ' Better luck next time!') : ''}`);
+            // Re-render to show new data
+            this.render();
+            
+            // Show success with points
+            alert(`✅ Score logged for ${game.name}!\n\n🎯 Points Earned: ${completedGame.points}${scoreData.won !== undefined ? (scoreData.won ? '\n🎉 You won!' : '\n Better luck next time!') : ''}`);
             
         } catch (error) {
             console.error('Error logging game score:', error);
@@ -1550,6 +1704,9 @@ class App {
             const totalAttempts = drills.reduce((sum, d) => sum + d.attempts, 0);
             const overallPercentage = (totalMakes / totalAttempts) * 100;
             
+            // Calculate points for routine
+            const routinePoints = calculateRoutinePoints(drills);
+            
             const duration = parseInt(document.getElementById('routineDuration')?.value || 0);
             const notes = document.getElementById('routineNotes')?.value;
             
@@ -1561,6 +1718,7 @@ class App {
                 endTime: new Date().toISOString(),
                 duration,
                 drills,
+                points: routinePoints,
                 totalStats: {
                     totalDrills: drills.length,
                     completedDrills: drills.length,
@@ -1577,22 +1735,27 @@ class App {
             if (user) {
                 await storageManager.saveRoutineCompletion(user.id, completion);
                 
-                // Increment totalRoutines counter
+                // Increment totalRoutines counter and add points
                 user.totalRoutines = (user.totalRoutines || 0) + 1;
+                user.totalPoints = (user.totalPoints || 0) + routinePoints;
                 await storageManager.saveUser(user);
             }
             
             // Check achievements
             await achievementManager.checkAchievements();
             
-            // Reload leaderboard
+            // Reload leaderboard and recent practice
             await this.loadLeaderboard();
+            await this.loadRecentPractice();
             
             // Close modal
             this.closeRoutineCompletionModal();
             
-            // Show success
-            alert(`✅ Routine completion logged!\n\n${routine.name}\nOverall: ${totalMakes}/${totalAttempts} (${Math.round(overallPercentage)}%)\nDuration: ${duration} minutes`);
+            // Re-render to show new data
+            this.render();
+            
+            // Show success with points
+            alert(`✅ Routine completion logged!\n\n${routine.name}\nOverall: ${totalMakes}/${totalAttempts} (${Math.round(overallPercentage)}%)\nDuration: ${duration} minutes\n\n🎯 Points Earned: ${routinePoints}`);
             
         } catch (error) {
             console.error('Error logging routine completion:', error);

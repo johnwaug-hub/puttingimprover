@@ -980,6 +980,16 @@
     border-radius: 8px;
 }
 
+.session-item.routine-item {
+    border-left-color: #3B82F6;
+    background: #EFF6FF;
+}
+
+.session-item.game-item {
+    border-left-color: #10B981;
+    background: #ECFDF5;
+}
+
 .session-header {
     display: flex;
     justify-content: space-between;
@@ -991,15 +1001,54 @@
     color: #6b7280;
 }
 
+.session-time {
+    color: #9ca3af;
+    font-size: 0.875rem;
+    margin-left: 0.5rem;
+}
+
 .session-points {
     color: #FF6B35;
     font-size: 1.1rem;
+}
+
+.routine-item .session-points {
+    color: #3B82F6;
+}
+
+.game-item .session-points {
+    color: #10B981;
 }
 
 .session-stats {
     display: flex;
     gap: 1rem;
     color: #4b5563;
+}
+
+.routine-tag {
+    display: inline-block;
+    background: #3B82F6;
+    color: white;
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    margin-left: 0.5rem;
+}
+
+.game-tag {
+    display: inline-block;
+    background: #10B981;
+    color: white;
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    margin-left: 0.5rem;
+}
+
+.goal-badge {
+    color: #10B981;
+    font-weight: 600;
 }
 
 /* Leaderboard */
