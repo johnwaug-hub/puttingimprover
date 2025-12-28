@@ -290,6 +290,51 @@ class StorageManager {
     }
 
     /**
+     * Delete a routine completion
+     * @param {string} userId - User ID
+     * @param {string} routineId - Routine completion ID
+     * @returns {Promise<void>}
+     */
+    async deleteRoutineCompletion(userId, routineId) {
+        try {
+            if (!this.db) this.init();
+            await this.db
+                .collection('users')
+                .doc(userId)
+                .collection('routineCompletions')
+                .doc(routineId)
+                .delete();
+            console.log(`Routine completion ${routineId} deleted for user ${userId}`);
+        } catch (error) {
+            console.error(`Error deleting routine completion:`, error);
+            throw error;
+        }
+    }
+
+    /**
+     * Update a routine completion
+     * @param {string} userId - User ID
+     * @param {string} routineId - Routine completion ID
+     * @param {Object} updatedData - Updated routine data
+     * @returns {Promise<void>}
+     */
+    async updateRoutineCompletion(userId, routineId, updatedData) {
+        try {
+            if (!this.db) this.init();
+            await this.db
+                .collection('users')
+                .doc(userId)
+                .collection('routineCompletions')
+                .doc(routineId)
+                .update(updatedData);
+            console.log(`Routine completion ${routineId} updated for user ${userId}`);
+        } catch (error) {
+            console.error(`Error updating routine completion:`, error);
+            throw error;
+        }
+    }
+
+    /**
      * Save a game completion
      * @param {string} userId - User ID
      * @param {Object} completion - Game completion object
@@ -319,6 +364,51 @@ class StorageManager {
         } catch (error) {
             console.error(`Error getting game completions for ${userId}:`, error);
             return [];
+        }
+    }
+
+    /**
+     * Delete a game completion
+     * @param {string} userId - User ID
+     * @param {string} gameId - Game completion ID
+     * @returns {Promise<void>}
+     */
+    async deleteGameCompletion(userId, gameId) {
+        try {
+            if (!this.db) this.init();
+            await this.db
+                .collection('users')
+                .doc(userId)
+                .collection('gameCompletions')
+                .doc(gameId)
+                .delete();
+            console.log(`Game completion ${gameId} deleted for user ${userId}`);
+        } catch (error) {
+            console.error(`Error deleting game completion:`, error);
+            throw error;
+        }
+    }
+
+    /**
+     * Update a game completion
+     * @param {string} userId - User ID
+     * @param {string} gameId - Game completion ID
+     * @param {Object} updatedData - Updated game data
+     * @returns {Promise<void>}
+     */
+    async updateGameCompletion(userId, gameId, updatedData) {
+        try {
+            if (!this.db) this.init();
+            await this.db
+                .collection('users')
+                .doc(userId)
+                .collection('gameCompletions')
+                .doc(gameId)
+                .update(updatedData);
+            console.log(`Game completion ${gameId} updated for user ${userId}`);
+        } catch (error) {
+            console.error(`Error updating game completion:`, error);
+            throw error;
         }
     }
 

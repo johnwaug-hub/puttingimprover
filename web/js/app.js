@@ -41,7 +41,11 @@ class App {
             recentGames: [],
             searchedPlayer: null,
             customAlert: null,
-            editingSession: null
+            editingSession: null,
+            editingRoutine: null,
+            editingGame: null,
+            showEditRoutineModal: false,
+            showEditGameModal: false
         };
 
         this.newSession = {
@@ -334,8 +338,9 @@ class App {
             return;
         }
         
-        // For now, show message that editing is not yet implemented
-        this.showCustomAlert('Routine editing coming soon! Delete and re-log for now.', 'info');
+        this.state.editingRoutine = routineId;
+        this.state.showEditRoutineModal = true;
+        this.render();
     }
     
     /**
@@ -394,8 +399,9 @@ class App {
             return;
         }
         
-        // For now, show message that editing is not yet implemented
-        this.showCustomAlert('Game editing coming soon! Delete and re-log for now.', 'info');
+        this.state.editingGame = gameId;
+        this.state.showEditGameModal = true;
+        this.render();
     }
 
     /**
@@ -747,6 +753,12 @@ class App {
             
             <!-- Profile Modal -->
             ${this.state.showProfileModal ? this.renderProfileModal() : ''}
+            
+            <!-- Edit Routine Modal -->
+            ${this.state.showEditRoutineModal ? this.renderEditRoutineModal() : ''}
+            
+            <!-- Edit Game Modal -->
+            ${this.state.showEditGameModal ? this.renderEditGameModal() : ''}
             
             <!-- Custom Alert -->
             ${this.state.customAlert ? this.renderCustomAlert() : ''}
@@ -1868,6 +1880,18 @@ class App {
                 this.render();
             });
         }
+        
+        // Edit routine form
+        const editRoutineForm = document.getElementById('editRoutineForm');
+        if (editRoutineForm) {
+            editRoutineForm.addEventListener('submit', (e) => this.handleRoutineUpdate(e));
+        }
+        
+        // Edit game form
+        const editGameForm = document.getElementById('editGameForm');
+        if (editGameForm) {
+            editGameForm.addEventListener('submit', (e) => this.handleGameUpdate(e));
+        }
     }
     
     /**
@@ -2502,6 +2526,167 @@ class App {
                 </div>
             </div>
         `;
+    }
+    
+    /**
+     * Render edit routine modal
+     */
+    renderEditRoutineModal() {
+        const routine = this.state.recentRoutines.find(r => r.id === this.state.editingRoutine);
+        if (!routine) return '';
+        
+        return `
+            <div class="modal-overlay" id="editRoutineModal">
+                <div class="modal">
+                    <div class="modal-header">
+                        <h3>✏️ Edit Routine: ${routine.routineName}</h3>
+                        <button type="button" class="close-modal-btn" onclick="app.closeEditRoutineModal()">✕</button>
+                    </div>
+                    <div class="modal-body">
+                        <form id="editRoutineForm">
+                            <div class="form-group">
+                                <label for="editRoutineDuration">Duration (minutes)</label>
+                                <input type="number" id="editRoutineDuration" min="1" max="180" value="${routine.duration}" required>
+                            </div>
+                            <div class="form-actions">
+                                <button type="submit" class="btn btn-primary">Update Routine</button>
+                                <button type="button" class="btn btn-secondary" onclick="app.closeEditRoutineModal()">Cancel</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        `;
+    }
+    
+    /**
+     * Render edit game modal
+     */
+    renderEditGameModal() {
+        const game = this.state.recentGames.find(g => g.id === this.state.editingGame);
+        if (!game) return '';
+        
+        return `
+            <div class="modal-overlay" id="editGameModal">
+                <div class="modal">
+                    <div class="modal-header">
+                        <h3>✏️ Edit Game: ${game.gameName}</h3>
+                        <button type="button" class="close-modal-btn" onclick="app.closeEditGameModal()">✕</button>
+                    </div>
+                    <div class="modal-body">
+                        <form id="editGameForm">
+                            <div class="form-group">
+                                <label for="editGameScore">Score</label>
+                                <input type="number" id="editGameScore" min="0" max="1000" value="${game.score}" required>
+                            </div>
+                            <div class="form-actions">
+                                <button type="submit" class="btn btn-primary">Update Game</button>
+                                <button type="button" class="btn btn-secondary" onclick="app.closeEditGameModal()">Cancel</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        `;
+    }
+    
+    /**
+     * Close edit routine modal
+     */
+    closeEditRoutineModal() {
+        this.state.showEditRoutineModal = false;
+        this.state.editingRoutine = null;
+        this.render();
+    }
+    
+    /**
+     * Close edit game modal
+     */
+    closeEditGameModal() {
+        this.state.showEditGameModal = false;
+        this.state.editingGame = null;
+        this.render();
+    }
+    
+    /**
+     * Handle routine update
+     */
+    async handleRoutineUpdate(e) {
+        e.preventDefault();
+        
+        try {
+            const routine = this.state.recentRoutines.find(r => r.id === this.state.editingRoutine);
+            if (!routine) return;
+            
+            const newDuration = parseInt(document.getElementById('editRoutineDuration').value);
+            const oldPoints = routine.points || 0;
+            
+            // Update routine
+            routine.duration = newDuration;
+            
+            const user = userManager.getCurrentUser();
+            await storageManager.updateRoutineCompletion(user.id, this.state.editingRoutine, {
+                duration: newDuration
+            });
+            
+            // Reload data
+            await this.loadRecentPractice();
+            await this.loadLeaderboard();
+            
+            this.closeEditRoutineModal();
+            this.showCustomAlert('Routine updated successfully!', 'success');
+            
+        } catch (error) {
+            console.error('Error updating routine:', error);
+            this.showCustomAlert('Failed to update routine: ' + error.message, 'error');
+        }
+    }
+    
+    /**
+     * Handle game update
+     */
+    async handleGameUpdate(e) {
+        e.preventDefault();
+        
+        try {
+            const game = this.state.recentGames.find(g => g.id === this.state.editingGame);
+            if (!game) return;
+            
+            const newScore = parseInt(document.getElementById('editGameScore').value);
+            const oldPoints = game.points || 0;
+            
+            // Recalculate points with new score
+            const { calculateGamePoints } = await import('./utils/calculations.js');
+            const gameDefinition = PUTTING_GAMES.find(g => g.name === game.gameName);
+            const newPoints = calculateGamePoints(gameDefinition, { score: newScore });
+            
+            const pointsDiff = newPoints - oldPoints;
+            
+            // Update game
+            game.score = newScore;
+            game.points = newPoints;
+            
+            const user = userManager.getCurrentUser();
+            await storageManager.updateGameCompletion(user.id, this.state.editingGame, {
+                score: newScore,
+                points: newPoints
+            });
+            
+            // Update user points
+            user.totalPoints = (user.totalPoints || 0) + pointsDiff;
+            await storageManager.saveUser(user);
+            
+            // Reload data
+            await this.loadRecentPractice();
+            await this.loadLeaderboard();
+            
+            this.closeEditGameModal();
+            this.showCustomAlert('Game updated successfully!', 'success');
+            
+        } catch (error) {
+            console.error('Error updating game:', error);
+            this.showCustomAlert('Failed to update game: ' + error.message, 'error');
+        }
     }
     
     /**
