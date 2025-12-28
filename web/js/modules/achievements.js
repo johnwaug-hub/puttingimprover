@@ -137,6 +137,175 @@ class AchievementManager {
             newlyUnlocked.push('consistency_king');
         }
 
+        // NEW ACHIEVEMENTS
+        
+        // Ninety Percent Club - 90%+ accuracy
+        const ninetyPercent = sessions.find(s => s.percentage >= 90);
+        if (ninetyPercent && !currentAchievements.includes('ninety_percent_club')) {
+            await userManager.addAchievement('ninety_percent_club');
+            newlyUnlocked.push('ninety_percent_club');
+        }
+
+        // Flawless - 50+ putts at 100%
+        const flawless = sessions.find(s => s.makes >= 50 && s.percentage === 100);
+        if (flawless && !currentAchievements.includes('flawless')) {
+            await userManager.addAchievement('flawless');
+            newlyUnlocked.push('flawless');
+        }
+
+        // Sharpshooter - 95%+ from 20+ feet
+        const sharpshooter = sessions.find(s => s.distance >= 20 && s.percentage >= 95);
+        if (sharpshooter && !currentAchievements.includes('sharpshooter')) {
+            await userManager.addAchievement('sharpshooter');
+            newlyUnlocked.push('sharpshooter');
+        }
+
+        // Half Century - 50 sessions
+        if (sessions.length >= 50 && !currentAchievements.includes('half_century')) {
+            await userManager.addAchievement('half_century');
+            newlyUnlocked.push('half_century');
+        }
+
+        // Centurion - 100 sessions
+        if (sessions.length >= 100 && !currentAchievements.includes('centurion')) {
+            await userManager.addAchievement('centurion');
+            newlyUnlocked.push('centurion');
+        }
+
+        // Point Legend - 5000+ points
+        if (user.totalPoints >= 5000 && !currentAchievements.includes('point_legend')) {
+            await userManager.addAchievement('point_legend');
+            newlyUnlocked.push('point_legend');
+        }
+
+        // Two Week Streak
+        if (stats.longestStreak >= 14 && !currentAchievements.includes('two_week_streak')) {
+            await userManager.addAchievement('two_week_streak');
+            newlyUnlocked.push('two_week_streak');
+        }
+
+        // Iron Will - 60 day streak
+        if (stats.longestStreak >= 60 && !currentAchievements.includes('iron_will')) {
+            await userManager.addAchievement('iron_will');
+            newlyUnlocked.push('iron_will');
+        }
+
+        // Unstoppable - 100 day streak
+        if (stats.longestStreak >= 100 && !currentAchievements.includes('unstoppable')) {
+            await userManager.addAchievement('unstoppable');
+            newlyUnlocked.push('unstoppable');
+        }
+
+        // Long Ranger - Practice from 30+ feet
+        const longRange = sessions.find(s => s.distance >= 30);
+        if (longRange && !currentAchievements.includes('long_ranger')) {
+            await userManager.addAchievement('long_ranger');
+            newlyUnlocked.push('long_ranger');
+        }
+
+        // Downtown Driver - Make putt from 50+ feet
+        const downtown = sessions.find(s => s.distance >= 50 && s.makes >= 1);
+        if (downtown && !currentAchievements.includes('downtown_driver')) {
+            await userManager.addAchievement('downtown_driver');
+            newlyUnlocked.push('downtown_driver');
+        }
+
+        // Extreme Range - 3+ putts from 60+ feet
+        const extreme = sessions.find(s => s.distance >= 60 && s.makes >= 3);
+        if (extreme && !currentAchievements.includes('extreme_range')) {
+            await userManager.addAchievement('extreme_range');
+            newlyUnlocked.push('extreme_range');
+        }
+
+        // Hundred Club - 100 makes in one session
+        const hundred = sessions.find(s => s.makes >= 100);
+        if (hundred && !currentAchievements.includes('hundred_club')) {
+            await userManager.addAchievement('hundred_club');
+            newlyUnlocked.push('hundred_club');
+        }
+
+        // Two Hundred Club - 200 makes in one session
+        const twoHundred = sessions.find(s => s.makes >= 200);
+        if (twoHundred && !currentAchievements.includes('two_hundred_club')) {
+            await userManager.addAchievement('two_hundred_club');
+            newlyUnlocked.push('two_hundred_club');
+        }
+
+        // Marathon Putter - 500 attempts in one session
+        const marathon = sessions.find(s => s.attempts >= 500);
+        if (marathon && !currentAchievements.includes('marathon_putter')) {
+            await userManager.addAchievement('marathon_putter');
+            newlyUnlocked.push('marathon_putter');
+        }
+
+        // Iron Man - 1000 attempts in one session
+        const ironMan = sessions.find(s => s.attempts >= 1000);
+        if (ironMan && !currentAchievements.includes('iron_man')) {
+            await userManager.addAchievement('iron_man');
+            newlyUnlocked.push('iron_man');
+        }
+
+        // Routine Addict - 25 total routines
+        if (user.totalRoutines >= 25 && !currentAchievements.includes('routine_addict')) {
+            await userManager.addAchievement('routine_addict');
+            newlyUnlocked.push('routine_addict');
+        }
+
+        // Game Enthusiast - 10 games
+        if (user.totalGames >= 10 && !currentAchievements.includes('game_enthusiast')) {
+            await userManager.addAchievement('game_enthusiast');
+            newlyUnlocked.push('game_enthusiast');
+        }
+
+        // Friend Magnet - 10 friends
+        const friends2 = await storageManager.getUserFriends(user.id);
+        if (friends2.length >= 10 && !currentAchievements.includes('friend_magnet')) {
+            await userManager.addAchievement('friend_magnet');
+            newlyUnlocked.push('friend_magnet');
+        }
+
+        // Top Ten - Top 10 on leaderboard
+        if (rank > 0 && rank <= 10 && !currentAchievements.includes('top_ten')) {
+            await userManager.addAchievement('top_ten');
+            newlyUnlocked.push('top_ten');
+        }
+
+        // Number One - #1 on leaderboard
+        if (rank === 1 && !currentAchievements.includes('number_one')) {
+            await userManager.addAchievement('number_one');
+            newlyUnlocked.push('number_one');
+        }
+
+        // Distance Explorer - 10 different distances
+        const uniqueDistances = new Set(sessions.map(s => s.distance));
+        if (uniqueDistances.size >= 10 && !currentAchievements.includes('distance_explorer')) {
+            await userManager.addAchievement('distance_explorer');
+            newlyUnlocked.push('distance_explorer');
+        }
+
+        // All Ranges - Practice from 10, 20, 30, 40, 50 feet
+        const requiredDistances = [10, 20, 30, 40, 50];
+        const hasAllRanges = requiredDistances.every(d => sessions.some(s => s.distance === d));
+        if (hasAllRanges && !currentAchievements.includes('all_ranges')) {
+            await userManager.addAchievement('all_ranges');
+            newlyUnlocked.push('all_ranges');
+        }
+
+        // Disc Collector - All 3 favorite discs
+        if (user.favoritePutter && user.favoriteMidrange && user.favoriteDriver && 
+            !currentAchievements.includes('disc_collector')) {
+            await userManager.addAchievement('disc_collector');
+            newlyUnlocked.push('disc_collector');
+        }
+
+        // Profile Complete - All profile fields
+        if (user.displayName && user.gender && user.birthday && 
+            user.favoritePutter && user.favoriteMidrange && user.favoriteDriver &&
+            !currentAchievements.includes('profile_complete')) {
+            await userManager.addAchievement('profile_complete');
+            newlyUnlocked.push('profile_complete');
+        }
+
         // Game On - View Games tab (checked in app.js when view changes)
         // This is a simple achievement just for viewing the tab
         if (!currentAchievements.includes('game_on')) {
