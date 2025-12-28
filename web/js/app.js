@@ -760,8 +760,15 @@ class App {
                 <!-- Games View -->
                 <div class="view ${this.state.currentView === 'games' ? 'active' : ''}" id="games-view">
                     <div class="card">
-                        <h2>🎮 Putting Games</h2>
-                        <p style="margin-bottom: 1.5rem; color: #6b7280;">Make practice fun with these competitive putting games!</p>
+                        <div class="header-flex">
+                            <div>
+                                <h2>🎮 Putting Games</h2>
+                                <p style="margin-bottom: 0.5rem; color: #6b7280;">Make practice fun with these competitive putting games!</p>
+                            </div>
+                            <button id="bulkLogGamesBtn" class="btn btn-secondary">
+                                📋 Bulk Log Games
+                            </button>
+                        </div>
                         <div class="games-grid">
                             ${this.renderGames()}
                         </div>
@@ -1773,8 +1780,15 @@ class App {
         
         let html = `
             <div class="card routines-panel">
-                <h3>📋 Suggested Putting Routines</h3>
-                <p style="margin-bottom: 1.5rem; color: #6b7280;">Choose a routine to structure your practice session</p>
+                <div class="header-flex">
+                    <div>
+                        <h3>📋 Suggested Putting Routines</h3>
+                        <p style="margin-bottom: 0.5rem; color: #6b7280;">Choose a routine to structure your practice session</p>
+                    </div>
+                    <button id="bulkLogRoutinesBtn" class="btn btn-secondary">
+                        📋 Bulk Log Routines
+                    </button>
+                </div>
         `;
         
         // Render each difficulty level
@@ -1932,6 +1946,37 @@ class App {
         if (bulkLogBtn) {
             bulkLogBtn.addEventListener('click', () => {
                 this.state.showBulkLogModal = true;
+                this.state.bulkActivityType = 'session'; // Default to sessions
+                this.render();
+                
+                // Attach modal event listeners after render
+                setTimeout(() => {
+                    this.attachBulkLogModalListeners();
+                }, 100);
+            });
+        }
+        
+        // Bulk log routines button
+        const bulkLogRoutinesBtn = document.getElementById('bulkLogRoutinesBtn');
+        if (bulkLogRoutinesBtn) {
+            bulkLogRoutinesBtn.addEventListener('click', () => {
+                this.state.showBulkLogModal = true;
+                this.state.bulkActivityType = 'routine'; // Set to routine
+                this.render();
+                
+                // Attach modal event listeners after render
+                setTimeout(() => {
+                    this.attachBulkLogModalListeners();
+                }, 100);
+            });
+        }
+        
+        // Bulk log games button
+        const bulkLogGamesBtn = document.getElementById('bulkLogGamesBtn');
+        if (bulkLogGamesBtn) {
+            bulkLogGamesBtn.addEventListener('click', () => {
+                this.state.showBulkLogModal = true;
+                this.state.bulkActivityType = 'game'; // Set to game
                 this.render();
                 
                 // Attach modal event listeners after render
