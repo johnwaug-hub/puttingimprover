@@ -7,7 +7,8 @@
 
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-            background-image: url('../background.jpg');
+            /* WebP for modern browsers, falls back to JPEG */
+            background-image: url('../background.webp');
             background-size: cover;
             background-position: center;
             background-attachment: fixed;
@@ -15,6 +16,13 @@
             position: relative;
             min-height: 100vh;
             color: #1f2937;
+        }
+        
+        /* JPEG fallback for older browsers */
+        @supports not (background-image: url('../background.webp')) {
+            body {
+                background-image: url('../background.jpg');
+            }
         }
 
         .container {
