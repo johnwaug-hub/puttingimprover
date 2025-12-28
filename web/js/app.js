@@ -47,7 +47,26 @@ class App {
             showEditRoutineModal: false,
             showEditGameModal: false,
             achievementSplash: null, // { id, name, icon, desc, points }
-            collapsedCategories: {} // Track which achievement categories are collapsed
+            collapsedCategories: {
+                // Achievement categories - all collapsed by default
+                'Getting Started': true,
+                'Accuracy': true,
+                'Points & Sessions': true,
+                'Streaks': true,
+                'Distance': true,
+                'Volume': true,
+                'Routines': true,
+                'Games': true,
+                'Social & Competition': true,
+                'Variety': true,
+                'Dedication': true,
+                'Special': true,
+                // Routine difficulty sections - all collapsed by default
+                'routine-Beginner': true,
+                'routine-Intermediate': true,
+                'routine-Advanced': true,
+                'routine-Expert': true
+            }
         };
 
         this.newSession = {
