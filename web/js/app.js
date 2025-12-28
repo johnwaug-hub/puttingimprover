@@ -712,7 +712,6 @@ class App {
                         <span class="player-name">
                             ${player.displayName || 'Unknown Player'}
                         </span>
-                        ${isCurrentUser ? '<span class="you-badge">(You)</span>' : ''}
                     </div>
                 </div>
                 <div class="player-stats">

@@ -1904,14 +1904,6 @@
     border-top: 2px solid #e5e7eb;
 }
 
-/* "You" badge on leaderboard */
-.you-badge {
-    font-size: 0.875rem;
-    color: #6b7280;
-    font-weight: normal;
-    margin-left: 0.5rem;
-}
-
 .player-name-wrapper {
     display: flex;
     align-items: center;
