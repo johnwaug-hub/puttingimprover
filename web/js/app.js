@@ -67,7 +67,11 @@ class App {
                 'routine-Advanced': true,
                 'routine-Expert': true
             },
-            otherPlayerStats: null // Cache for other player's calculated stats
+            otherPlayerStats: null, // Cache for other player's calculated stats
+            showBulkLogModal: false,
+            showPermissionsModal: false,
+            bulkLogPlayers: [], // Players selected for bulk logging
+            permissionRequests: [] // Pending permission requests
         };
 
         this.newSession = {
@@ -667,9 +671,17 @@ class App {
                     <div class="card">
                         <div class="header-flex">
                             <h2>Recent Practice</h2>
-                            <button id="addSessionBtn" class="btn btn-primary">
-                                ➕ Add Practice Session
-                            </button>
+                            <div class="header-actions">
+                                <button id="bulkLogBtn" class="btn btn-secondary btn-small">
+                                    📋 Bulk Log
+                                </button>
+                                <button id="managePermissionsBtn" class="btn btn-secondary btn-small">
+                                    🔐 Permissions
+                                </button>
+                                <button id="addSessionBtn" class="btn btn-primary">
+                                    ➕ Add Practice Session
+                                </button>
+                            </div>
                         </div>
                         <div class="sessions-list">
                             ${this.renderRecentPractice()}
@@ -772,6 +784,12 @@ class App {
             
             <!-- Routine Completion Modal -->
             ${this.state.showRoutineCompletionModal ? this.renderRoutineCompletionModal() : ''}
+            
+            <!-- Bulk Logging Modal -->
+            ${this.state.showBulkLogModal ? this.renderBulkLogModal() : ''}
+            
+            <!-- Permissions Modal -->
+            ${this.state.showPermissionsModal ? this.renderPermissionsModal() : ''}
             
             <!-- Profile Modal -->
             ${this.state.showProfileModal ? this.renderProfileModal() : ''}
@@ -959,23 +977,37 @@ class App {
         const dateObj = new Date(routine.endTime);
         const date = dateObj.toLocaleDateString();
         const time = dateObj.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
+        const currentUserId = userManager.getCurrentUser()?.id;
+        const loggedByOther = routine.loggedBy && routine.loggedBy !== currentUserId;
+        const needsAccept = routine.pending && loggedByOther;
         
         return `
-            <div class="session-item routine-item">
+            <div class="session-item routine-item ${needsAccept ? 'pending-session' : ''}">
                 <div class="session-header">
                     <div>
                         <span class="session-date">${date}</span>
                         <span class="session-time">${time}</span>
                         <span class="routine-tag">📋 ${routine.routineName}</span>
+                        ${loggedByOther ? `<span class="logged-by-badge">📝 Logged by ${routine.loggedByName || 'Another user'}</span>` : ''}
+                        ${needsAccept ? `<span class="pending-badge">⏳ Pending</span>` : ''}
                     </div>
                     <div class="session-actions">
-                        <span class="session-points">${routine.points || 0} pts</span>
-                        <button class="btn-edit-routine" data-routine-id="${routine.id}" title="Edit routine">
-                            ✏️
-                        </button>
-                        <button class="btn-delete-routine" data-routine-id="${routine.id}" title="Delete routine">
-                            🗑️
-                        </button>
+                        ${needsAccept ? `
+                            <button class="btn btn-success btn-small accept-routine-btn" data-routine-id="${routine.id}">
+                                ✓ Accept
+                            </button>
+                            <button class="btn btn-danger btn-small reject-routine-btn" data-routine-id="${routine.id}">
+                                ✕ Reject
+                            </button>
+                        ` : `
+                            <span class="session-points">${routine.points || 0} pts</span>
+                            <button class="btn-edit-routine" data-routine-id="${routine.id}" title="Edit routine">
+                                ✏️
+                            </button>
+                            <button class="btn-delete-routine" data-routine-id="${routine.id}" title="Delete routine">
+                                🗑️
+                            </button>
+                        `}
                     </div>
                 </div>
                 <div class="session-stats">
@@ -995,22 +1027,37 @@ class App {
         const date = dateObj.toLocaleDateString();
         const time = dateObj.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
         
+        const currentUserId = userManager.getCurrentUser()?.id;
+        const loggedByOther = game.loggedBy && game.loggedBy !== currentUserId;
+        const needsAccept = game.pending && loggedByOther;
+        
         return `
-            <div class="session-item game-item">
+            <div class="session-item game-item ${needsAccept ? 'pending-session' : ''}">
                 <div class="session-header">
                     <div>
                         <span class="session-date">${date}</span>
                         <span class="session-time">${time}</span>
                         <span class="game-tag">🎮 ${game.gameName}</span>
+                        ${loggedByOther ? `<span class="logged-by-badge">📝 Logged by ${game.loggedByName || 'Another user'}</span>` : ''}
+                        ${needsAccept ? `<span class="pending-badge">⏳ Pending</span>` : ''}
                     </div>
                     <div class="session-actions">
-                        <span class="session-points">${game.points || 0} pts</span>
-                        <button class="btn-edit-game" data-game-id="${game.id}" title="Edit game">
-                            ✏️
-                        </button>
-                        <button class="btn-delete-game" data-game-id="${game.id}" title="Delete game">
-                            🗑️
-                        </button>
+                        ${needsAccept ? `
+                            <button class="btn btn-success btn-small accept-game-btn" data-game-id="${game.id}">
+                                ✓ Accept
+                            </button>
+                            <button class="btn btn-danger btn-small reject-game-btn" data-game-id="${game.id}">
+                                ✕ Reject
+                            </button>
+                        ` : `
+                            <span class="session-points">${game.points || 0} pts</span>
+                            <button class="btn-edit-game" data-game-id="${game.id}" title="Edit game">
+                                ✏️
+                            </button>
+                            <button class="btn-delete-game" data-game-id="${game.id}" title="Delete game">
+                                🗑️
+                            </button>
+                        `}
                     </div>
                 </div>
                 <div class="session-stats">
@@ -1027,22 +1074,38 @@ class App {
         const time = session.timestamp ? dateObj.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' }) : '';
         const routineTag = session.routineName ? `<span class="routine-tag">📋 ${session.routineName}</span>` : '';
         
+        // Check if logged by someone else
+        const currentUserId = userManager.getCurrentUser()?.id;
+        const loggedByOther = session.loggedBy && session.loggedBy !== currentUserId;
+        const needsAccept = session.pending && loggedByOther;
+        
         return `
-            <div class="session-item" data-session-id="${session.id}">
+            <div class="session-item ${needsAccept ? 'pending-session' : ''}" data-session-id="${session.id}">
                 <div class="session-header">
                     <div>
                         <span class="session-date">${date}</span>
                         ${time ? `<span class="session-time">${time}</span>` : ''}
                         ${routineTag}
+                        ${loggedByOther ? `<span class="logged-by-badge">📝 Logged by ${session.loggedByName || 'Another user'}</span>` : ''}
+                        ${needsAccept ? `<span class="pending-badge">⏳ Pending</span>` : ''}
                     </div>
                     <div class="session-actions">
-                        <span class="session-points">${session.points} pts</span>
-                        <button class="btn-edit-session" data-session-id="${session.id}" title="Edit session">
-                            ✏️
-                        </button>
-                        <button class="btn-delete-session" data-session-id="${session.id}" title="Delete session">
-                            🗑️
-                        </button>
+                        ${needsAccept ? `
+                            <button class="btn btn-success btn-small accept-session-btn" data-session-id="${session.id}">
+                                ✓ Accept
+                            </button>
+                            <button class="btn btn-danger btn-small reject-session-btn" data-session-id="${session.id}">
+                                ✕ Reject
+                            </button>
+                        ` : `
+                            <span class="session-points">${session.points} pts</span>
+                            <button class="btn-edit-session" data-session-id="${session.id}" title="Edit session">
+                                ✏️
+                            </button>
+                            <button class="btn-delete-session" data-session-id="${session.id}" title="Delete session">
+                                🗑️
+                            </button>
+                        `}
                     </div>
                 </div>
                 <div class="session-stats">
@@ -2051,8 +2114,8 @@ class App {
             sharePerformanceBtn.addEventListener('click', () => this.handleSharePerformance());
         }
         
-        // Achievement category toggles
-        const categoryTitles = document.querySelectorAll('.category-title.clickable');
+        // Achievement and routine category toggles
+        const categoryTitles = document.querySelectorAll('.category-title.clickable, .difficulty-title.clickable');
         categoryTitles.forEach(title => {
             title.addEventListener('click', (e) => {
                 const category = e.currentTarget.dataset.category;
@@ -2176,7 +2239,7 @@ class App {
     /**
      * Add session for another user
      */
-    async addSessionForUser(userId, sessionData) {
+    async addSessionForUser(userId, sessionData, requireApproval = false) {
         const { makes, attempts, distance } = sessionData;
         
         // Calculate points and percentage
@@ -2193,39 +2256,42 @@ class App {
             attempts,
             percentage,
             points,
-            loggedBy: userManager.getCurrentUser().id, // Track who logged it
-            loggedByName: userManager.getCurrentUser().displayName
+            loggedBy: userManager.getCurrentUser().id,
+            loggedByName: userManager.getCurrentUser().displayName,
+            pending: requireApproval // If true, requires user acceptance
         };
         
         // Save session for target user
         await storageManager.saveSession(userId, session);
         
-        // Update target user's stats
-        const targetUser = await storageManager.getUser(userId);
-        if (targetUser) {
-            targetUser.totalPoints = (targetUser.totalPoints || 0) + points;
-            targetUser.totalSessions = (targetUser.totalSessions || 0) + 1;
-            targetUser.totalPutts = (targetUser.totalPutts || 0) + attempts;
-            targetUser.totalMakes = (targetUser.totalMakes || 0) + makes;
-            
-            // Update best session if needed
-            if (!targetUser.bestSession || points > (targetUser.bestSession.points || 0)) {
-                targetUser.bestSession = {
-                    distance,
-                    makes,
-                    attempts,
-                    percentage,
-                    points,
-                    date: session.date
-                };
+        // Only update stats if not requiring approval
+        if (!requireApproval) {
+            const targetUser = await storageManager.getUser(userId);
+            if (targetUser) {
+                targetUser.totalPoints = (targetUser.totalPoints || 0) + points;
+                targetUser.totalSessions = (targetUser.totalSessions || 0) + 1;
+                targetUser.totalPutts = (targetUser.totalPutts || 0) + attempts;
+                targetUser.totalMakes = (targetUser.totalMakes || 0) + makes;
+                
+                // Update best session if needed
+                if (!targetUser.bestSession || points > (targetUser.bestSession.points || 0)) {
+                    targetUser.bestSession = {
+                        distance,
+                        makes,
+                        attempts,
+                        percentage,
+                        points,
+                        date: session.date
+                    };
+                }
+                
+                // Update best accuracy
+                if (!targetUser.bestAccuracy || percentage > targetUser.bestAccuracy) {
+                    targetUser.bestAccuracy = percentage;
+                }
+                
+                await storageManager.saveUser(targetUser);
             }
-            
-            // Update best accuracy
-            if (!targetUser.bestAccuracy || percentage > targetUser.bestAccuracy) {
-                targetUser.bestAccuracy = percentage;
-            }
-            
-            await storageManager.saveUser(targetUser);
         }
         
         return session;
@@ -2681,6 +2747,132 @@ class App {
                                 <button type="button" class="btn btn-secondary" id="cancelRoutineCompletion">Cancel</button>
                             </div>
                         </form>
+                    </div>
+                </div>
+            </div>
+        `;
+    }
+    
+    /**
+     * Render bulk logging modal
+     */
+    renderBulkLogModal() {
+        return `
+            <div class="modal-overlay" id="bulkLogModal">
+                <div class="modal bulk-log-modal">
+                    <div class="modal-header">
+                        <h3>📋 Bulk Log Sessions</h3>
+                        <button type="button" class="close-modal-btn" id="closeBulkLogModal">✕</button>
+                    </div>
+                    <div class="modal-body">
+                        <p class="modal-description">Log the same practice session for multiple players at once</p>
+                        
+                        <form id="bulkLogForm">
+                            <!-- Player Selection -->
+                            <div class="form-group">
+                                <label>Select Players</label>
+                                <div class="player-checkbox-list">
+                                    ${this.state.leaderboard
+                                        .filter(p => p.id !== userManager.getCurrentUser()?.id)
+                                        .map(player => `
+                                            <label class="checkbox-label">
+                                                <input type="checkbox" 
+                                                       name="bulkPlayers" 
+                                                       value="${player.id}"
+                                                       class="bulk-player-checkbox">
+                                                <span>${player.displayName}</span>
+                                            </label>
+                                        `).join('')}
+                                </div>
+                            </div>
+                            
+                            <!-- Session Data -->
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="bulkDistance">Distance (feet)</label>
+                                    <input type="number" id="bulkDistance" min="5" max="100" value="20" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="bulkMakes">Makes</label>
+                                    <input type="number" id="bulkMakes" min="0" max="100" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="bulkAttempts">Attempts</label>
+                                    <input type="number" id="bulkAttempts" min="1" max="100" value="20" required>
+                                </div>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label>
+                                    <input type="checkbox" id="requireApproval" checked>
+                                    Require player approval before adding to stats
+                                </label>
+                            </div>
+                            
+                            <div class="form-actions">
+                                <button type="submit" class="btn btn-primary">Log for All Selected</button>
+                                <button type="button" class="btn btn-secondary" id="cancelBulkLog">Cancel</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        `;
+    }
+    
+    /**
+     * Render permissions modal
+     */
+    renderPermissionsModal() {
+        const currentUser = userManager.getCurrentUser();
+        
+        return `
+            <div class="modal-overlay" id="permissionsModal">
+                <div class="modal permissions-modal">
+                    <div class="modal-header">
+                        <h3>🔐 Logging Permissions</h3>
+                        <button type="button" class="close-modal-btn" id="closePermissionsModal">✕</button>
+                    </div>
+                    <div class="modal-body">
+                        <p class="modal-description">Manage who can log practice sessions on your behalf</p>
+                        
+                        <!-- Pending Requests -->
+                        <div class="permissions-section">
+                            <h4>Pending Approvals</h4>
+                            ${this.state.permissionRequests && this.state.permissionRequests.length > 0 ? `
+                                <div class="permission-list">
+                                    ${this.state.permissionRequests.map(req => `
+                                        <div class="permission-item">
+                                            <div class="permission-info">
+                                                <span class="permission-name">${req.fromName}</span>
+                                                <span class="permission-detail">${req.activityType} logged ${req.date}</span>
+                                            </div>
+                                            <div class="permission-actions">
+                                                <button class="btn btn-success btn-small" data-request-id="${req.id}">
+                                                    ✓ Approve
+                                                </button>
+                                                <button class="btn btn-danger btn-small" data-request-id="${req.id}">
+                                                    ✕ Deny
+                                                </button>
+                                            </div>
+                                        </div>
+                                    `).join('')}
+                                </div>
+                            ` : '<p class="empty-state">No pending approvals</p>'}
+                        </div>
+                        
+                        <!-- Logging History -->
+                        <div class="permissions-section">
+                            <h4>Recent Logging Activity</h4>
+                            <p class="section-hint">Sessions logged by others on your behalf</p>
+                            <div class="logging-history">
+                                <p class="empty-state">View this in Recent Practice section</p>
+                            </div>
+                        </div>
+                        
+                        <div class="form-actions">
+                            <button type="button" class="btn btn-secondary" id="closePermissions">Close</button>
+                        </div>
                     </div>
                 </div>
             </div>
