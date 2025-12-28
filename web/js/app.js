@@ -632,10 +632,12 @@ class App {
         
         // Add sessions
         sessions.forEach(session => {
+            // Use timestamp if available, otherwise use date
+            const dateToUse = session.timestamp ? new Date(session.timestamp) : new Date(session.date);
             allActivities.push({
                 type: 'session',
                 data: session,
-                date: new Date(session.date),
+                date: dateToUse,
                 id: session.id
             });
         });
@@ -688,8 +690,9 @@ class App {
      * Render routine item for recent practice list
      */
     renderRoutineItem(routine) {
-        const date = new Date(routine.endTime).toLocaleDateString();
-        const time = new Date(routine.endTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        const dateObj = new Date(routine.endTime);
+        const date = dateObj.toLocaleDateString();
+        const time = dateObj.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
         
         return `
             <div class="session-item routine-item">
@@ -716,8 +719,9 @@ class App {
      * Render game item for recent practice list
      */
     renderGameItem(game) {
-        const date = new Date(game.endTime).toLocaleDateString();
-        const time = new Date(game.endTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        const dateObj = new Date(game.endTime);
+        const date = dateObj.toLocaleDateString();
+        const time = dateObj.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
         
         return `
             <div class="session-item game-item">
@@ -742,7 +746,7 @@ class App {
     renderSessionItem(session) {
         const dateObj = new Date(session.timestamp || session.date);
         const date = dateObj.toLocaleDateString();
-        const time = session.timestamp ? dateObj.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '';
+        const time = session.timestamp ? dateObj.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' }) : '';
         const routineTag = session.routineName ? `<span class="routine-tag">📋 ${session.routineName}</span>` : '';
         
         return `
@@ -893,14 +897,54 @@ class App {
             return '<p class="empty-state">No achievements yet. Keep practicing!</p>';
         }
         
-        return achievements.map(achievement => `
-            <div class="achievement-card ${achievement.isUnlocked ? 'unlocked' : 'locked'}">
-                <div class="achievement-icon">${achievement.icon}</div>
-                <div class="achievement-name">${achievement.name}</div>
-                <div class="achievement-description">${achievement.desc}</div>
-                ${achievement.isUnlocked ? '<div class="achievement-badge">✓ Unlocked</div>' : ''}
-            </div>
-        `).join('');
+        // Group achievements by category
+        const categories = {
+            'Getting Started': ['first_steps', 'early_bird', 'night_owl'],
+            'Accuracy': ['perfect_10', 'ninety_percent_club', 'flawless', 'sharpshooter'],
+            'Points & Sessions': ['century_club', 'half_century', 'centurion', 'point_king', 'point_legend'],
+            'Streaks': ['week_warrior', 'two_week_streak', 'month_master', 'iron_will', 'unstoppable'],
+            'Distance': ['long_ranger', 'distance_demon', 'downtown_driver', 'extreme_range'],
+            'Volume': ['hundred_club', 'two_hundred_club', 'marathon_putter', 'iron_man'],
+            'Routines': ['routine_rookie', 'routine_regular', 'routine_master', 'ladder_climber', 'consistency_king', 'routine_addict'],
+            'Games': ['game_on', 'first_game', 'game_enthusiast', 'game_master', 'around_the_world_champ', 'horse_master', 'perfect_streak', 'distance_champion', 'par_shooter', 'poker_pro', 'putt_100_master'],
+            'Social & Competition': ['social_butterfly', 'friend_magnet', 'podium_finish', 'top_ten', 'number_one', 'challenge_accepted'],
+            'Variety': ['distance_explorer', 'all_ranges', 'versatile_putter'],
+            'Dedication': ['weekend_warrior', 'daily_grinder', 'committed', 'veteran', 'legend', 'early_adopter'],
+            'Special': ['comeback_kid', 'profile_complete', 'disc_collector']
+        };
+        
+        let html = '';
+        
+        // Render each category
+        for (const [categoryName, achievementIds] of Object.entries(categories)) {
+            const categoryAchievements = achievements.filter(a => achievementIds.includes(a.id));
+            
+            if (categoryAchievements.length === 0) continue;
+            
+            const unlockedCount = categoryAchievements.filter(a => a.isUnlocked).length;
+            
+            html += `
+                <div class="achievement-category">
+                    <h3 class="category-title">
+                        ${categoryName}
+                        <span class="category-progress">${unlockedCount}/${categoryAchievements.length}</span>
+                    </h3>
+                    <div class="achievements-grid">
+                        ${categoryAchievements.map(achievement => `
+                            <div class="achievement-card ${achievement.isUnlocked ? 'unlocked' : 'locked'}">
+                                <div class="achievement-icon">${achievement.icon}</div>
+                                <div class="achievement-name">${achievement.name}</div>
+                                <div class="achievement-description">${achievement.desc}</div>
+                                <div class="achievement-points">${achievement.points} pts</div>
+                                ${achievement.isUnlocked ? '<div class="achievement-badge">✓ Unlocked</div>' : ''}
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+        }
+        
+        return html;
     }
     
     /**
