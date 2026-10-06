@@ -1,0 +1,1121 @@
+/**
+ * modal-redesign.css — v10.1.0
+ * (c) 2024-2026 Lock Jaw Disc Golf / John Waugaman. All rights reserved.
+ *
+ * Unified modal design system:
+ *  1. CSS variables (replaces ~550 scattered body.dark-mode patches)
+ *  2. Gradient branded headers
+ *  3. Profile hero / avatar-overlap layout
+ *  4. XP progress bar in profile
+ *  5. Profile tab navigation
+ *  6. Stat cards with accent bars
+ *  7. Redesigned confirm dialogs
+ *  8. Mobile bottom-sheet modals
+ *  9. Backdrop-blur overlay
+ * 10. Slide-up entry animation
+ */
+
+/* ============================================================
+   1. CSS VARIABLE SYSTEM — single source of truth for modals
+   ============================================================ */
+:root {
+    --modal-bg:              #ffffff;
+    --modal-header-border:   #e5e7eb;
+    --modal-text-primary:    #1f2937;
+    --modal-text-secondary:  #6b7280;
+    --modal-text-hint:       #9ca3af;
+    --modal-input-bg:        #f9fafb;
+    --modal-input-border:    #d1d5db;
+    --modal-stat-bg:         #f9fafb;
+    --modal-section-bg:      #f3f4f6;
+    --modal-section-border:  #e5e7eb;
+    --modal-footer-border:   #e5e7eb;
+    --modal-overlay-bg:      rgba(0, 0, 0, 0.55);
+    --modal-close-hover-bg:  rgba(0, 0, 0, 0.08);
+
+    /* Brand */
+    --brand-orange:     #FF6B35;
+    --brand-red:        #D9534F;
+    --brand-gradient:   linear-gradient(135deg, #FF6B35 0%, #D9534F 100%);
+
+    /* App-wide CSS variables (used by coaching.css, coachingUI.js, etc.) */
+    --accent-color:   #FF6B35;
+    --bg-color:       #f9fafb;
+    --card-bg:        #ffffff;
+    --text-color:     #1f2937;
+    --text-muted:     #6b7280;
+    --border-color:   #e5e7eb;
+    --border-radius:  8px;
+}
+
+body.dark-mode {
+    --modal-bg:              #1e293b;
+    --modal-header-border:   #334155;
+    --modal-text-primary:    #f1f5f9;
+    --modal-text-secondary:  #94a3b8;
+    --modal-text-hint:       #64748b;
+    --modal-input-bg:        #0f172a;
+    --modal-input-border:    #334155;
+    --modal-stat-bg:         #0f172a;
+    --modal-section-bg:      #0f172a;
+    --modal-section-border:  #334155;
+    --modal-footer-border:   #334155;
+    --modal-overlay-bg:      rgba(0, 0, 0, 0.78);
+    --modal-close-hover-bg:  rgba(255, 255, 255, 0.1);
+
+    /* App-wide CSS variables — dark overrides */
+    --accent-color:   #FF8C5A;
+    --bg-color:       #0f172a;
+    --card-bg:        #1e293b;
+    --text-color:     #f1f5f9;
+    --text-muted:     #94a3b8;
+    --border-color:   #334155;
+}
+
+
+/* ============================================================
+   2. OVERLAY & BASE MODAL
+   ============================================================ */
+.modal-overlay {
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    background: var(--modal-overlay-bg) !important;
+}
+
+.modal {
+    background: var(--modal-bg) !important;
+    animation: piModalSlideUp 0.22s ease-out !important;
+}
+
+@keyframes piModalSlideUp {
+    from { opacity: 0; transform: translateY(18px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+/* Unified dark-mode base for ALL modals */
+body.dark-mode .modal,
+body.dark-mode .modal-container {
+    background: var(--modal-bg) !important;
+    color: var(--modal-text-primary);
+}
+
+body.dark-mode .modal-header {
+    background: var(--modal-bg) !important;
+    border-bottom-color: var(--modal-header-border) !important;
+}
+
+body.dark-mode .modal-header h3,
+body.dark-mode .modal-header h4,
+body.dark-mode .modal-title {
+    color: var(--modal-text-primary) !important;
+}
+
+body.dark-mode .modal-body {
+    background: var(--modal-bg) !important;
+    color: var(--modal-text-primary) !important;
+}
+
+body.dark-mode .modal-body h3,
+body.dark-mode .modal-body h4,
+body.dark-mode .modal-body h5,
+body.dark-mode .modal-body p,
+body.dark-mode .modal-body label {
+    color: var(--modal-text-primary) !important;
+}
+
+body.dark-mode .modal-footer {
+    border-top-color: var(--modal-footer-border) !important;
+    background: var(--modal-bg) !important;
+}
+
+
+/* ============================================================
+   3. CLOSE BUTTON — circle style
+   ============================================================ */
+.close-modal-btn {
+    width: 30px !important;
+    height: 30px !important;
+    border-radius: 50% !important;
+    background: none !important;
+    border: none !important;
+    font-size: 1rem !important;
+    cursor: pointer;
+    color: #6b7280;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.15s, color 0.15s;
+    flex-shrink: 0;
+}
+
+.close-modal-btn:hover {
+    background: var(--modal-close-hover-bg) !important;
+    color: var(--modal-text-primary) !important;
+    border-radius: 50% !important;
+}
+
+body.dark-mode .close-modal-btn {
+    color: var(--modal-text-secondary);
+}
+
+
+/* ============================================================
+   4. PROFILE MODAL — complete redesign
+   ============================================================ */
+
+/* Remove old padding from modal-body inside profile */
+.profile-modal .modal-body {
+    padding: 0 !important;
+}
+
+/* --- 4a. Gradient Header --- */
+.profile-modal-header {
+    position: relative;
+    overflow: hidden;
+    min-height: 80px;
+    flex-shrink: 0;
+}
+
+.profile-header-bg {
+    position: absolute;
+    inset: 0;
+    background: var(--brand-gradient);
+}
+
+.profile-header-pattern {
+    position: absolute;
+    inset: 0;
+    opacity: 0.07;
+    background-image:
+        radial-gradient(circle, white 1.5px, transparent 1.5px),
+        radial-gradient(circle, white 1px, transparent 1px);
+    background-size: 28px 28px, 14px 14px;
+    background-position: 0 0, 14px 14px;
+}
+
+.profile-header-content {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 14px 18px 36px 18px;
+}
+
+.profile-header-title {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.95);
+    letter-spacing: 0.01em;
+}
+
+.profile-close-btn {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.2);
+    border: none;
+    color: rgba(255, 255, 255, 0.92);
+    font-size: 0.9rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.15s;
+    flex-shrink: 0;
+}
+
+.profile-close-btn:hover {
+    background: rgba(255, 255, 255, 0.32);
+}
+
+/* --- 4b. Hero Row — avatar overlaps header --- */
+.profile-hero {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 0 18px 0 18px;
+    margin-top: -28px;
+    position: relative;
+    z-index: 2;
+}
+
+.profile-hero-avatar {
+    width: 62px;
+    height: 62px;
+    border-radius: 50%;
+    overflow: hidden;
+    border: 3px solid var(--modal-bg);
+    flex-shrink: 0;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.18);
+    background: var(--brand-gradient);
+}
+
+.profile-hero-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.profile-hero-placeholder {
+    width: 100%;
+    height: 100%;
+    background: var(--brand-gradient);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    font-weight: 700;
+}
+
+.profile-hero-info {
+    min-width: 0;
+}
+
+.profile-hero-name {
+    font-size: 0.975rem;
+    font-weight: 600;
+    color: var(--modal-text-primary);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.profile-hero-sub {
+    font-size: 0.75rem;
+    color: var(--modal-text-secondary);
+    margin-top: 1px;
+}
+
+.profile-hero-photo-btn {
+    margin-left: auto;
+    flex-shrink: 0;
+}
+
+.profile-hero-photo-btn button {
+    padding: 5px 12px;
+    border: 1px solid var(--modal-section-border);
+    border-radius: 6px;
+    font-size: 0.75rem;
+    color: var(--modal-text-secondary);
+    background: var(--modal-input-bg);
+    cursor: pointer;
+    transition: all 0.15s;
+}
+
+.profile-hero-photo-btn button:hover {
+    border-color: var(--brand-orange);
+    color: var(--brand-orange);
+}
+
+/* --- 4c. XP Progress Bar --- */
+.profile-xp-section {
+    padding: 10px 18px 4px;
+}
+
+.profile-xp-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 5px;
+}
+
+.profile-xp-label {
+    font-size: 0.72rem;
+    font-weight: 600;
+    color: var(--modal-text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.profile-xp-value {
+    font-size: 0.72rem;
+    font-weight: 600;
+    color: var(--brand-orange);
+}
+
+.profile-xp-track {
+    height: 5px;
+    background: var(--modal-section-bg);
+    border-radius: 3px;
+    overflow: hidden;
+}
+
+.profile-xp-fill {
+    height: 100%;
+    border-radius: 3px;
+    background: var(--brand-gradient);
+    transition: width 0.6s ease;
+}
+
+/* --- 4d. Tabs --- */
+.profile-tabs {
+    display: flex;
+    border-bottom: 1px solid var(--modal-header-border);
+    padding: 0 18px;
+    margin-top: 10px;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    gap: 0;
+}
+
+.profile-tabs::-webkit-scrollbar {
+    display: none;
+}
+
+.profile-tab {
+    padding: 9px 14px;
+    font-size: 0.8rem;
+    font-weight: 500;
+    color: var(--modal-text-secondary);
+    border: none;
+    border-bottom: 2px solid transparent;
+    background: none;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: color 0.15s, border-color 0.15s;
+    margin-bottom: -1px;
+}
+
+.profile-tab:hover {
+    color: var(--modal-text-primary);
+}
+
+.profile-tab.active {
+    color: var(--brand-orange);
+    border-bottom-color: var(--brand-orange);
+}
+
+/* --- 4e. Tab Panels --- */
+.profile-panel {
+    padding: 16px 18px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.profile-panel[style*="display: none"],
+.profile-panel[style*="display:none"] {
+    display: none !important;
+}
+
+/* Section headers inside panels */
+.profile-panel-section-title {
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--modal-text-hint);
+    margin-top: 6px;
+    margin-bottom: -4px;
+    padding-bottom: 6px;
+    border-bottom: 1px solid var(--modal-section-border);
+}
+
+/* --- 4f. Profile Fields (cleaner look) --- */
+.profile-field {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.profile-field label {
+    font-size: 0.75rem !important;
+    font-weight: 600 !important;
+    color: var(--modal-text-secondary) !important;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.profile-input {
+    padding: 0.65rem 0.75rem !important;
+    border: 1px solid var(--modal-input-border) !important;
+    border-radius: 7px !important;
+    font-size: 0.9rem !important;
+    background: var(--modal-input-bg) !important;
+    color: var(--modal-text-primary) !important;
+    transition: border-color 0.15s, box-shadow 0.15s;
+    width: 100%;
+}
+
+.profile-input:focus {
+    outline: none;
+    border-color: var(--brand-orange) !important;
+    box-shadow: 0 0 0 3px rgba(255, 107, 53, 0.12) !important;
+}
+
+.profile-value {
+    padding: 0.65rem 0.75rem;
+    background: var(--modal-section-bg);
+    border-radius: 7px;
+    color: var(--modal-text-primary);
+    font-size: 0.9rem;
+}
+
+.profile-hint {
+    font-size: 0.75rem !important;
+    color: var(--modal-text-hint) !important;
+    font-style: normal !important;
+    margin: 0;
+}
+
+/* --- 4g. Stats Panel — cards with accent bar --- */
+.profile-stats-grid-new {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+}
+
+.profile-stat-card {
+    position: relative;
+    background: var(--modal-stat-bg);
+    border: 1px solid var(--modal-section-border);
+    border-radius: 9px;
+    padding: 10px 8px 10px;
+    text-align: center;
+    overflow: hidden;
+}
+
+.profile-stat-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: var(--brand-gradient);
+}
+
+.profile-stat-card-value {
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: var(--brand-orange);
+    line-height: 1.1;
+}
+
+.profile-stat-card-label {
+    font-size: 0.68rem;
+    color: var(--modal-text-secondary);
+    margin-top: 3px;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+
+.profile-member-since {
+    text-align: center;
+    color: var(--modal-text-hint) !important;
+    font-size: 0.8rem;
+    padding-top: 10px;
+    border-top: 1px solid var(--modal-section-border);
+}
+
+/* --- 4h. Footer --- */
+.profile-modal-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 12px 18px;
+    border-top: 1px solid var(--modal-footer-border);
+    flex-shrink: 0;
+}
+
+.profile-footer-left {
+    flex-shrink: 0;
+}
+
+.profile-footer-right {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+.btn-sign-out {
+    padding: 7px 14px;
+    border: 1px solid rgba(239, 68, 68, 0.35);
+    border-radius: 7px;
+    font-size: 0.8rem;
+    cursor: pointer;
+    background: transparent;
+    color: #ef4444;
+    font-weight: 500;
+    transition: all 0.15s;
+}
+
+.btn-sign-out:hover {
+    background: rgba(239, 68, 68, 0.08);
+    border-color: #ef4444;
+}
+
+.btn-modal-ghost {
+    padding: 7px 14px;
+    border: 1px solid var(--modal-section-border);
+    border-radius: 7px;
+    font-size: 0.8rem;
+    cursor: pointer;
+    background: transparent;
+    color: var(--modal-text-secondary);
+    transition: all 0.15s;
+}
+
+.btn-modal-ghost:hover {
+    background: var(--modal-section-bg);
+    color: var(--modal-text-primary);
+}
+
+.btn-modal-primary {
+    padding: 7px 16px;
+    border: none;
+    border-radius: 7px;
+    font-size: 0.8rem;
+    cursor: pointer;
+    background: var(--brand-gradient);
+    color: white;
+    font-weight: 600;
+    transition: opacity 0.15s;
+}
+
+.btn-modal-primary:hover {
+    opacity: 0.88;
+}
+
+.btn-modal-export {
+    padding: 7px 12px;
+    border: 1px solid var(--modal-section-border);
+    border-radius: 7px;
+    font-size: 0.75rem;
+    cursor: pointer;
+    background: transparent;
+    color: var(--modal-text-secondary);
+    transition: all 0.15s;
+}
+
+.btn-modal-export:hover {
+    border-color: var(--brand-orange);
+    color: var(--brand-orange);
+}
+
+/* Linked accounts (now inside Privacy tab) */
+.linked-accounts-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.linked-account-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 12px;
+    background: var(--modal-stat-bg);
+    border: 1px solid var(--modal-section-border);
+    border-radius: 8px;
+}
+
+.linked-account-info {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.linked-account-icon {
+    font-size: 1.1rem;
+}
+
+.linked-account-name {
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: var(--modal-text-primary);
+}
+
+.linked-account-status {
+    font-size: 0.75rem;
+    color: var(--modal-text-secondary);
+}
+
+/* Goal items (now inside Info tab) */
+.goal-item {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.goal-item label {
+    font-size: 0.75rem !important;
+    font-weight: 600 !important;
+    color: var(--modal-text-secondary) !important;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.goal-progress-bar {
+    height: 4px;
+    background: var(--modal-section-bg);
+    border-radius: 2px;
+    overflow: hidden;
+}
+
+.goal-progress-fill {
+    height: 100%;
+    background: var(--brand-gradient);
+    border-radius: 2px;
+}
+
+.goal-progress-text {
+    font-size: 0.72rem;
+    color: var(--modal-text-hint);
+}
+
+/* Profile section divider */
+.profile-section-divider {
+    height: 1px;
+    background: var(--modal-section-border);
+    margin: 4px 0;
+}
+
+
+/* ============================================================
+   5. CONFIRM MODAL — redesigned
+   ============================================================ */
+.modal-container {
+    background: var(--modal-bg) !important;
+    color: var(--modal-text-primary);
+}
+
+body.dark-mode .modal-container {
+    background: var(--modal-bg) !important;
+}
+
+/* New confirm modal layout */
+.pi-confirm-icon-wrap {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 20px auto 10px;
+    font-size: 1.2rem;
+}
+
+.pi-confirm-icon-wrap.warning {
+    background: rgba(245, 158, 11, 0.12);
+}
+
+.pi-confirm-icon-wrap.danger {
+    background: rgba(239, 68, 68, 0.12);
+}
+
+.pi-confirm-icon-wrap.success {
+    background: rgba(16, 185, 129, 0.12);
+}
+
+.pi-confirm-icon-wrap.info {
+    background: rgba(59, 130, 246, 0.12);
+}
+
+.pi-confirm-body {
+    padding: 0 24px 18px;
+    text-align: center;
+}
+
+.pi-confirm-title {
+    font-size: 1rem !important;
+    font-weight: 600 !important;
+    color: var(--modal-text-primary) !important;
+    margin: 0 0 6px !important;
+}
+
+.pi-confirm-message {
+    font-size: 0.875rem;
+    color: var(--modal-text-secondary) !important;
+    line-height: 1.55;
+    margin: 0 !important;
+}
+
+.pi-confirm-footer {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    padding: 12px 18px 18px;
+    border-top: 1px solid var(--modal-footer-border);
+}
+
+.pi-confirm-footer .btn {
+    justify-content: center;
+    text-align: center;
+}
+
+.pi-confirm-footer .btn-danger {
+    background: rgba(239, 68, 68, 0.1) !important;
+    color: #ef4444 !important;
+    border: 1px solid rgba(239, 68, 68, 0.3) !important;
+}
+
+.pi-confirm-footer .btn-danger:hover {
+    background: rgba(239, 68, 68, 0.18) !important;
+}
+
+.pi-confirm-footer .btn-primary {
+    background: var(--brand-gradient) !important;
+    border: none !important;
+    color: white !important;
+}
+
+.pi-confirm-footer .btn-secondary {
+    background: var(--modal-input-bg) !important;
+    border: 1px solid var(--modal-section-border) !important;
+    color: var(--modal-text-secondary) !important;
+}
+
+
+/* ============================================================
+   6. MOBILE BOTTOM SHEET (≤640px)
+   ============================================================ */
+@media (max-width: 640px) {
+    /* Modals that get sheet treatment on mobile */
+    .modal-overlay.sheet-ready {
+        align-items: flex-end !important;
+        padding: 0 !important;
+    }
+
+    .modal-overlay.sheet-ready .modal,
+    .modal-overlay.sheet-ready .modal-container {
+        border-radius: 18px 18px 0 0 !important;
+        max-height: 92vh !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        animation: piSheetUp 0.28s cubic-bezier(0.32, 0.72, 0, 1) !important;
+    }
+
+    @keyframes piSheetUp {
+        from { transform: translateY(100%); opacity: 1; }
+        to   { transform: translateY(0);   opacity: 1; }
+    }
+
+    /* Drag handle */
+    .modal-overlay.sheet-ready .modal::before,
+    .modal-overlay.sheet-ready .modal-container::before {
+        content: '';
+        display: block;
+        width: 36px;
+        height: 4px;
+        border-radius: 2px;
+        background: var(--modal-section-border);
+        margin: 10px auto 6px;
+    }
+
+    /* Profile modal on mobile — sheet */
+    #profileModal {
+        align-items: flex-end !important;
+        padding: 0 !important;
+    }
+
+    #profileModal .profile-modal {
+        border-radius: 18px 18px 0 0 !important;
+        max-height: 92vh !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        animation: piSheetUp 0.28s cubic-bezier(0.32, 0.72, 0, 1) !important;
+    }
+
+    #profileModal .profile-modal::before {
+        content: '';
+        display: block;
+        width: 36px;
+        height: 4px;
+        border-radius: 2px;
+        background: rgba(255, 255, 255, 0.5);
+        margin: 10px auto -10px;
+        position: relative;
+        z-index: 3;
+    }
+
+    .profile-stats-grid-new {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .profile-modal-footer {
+        flex-wrap: wrap;
+    }
+
+    .profile-footer-right {
+        flex-wrap: wrap;
+        justify-content: flex-end;
+    }
+
+    .profile-hero-photo-btn {
+        display: none; /* Accessible via Settings tab instead */
+    }
+
+    /* Confirm modal — sheet on mobile too */
+    #confirmation-modal {
+        align-items: flex-end !important;
+        padding: 0 !important;
+    }
+
+    #confirmation-modal .modal-container {
+        border-radius: 18px 18px 0 0 !important;
+        max-width: 100% !important;
+        animation: piSheetUp 0.28s cubic-bezier(0.32, 0.72, 0, 1) !important;
+    }
+}
+
+
+/* ============================================================
+   7. DARK MODE — remaining specific modal types
+   (Replaces all the scattered per-modal patches in phase5.css)
+   ============================================================ */
+
+/* Inputs inside all modals */
+body.dark-mode .modal input,
+body.dark-mode .modal textarea,
+body.dark-mode .modal select,
+body.dark-mode .modal-container input,
+body.dark-mode .modal-container textarea,
+body.dark-mode .modal-container select {
+    background: var(--modal-input-bg) !important;
+    border-color: var(--modal-input-border) !important;
+    color: var(--modal-text-primary) !important;
+}
+
+/* Profile stat sections */
+body.dark-mode .profile-stats-section {
+    background: var(--modal-stat-bg) !important;
+    border-color: var(--modal-section-border) !important;
+}
+
+body.dark-mode .profile-stat {
+    background: var(--modal-section-bg) !important;
+}
+
+body.dark-mode .profile-stat-card {
+    background: var(--modal-stat-bg) !important;
+    border-color: var(--modal-section-border) !important;
+}
+
+/* Profile hero border (avatar ring) */
+body.dark-mode .profile-hero-avatar {
+    border-color: var(--modal-bg) !important;
+}
+
+/* Season/team/H2H etc modals */
+body.dark-mode .season-modal,
+body.dark-mode .team-modal,
+body.dark-mode .create-team-modal,
+body.dark-mode .player-practice-modal,
+body.dark-mode .insights-modal,
+body.dark-mode .routine-builder-modal {
+    background: var(--modal-bg) !important;
+    color: var(--modal-text-primary) !important;
+}
+
+/* Sub-sections inside modals */
+body.dark-mode .xp-earn-guide,
+body.dark-mode .bp-tier,
+body.dark-mode .team-stat,
+body.dark-mode .team-member-item,
+body.dark-mode .xp-item,
+body.dark-mode .insight-card,
+body.dark-mode .challenge-option,
+body.dark-mode .comment-item,
+body.dark-mode .team-browse-item,
+body.dark-mode .player-stats-grid {
+    background: var(--modal-section-bg) !important;
+    border-color: var(--modal-section-border) !important;
+}
+
+body.dark-mode .challenge-option:hover {
+    background: #1e3a5f !important;
+}
+
+/* Form sections */
+body.dark-mode .form-section,
+body.dark-mode .form-group {
+    color: var(--modal-text-primary);
+}
+
+body.dark-mode .form-section-header {
+    color: var(--modal-text-primary);
+    border-bottom-color: var(--modal-section-border);
+}
+
+/* XP / level labels */
+body.dark-mode .xp-earn-guide h4,
+body.dark-mode .reward-track h4 {
+    color: var(--modal-text-primary) !important;
+}
+
+body.dark-mode .bp-level {
+    color: var(--modal-text-secondary) !important;
+}
+
+body.dark-mode .bp-reward {
+    color: var(--modal-text-primary) !important;
+}
+
+body.dark-mode .bp-tier.unlocked {
+    background: rgba(34, 197, 94, 0.15) !important;
+}
+
+/* Profile action text */
+body.dark-mode .profile-value {
+    background: var(--modal-section-bg) !important;
+    color: var(--modal-text-primary) !important;
+}
+
+body.dark-mode .profile-member-since {
+    color: var(--modal-text-hint) !important;
+    border-top-color: var(--modal-section-border) !important;
+}
+
+body.dark-mode .linked-account-row {
+    background: var(--modal-stat-bg) !important;
+    border-color: var(--modal-section-border) !important;
+}
+
+body.dark-mode .linked-account-name {
+    color: var(--modal-text-primary) !important;
+}
+
+body.dark-mode .linked-account-status {
+    color: var(--modal-text-secondary) !important;
+}
+
+body.dark-mode .profile-section-divider {
+    background: var(--modal-section-border) !important;
+}
+
+/* Modal confirm dark */
+body.dark-mode .pi-confirm-title {
+    color: var(--modal-text-primary) !important;
+}
+
+body.dark-mode .pi-confirm-message {
+    color: var(--modal-text-secondary) !important;
+}
+
+body.dark-mode .pi-confirm-footer {
+    border-top-color: var(--modal-section-border) !important;
+}
+
+/* Modal footer lines */
+body.dark-mode .modal-footer {
+    border-top-color: var(--modal-footer-border) !important;
+}
+
+/* Routine completion modal */
+body.dark-mode .routine-completion-modal .section-label {
+    color: var(--modal-text-secondary) !important;
+}
+
+body.dark-mode .routine-completion-modal .timer-display {
+    background: var(--modal-section-bg) !important;
+}
+
+/* Background picker inside modal */
+body.dark-mode .bg-rotation-row {
+    color: var(--modal-text-primary) !important;
+}
+
+body.dark-mode .bg-rotation-label {
+    color: var(--modal-text-primary) !important;
+}
+
+body.dark-mode .bg-rotation-sub {
+    color: var(--modal-text-secondary) !important;
+}
+
+body.dark-mode .bg-swatch {
+    background: var(--modal-section-bg) !important;
+}
+
+body.dark-mode .bg-swatch-name {
+    color: var(--modal-text-primary) !important;
+}
+
+/* ─── Dark Mode Toggle (Profile > Privacy panel) ─────────────── */
+
+.profile-field-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+}
+
+.profile-field-label-group {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    flex: 1;
+}
+
+.profile-field-label-group label {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--modal-text-primary);
+}
+
+.dm-toggle-btn {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0.25rem;
+    flex-shrink: 0;
+    transition: opacity 0.2s;
+}
+
+.dm-toggle-btn:hover {
+    opacity: 0.85;
+}
+
+.dm-toggle-track {
+    position: relative;
+    width: 44px;
+    height: 24px;
+    background: #d1d5db;
+    border-radius: 12px;
+    transition: background 0.25s;
+    display: block;
+    flex-shrink: 0;
+}
+
+.dm-toggle-btn.active .dm-toggle-track {
+    background: linear-gradient(135deg, #FF6B35, #D9534F);
+}
+
+.dm-toggle-thumb {
+    position: absolute;
+    top: 3px;
+    left: 3px;
+    width: 18px;
+    height: 18px;
+    background: white;
+    border-radius: 50%;
+    transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+    box-shadow: 0 1px 4px rgba(0,0,0,0.2);
+}
+
+.dm-toggle-btn.active .dm-toggle-thumb {
+    transform: translateX(20px);
+}
+
+.dm-toggle-label {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--modal-text-secondary);
+    min-width: 44px;
+}
+
+body.dark-mode .dm-toggle-label {
+    color: #94a3b8;
+}
+
+body.dark-mode .dm-toggle-track {
+    background: #334155;
+}

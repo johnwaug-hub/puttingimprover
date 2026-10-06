@@ -1,0 +1,20 @@
+node_modules/
+**/node_modules/
+.firebase/
+.expo/
+dist/
+build/
+.env
+.env.*
+!.env.example
+*adminsdk*
+serviceAccount*.json
+*.secret.local
+*.log
+*.zip
+claude-patches/
+Claude outputs/
+*Audit*.md
+local.properties
+*.jks
+*.keystore

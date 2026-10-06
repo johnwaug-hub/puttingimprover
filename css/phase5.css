@@ -1,0 +1,2285 @@
+/**
+ * (c) 2024-2026 Lock Jaw Disc Golf / John Waugaman. All rights reserved.
+ * PROPRIETARY - Unauthorized use prohibited. DMCA protected.
+ */
+/* Phase 5: Teams, ELO, and Season Pass Styles */
+
+/* ==========================================
+   LEADERBOARD TYPE TABS
+   ========================================== */
+
+.leaderboard-type-tabs {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+    padding: 0.25rem;
+    background: #f3f4f6;
+    border-radius: 0.5rem;
+}
+
+.leaderboard-type-tab {
+    flex: 1;
+    padding: 0.75rem 1rem;
+    border: none;
+    background: transparent;
+    border-radius: 0.375rem;
+    font-size: 0.9rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+    color: #6b7280;
+}
+
+.leaderboard-type-tab:hover {
+    background: rgba(255, 255, 255, 0.5);
+}
+
+.leaderboard-type-tab.active {
+    background: white;
+    color: #8b5cf6;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+/* ==========================================
+   ELO LEADERBOARD
+   ========================================== */
+
+.elo-info-banner {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 1rem;
+    border-radius: 0.5rem;
+    margin-bottom: 1rem;
+}
+
+.elo-info-banner strong {
+    font-size: 1.1rem;
+}
+
+.elo-info-banner p {
+    margin: 0.5rem 0 0;
+    opacity: 0.9;
+    font-size: 0.85rem;
+}
+
+.elo-tiers-legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+}
+
+.elo-tier-badge {
+    padding: 0.25rem 0.5rem;
+    border-radius: 0.25rem;
+    font-size: 0.75rem;
+    font-weight: 500;
+}
+
+.elo-leaderboard-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.elo-leaderboard-item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.75rem;
+    background: #f9fafb;
+    border-radius: 0.5rem;
+    transition: all 0.2s;
+}
+
+.elo-leaderboard-item:hover {
+    background: #f3f4f6;
+}
+
+.elo-leaderboard-item.current-user {
+    background: #faf5ff;
+    border: 2px solid #8b5cf6;
+}
+
+.elo-player-info {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    flex: 1;
+}
+
+.elo-profile-pic img,
+.elo-profile-placeholder {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.elo-profile-placeholder {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+}
+
+.elo-player-details {
+    display: flex;
+    flex-direction: column;
+}
+
+.elo-player-details .player-name {
+    font-weight: 600;
+    color: #374151;
+}
+
+.elo-player-details .player-name:hover {
+    color: #8b5cf6;
+}
+
+.elo-player-details .player-title {
+    font-size: 0.75rem;
+    color: #8b5cf6;
+}
+
+/* Points leaderboard specific badges */
+.elo-player-details .join-order-badge {
+    font-size: 0.7rem;
+    color: #10b981;
+    margin-left: 0.5rem;
+}
+
+.elo-player-details .player-achievements-badge {
+    font-size: 0.75rem;
+    color: #f59e0b;
+}
+
+.elo-rating {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+/* Points leaderboard stats columns */
+.elo-rating.points-stats {
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 0;
+    min-width: 70px;
+}
+
+.elo-rating.points-stats-secondary {
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 0;
+    min-width: 90px;
+}
+
+.elo-rating.points-stats .elo-value,
+.elo-rating.points-stats-secondary .elo-value {
+    font-size: 1.1rem;
+    color: #10b981;
+}
+
+.elo-rating.points-stats .elo-tier-name,
+.elo-rating.points-stats-secondary .elo-tier-name {
+    font-size: 0.65rem;
+    color: #6b7280;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* Compact challenge button for points leaderboard */
+.h2h-challenge-btn.compact {
+    padding: 0.4rem 0.6rem;
+    font-size: 1rem;
+    min-width: unset;
+}
+
+/* Show More/Less buttons for leaderboards */
+.show-more-btn,
+.show-less-btn {
+    display: block;
+    width: 100%;
+    padding: 0.75rem 1rem;
+    margin-top: 0.75rem;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border: none;
+    border-radius: 0.5rem;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.show-more-btn:hover,
+.show-less-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+}
+
+.show-less-btn {
+    background: linear-gradient(135deg, #6b7280 0%, #4b5563 100%);
+}
+
+.show-less-btn:hover {
+    box-shadow: 0 4px 12px rgba(107, 114, 128, 0.4);
+}
+
+body.dark-mode .show-more-btn,
+body.dark-mode .show-less-btn {
+    background: linear-gradient(135deg, #7c3aed 0%, #5b21b6 100%);
+}
+
+body.dark-mode .show-less-btn {
+    background: linear-gradient(135deg, #4b5563 0%, #374151 100%);
+}
+
+.elo-tier-icon {
+    font-size: 1.25rem;
+}
+
+.elo-value {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #374151;
+}
+
+.elo-tier-name {
+    font-size: 0.75rem;
+    font-weight: 500;
+}
+
+/* ==========================================
+   TEAM LEADERBOARD
+   ========================================== */
+
+.team-info-banner {
+    background: linear-gradient(135deg, #f59e0b 0%, #ef4444 100%);
+    color: white;
+    padding: 1rem;
+    border-radius: 0.5rem;
+    margin-bottom: 1rem;
+}
+
+.team-info-banner strong {
+    font-size: 1.1rem;
+}
+
+.team-info-banner p {
+    margin: 0.5rem 0 0;
+    opacity: 0.9;
+    font-size: 0.85rem;
+}
+
+.my-team-card {
+    background: linear-gradient(135deg, #faf5ff 0%, #f3e8ff 100%);
+    border: 2px solid #8b5cf6;
+    border-radius: 0.75rem;
+    padding: 1rem;
+    margin-bottom: 1rem;
+}
+
+.my-team-header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.my-team-header .team-icon {
+    font-size: 2rem;
+}
+
+.my-team-info {
+    flex: 1;
+}
+
+.my-team-name {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #374151;
+}
+
+.my-team-tag {
+    color: #6b7280;
+    font-size: 0.9rem;
+}
+
+.my-team-stats {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+}
+
+.my-team-stats .team-points {
+    font-weight: 700;
+    color: #8b5cf6;
+}
+
+.my-team-stats .team-members {
+    font-size: 0.8rem;
+    color: #6b7280;
+}
+
+.view-team-btn {
+    padding: 0.5rem 1rem;
+    background: #8b5cf6;
+    color: white;
+    border: none;
+    border-radius: 0.375rem;
+    cursor: pointer;
+    font-weight: 500;
+    transition: background 0.2s;
+}
+
+.view-team-btn:hover {
+    background: #7c3aed;
+}
+
+.no-team-cta {
+    text-align: center;
+    padding: 1.5rem;
+    background: #f9fafb;
+    border-radius: 0.5rem;
+    margin-bottom: 1rem;
+}
+
+.no-team-cta p {
+    margin: 0 0 1rem;
+    color: #6b7280;
+}
+
+.team-action-btns {
+    display: flex;
+    gap: 0.75rem;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.team-leaderboard-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.team-leaderboard-item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.75rem;
+    background: #f9fafb;
+    border-radius: 0.5rem;
+    transition: all 0.2s;
+}
+
+.team-leaderboard-item:hover {
+    background: #f3f4f6;
+}
+
+.team-leaderboard-item.my-team {
+    background: #faf5ff;
+    border: 2px solid #8b5cf6;
+}
+
+.team-icon-container {
+    width: 48px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 0.5rem;
+    font-size: 1.5rem;
+}
+
+.team-leaderboard-info {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.team-leaderboard-info .team-name {
+    font-weight: 600;
+    color: #374151;
+}
+
+.team-leaderboard-info .team-tag {
+    display: inline;
+    margin-left: 0.25rem;
+    opacity: 0.7;
+}
+
+.team-leaderboard-info .team-members {
+    font-size: 0.8rem;
+    color: #6b7280;
+}
+
+.team-points {
+    text-align: right;
+}
+
+.team-points .points-value {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #8b5cf6;
+    display: block;
+}
+
+.team-points .points-label {
+    font-size: 0.75rem;
+    color: #6b7280;
+}
+
+/* ==========================================
+   SEASON PASS MODAL
+   ========================================== */
+
+.season-modal {
+    max-width: 500px;
+}
+
+.season-header {
+    background: linear-gradient(135deg, #1e1b4b 0%, #312e81 100%);
+    color: white;
+    border-bottom: none;
+}
+
+.season-header h3 {
+    color: white !important;
+}
+
+.season-header .modal-close {
+    color: white;
+    opacity: 0.8;
+}
+
+.season-header .modal-close:hover {
+    opacity: 1;
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.season-progress-card {
+    background: linear-gradient(135deg, #1e1b4b 0%, #312e81 50%, #4c1d95 100%);
+    color: white;
+    padding: 1.5rem;
+    border-radius: 0.75rem;
+    margin-bottom: 1rem;
+}
+
+.season-level-display {
+    text-align: center;
+    margin-bottom: 1rem;
+}
+
+.season-level-display .level-label {
+    display: block;
+    font-size: 0.8rem;
+    opacity: 0.8;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.season-level-display .level-value {
+    font-size: 3rem;
+    font-weight: 800;
+    background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.season-level-display .level-max {
+    font-size: 1rem;
+    opacity: 0.7;
+}
+
+.season-xp-bar {
+    height: 20px;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 10px;
+    position: relative;
+    overflow: hidden;
+    margin-bottom: 0.75rem;
+}
+
+.season-xp-bar .xp-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #fbbf24 0%, #f59e0b 100%);
+    border-radius: 10px;
+    transition: width 0.5s ease;
+}
+
+.season-xp-bar .xp-text {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+}
+
+.season-countdown {
+    text-align: center;
+    opacity: 0.9;
+    font-size: 0.9rem;
+}
+
+.season-countdown .countdown-icon {
+    margin-right: 0.5rem;
+}
+
+/* XP Earning Guide */
+.xp-earn-guide {
+    background: #f9fafb;
+    padding: 1rem;
+    border-radius: 0.5rem;
+    margin-bottom: 1rem;
+}
+
+.xp-earn-guide h4 {
+    margin: 0 0 0.75rem;
+    color: #374151;
+}
+
+.xp-guide-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.5rem;
+}
+
+.xp-item {
+    display: flex;
+    justify-content: space-between;
+    padding: 0.5rem;
+    background: white;
+    border-radius: 0.375rem;
+    font-size: 0.85rem;
+}
+
+.xp-item span:last-child {
+    font-weight: 600;
+    color: #8b5cf6;
+}
+
+/* Reward Track */
+.reward-track h4 {
+    margin: 0 0 0.75rem;
+    color: #374151;
+}
+
+.reward-tiers {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.bp-tier {
+    display: grid;
+    grid-template-columns: 50px 40px 1fr auto;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem;
+    background: #f9fafb;
+    border-radius: 0.5rem;
+    transition: all 0.2s;
+}
+
+.bp-tier.unlocked {
+    background: #f0fdf4;
+    border-left: 3px solid #22c55e;
+}
+
+.bp-tier.claimed {
+    opacity: 0.7;
+}
+
+.bp-tier.locked {
+    opacity: 0.6;
+}
+
+.bp-level {
+    font-weight: 600;
+    color: #6b7280;
+    font-size: 0.85rem;
+}
+
+.bp-icon {
+    font-size: 1.25rem;
+}
+
+.bp-reward {
+    font-size: 0.9rem;
+    color: #374151;
+}
+
+.claim-reward-btn {
+    padding: 0.5rem 1rem;
+    background: #22c55e;
+    color: white;
+    border: none;
+    border-radius: 0.375rem;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s;
+    min-height: 44px;
+    min-width: 70px;
+    touch-action: manipulation;
+}
+
+.claim-reward-btn:hover {
+    background: #16a34a;
+}
+
+.claimed-badge {
+    color: #22c55e;
+    font-weight: 600;
+}
+
+.locked-badge {
+    color: #9ca3af;
+}
+
+/* ==========================================
+   TEAM MODAL
+   ========================================== */
+
+.team-modal {
+    max-width: 450px;
+}
+
+.team-header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.team-header-info {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    flex: 1;
+}
+
+.team-modal-icon {
+    font-size: 2rem;
+}
+
+.team-modal-tag {
+    opacity: 0.7;
+}
+
+.team-stats-row {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.team-stat {
+    text-align: center;
+    padding: 1rem;
+    background: #f9fafb;
+    border-radius: 0.5rem;
+}
+
+.team-stat .stat-value {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #8b5cf6;
+    display: block;
+}
+
+.team-stat .stat-label {
+    font-size: 0.75rem;
+    color: #6b7280;
+}
+
+.team-members-section h4 {
+    margin: 0 0 0.75rem;
+    color: #374151;
+}
+
+.team-members-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    max-height: 200px;
+    overflow-y: auto;
+}
+
+.team-member-item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.5rem;
+    background: #f9fafb;
+    border-radius: 0.375rem;
+}
+
+.team-member-item.captain {
+    background: #fef3c7;
+    border: 1px solid #f59e0b;
+}
+
+.member-avatar img,
+.member-avatar .avatar-placeholder {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.member-avatar .avatar-placeholder {
+    background: #8b5cf6;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+}
+
+.member-info {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.member-name {
+    font-weight: 500;
+    color: #374151;
+}
+
+.captain-badge {
+    font-size: 0.75rem;
+    color: #f59e0b;
+}
+
+.member-points {
+    font-weight: 600;
+    color: #8b5cf6;
+    font-size: 0.9rem;
+}
+
+.team-actions {
+    margin-top: 1.5rem;
+    text-align: center;
+}
+
+.captain-note {
+    color: #6b7280;
+    font-size: 0.85rem;
+    font-style: italic;
+}
+
+/* ==========================================
+   CREATE TEAM MODAL
+   ========================================== */
+
+.create-team-modal {
+    max-width: 400px;
+}
+
+.icon-picker {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.icon-option {
+    width: 44px;
+    height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    border: 2px solid #e5e7eb;
+    border-radius: 0.5rem;
+    background: white;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.icon-option:hover {
+    border-color: #8b5cf6;
+}
+
+.icon-option.selected {
+    border-color: #8b5cf6;
+    background: #faf5ff;
+}
+
+.color-picker {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.color-option {
+    width: 36px;
+    height: 36px;
+    border: 3px solid transparent;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.color-option:hover {
+    transform: scale(1.1);
+}
+
+.color-option.selected {
+    border-color: #374151;
+    box-shadow: 0 0 0 2px white, 0 0 0 4px #374151;
+}
+
+.checkbox-label {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    cursor: pointer;
+}
+
+.checkbox-label input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
+}
+
+.form-actions {
+    display: flex;
+    gap: 0.75rem;
+    justify-content: flex-end;
+    margin-top: 1.5rem;
+}
+
+.btn-secondary {
+    padding: 0.625rem 1.25rem;
+    background: #e5e7eb;
+    color: #374151;
+    border: none;
+    border-radius: 0.375rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.btn-secondary:hover {
+    background: #d1d5db;
+}
+
+.btn-primary {
+    padding: 0.625rem 1.25rem;
+    background: #8b5cf6;
+    color: white;
+    border: none;
+    border-radius: 0.375rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.btn-primary:hover {
+    background: #7c3aed;
+}
+
+.btn-danger {
+    padding: 0.625rem 1.25rem;
+    background: #ef4444;
+    color: white;
+    border: none;
+    border-radius: 0.375rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.btn-danger:hover {
+    background: #dc2626;
+}
+
+/* ==========================================
+   DARK MODE OVERRIDES
+   ========================================== */
+
+body.dark-mode .leaderboard-type-tabs {
+    background: var(--bg-secondary);
+}
+
+body.dark-mode .leaderboard-type-tab {
+    color: var(--text-muted);
+}
+
+body.dark-mode .leaderboard-type-tab.active {
+    background: var(--bg-card);
+    color: #a78bfa;
+}
+
+body.dark-mode .elo-leaderboard-item,
+body.dark-mode .team-leaderboard-item {
+    background: var(--bg-secondary);
+}
+
+body.dark-mode .elo-leaderboard-item:hover {
+    background: var(--bg-card);
+}
+
+body.dark-mode .elo-leaderboard-item.current-user,
+body.dark-mode .team-leaderboard-item.my-team {
+    background: rgba(139, 92, 246, 0.1);
+}
+
+body.dark-mode .elo-player-details .player-name {
+    color: var(--text-primary);
+}
+
+body.dark-mode .elo-value {
+    color: var(--text-primary);
+}
+
+body.dark-mode .elo-rating.points-stats .elo-value,
+body.dark-mode .elo-rating.points-stats-secondary .elo-value {
+    color: #34d399;
+}
+
+body.dark-mode .elo-rating.points-stats .elo-tier-name,
+body.dark-mode .elo-rating.points-stats-secondary .elo-tier-name {
+    color: var(--text-muted);
+}
+
+body.dark-mode .season-modal,
+body.dark-mode .team-modal,
+body.dark-mode .create-team-modal {
+    background: var(--bg-card);
+}
+
+body.dark-mode .xp-earn-guide,
+body.dark-mode .bp-tier,
+body.dark-mode .team-stat,
+body.dark-mode .team-member-item {
+    background: var(--bg-secondary);
+}
+
+body.dark-mode .xp-item {
+    background: var(--bg-card);
+}
+
+body.dark-mode .icon-option {
+    background: var(--bg-secondary);
+    border-color: var(--border-color);
+}
+
+body.dark-mode .no-team-cta,
+body.dark-mode .my-team-card {
+    background: var(--bg-secondary);
+}
+
+/* ==========================================
+   COMPREHENSIVE DARK MODE FIXES FOR MODALS
+   ========================================== */
+
+/* Season Modal specific fixes */
+body.dark-mode .xp-earn-guide h4,
+body.dark-mode .reward-track h4 {
+    color: var(--text-primary);
+}
+
+body.dark-mode .bp-level {
+    color: var(--text-secondary);
+}
+
+body.dark-mode .bp-reward {
+    color: var(--text-primary);
+}
+
+body.dark-mode .bp-tier.unlocked {
+    background: rgba(34, 197, 94, 0.15);
+}
+
+/* All modal headers */
+body.dark-mode .modal-header {
+    background: var(--bg-secondary);
+    border-bottom-color: var(--border-color);
+}
+
+body.dark-mode .modal-header h3,
+body.dark-mode .modal-header h4 {
+    color: var(--text-primary);
+}
+
+/* Modal body content */
+body.dark-mode .modal-body {
+    background: var(--bg-card);
+    color: var(--text-primary);
+}
+
+body.dark-mode .modal-body h3,
+body.dark-mode .modal-body h4,
+body.dark-mode .modal-body h5 {
+    color: var(--text-primary);
+}
+
+body.dark-mode .modal-body p {
+    color: var(--text-secondary);
+}
+
+body.dark-mode .modal-body label {
+    color: var(--text-primary);
+}
+
+/* Form sections inside modals */
+body.dark-mode .form-section,
+body.dark-mode .form-group {
+    color: var(--text-primary);
+}
+
+body.dark-mode .form-section-header {
+    color: var(--text-primary);
+    border-bottom-color: var(--border-color);
+}
+
+/* Player practice modal */
+body.dark-mode #playerPracticeModal,
+body.dark-mode .player-practice-modal {
+    background: var(--bg-card);
+}
+
+body.dark-mode .player-stats-grid {
+    background: var(--bg-secondary);
+}
+
+/* Feedback modal */
+body.dark-mode #feedbackModal .modal {
+    background: var(--bg-card);
+}
+
+/* Insights modal */
+body.dark-mode #insightsModalOverlay .modal,
+body.dark-mode .insights-modal {
+    background: var(--bg-card);
+}
+
+body.dark-mode .insight-card {
+    background: var(--bg-secondary);
+    border-color: var(--border-color);
+}
+
+/* H2H Challenge modal */
+body.dark-mode #h2hChallengeModalOverlay .modal {
+    background: var(--bg-card);
+}
+
+body.dark-mode .challenge-option {
+    background: var(--bg-secondary);
+    border-color: var(--border-color);
+}
+
+body.dark-mode .challenge-option:hover {
+    background: #334155;
+}
+
+/* Comments modal */
+body.dark-mode #commentsModalOverlay .modal {
+    background: var(--bg-card);
+}
+
+body.dark-mode .comment-item {
+    background: var(--bg-secondary);
+    border-color: var(--border-color);
+}
+
+/* Browse teams modal */
+body.dark-mode #browseTeamsModalOverlay .modal {
+    background: var(--bg-card);
+}
+
+body.dark-mode .team-browse-item {
+    background: var(--bg-secondary);
+    border-color: var(--border-color);
+}
+
+/* Team invite modal */
+body.dark-mode #teamInviteModalOverlay .modal {
+    background: var(--bg-card);
+}
+
+/* Create team modal */
+body.dark-mode #createTeamModalOverlay .modal {
+    background: var(--bg-card);
+}
+
+/* Game score modal */
+body.dark-mode #gameScoreModal .modal {
+    background: var(--bg-card);
+}
+
+body.dark-mode .game-score-section {
+    background: var(--bg-secondary);
+}
+
+/* Routine completion modal */
+body.dark-mode #routineCompletionModal .modal,
+body.dark-mode .routine-completion-modal {
+    background: var(--bg-card);
+}
+
+body.dark-mode .drill-row {
+    background: var(--bg-secondary);
+    border-color: var(--border-color);
+}
+
+/* Permissions modal */
+body.dark-mode #permissionsModal .modal {
+    background: var(--bg-card);
+}
+
+/* Challenge modal */
+body.dark-mode #challengeModal .modal {
+    background: var(--bg-card);
+}
+
+/* Profile modal */
+body.dark-mode #profileModal .modal {
+    background: var(--bg-card);
+}
+
+body.dark-mode .profile-section {
+    background: var(--bg-secondary);
+}
+
+/* Edit routine/game modals */
+body.dark-mode #editRoutineModal .modal,
+body.dark-mode #editGameModal .modal {
+    background: var(--bg-card);
+}
+
+/* Wizard steps and progress */
+body.dark-mode .wizard-progress {
+    background: var(--bg-secondary);
+}
+
+body.dark-mode .wizard-step {
+    color: var(--text-secondary);
+}
+
+body.dark-mode .wizard-step.active {
+    color: var(--text-primary);
+}
+
+body.dark-mode .wizard-step.completed {
+    color: #22c55e;
+}
+
+/* Info banners */
+body.dark-mode .info-banner,
+body.dark-mode .elo-info-banner {
+    background: var(--bg-secondary);
+    border-color: var(--border-color);
+}
+
+body.dark-mode .info-banner strong,
+body.dark-mode .elo-info-banner strong {
+    color: var(--text-primary);
+}
+
+body.dark-mode .info-banner p,
+body.dark-mode .elo-info-banner p {
+    color: var(--text-secondary);
+}
+
+/* Empty states */
+body.dark-mode .empty-state {
+    color: var(--text-secondary);
+}
+
+body.dark-mode .empty-state h3 {
+    color: var(--text-primary);
+}
+
+/* Close buttons */
+body.dark-mode .close-modal-btn,
+body.dark-mode .modal-close {
+    color: var(--text-secondary);
+}
+
+body.dark-mode .close-modal-btn:hover,
+body.dark-mode .modal-close:hover {
+    color: var(--text-primary);
+}
+
+/* Activity items in modals */
+body.dark-mode .activity-item,
+body.dark-mode .recent-activity-item {
+    background: var(--bg-secondary);
+    border-color: var(--border-color);
+}
+
+/* Slideout panels */
+body.dark-mode .slideout,
+body.dark-mode .side-panel {
+    background: var(--bg-card);
+    border-color: var(--border-color);
+}
+
+body.dark-mode .slideout-header,
+body.dark-mode .side-panel-header {
+    background: var(--bg-secondary);
+    border-bottom-color: var(--border-color);
+}
+
+/* Alert/Toast dark mode */
+body.dark-mode .custom-alert {
+    background: var(--bg-card);
+    border-color: var(--border-color);
+    color: var(--text-primary);
+}
+
+/* Leaderboard items with hardcoded colors */
+body.dark-mode .elo-leaderboard-item {
+    background: var(--bg-secondary);
+    border-color: var(--border-color);
+}
+
+body.dark-mode .elo-player-details .player-name {
+    color: var(--text-primary);
+}
+
+body.dark-mode .elo-player-details .player-title {
+    color: var(--text-secondary);
+}
+
+body.dark-mode .elo-tier-name {
+    color: var(--text-secondary);
+}
+
+/* Team leaderboard items */
+body.dark-mode .team-leaderboard-item {
+    background: var(--bg-secondary);
+    border-color: var(--border-color);
+}
+
+body.dark-mode .team-leaderboard-item .team-name {
+    color: var(--text-primary);
+}
+
+body.dark-mode .team-leaderboard-item .team-tag {
+    color: var(--text-secondary);
+}
+
+/* Tab buttons */
+body.dark-mode .leaderboard-type-tabs button {
+    background: var(--bg-secondary);
+    color: var(--text-secondary);
+    border-color: var(--border-color);
+}
+
+body.dark-mode .leaderboard-type-tabs button.active {
+    background: var(--bg-card);
+    color: var(--text-primary);
+    border-color: #3b82f6;
+}
+
+body.dark-mode .leaderboard-type-tabs button:hover:not(.active) {
+    background: #334155;
+}
+
+/* Filter dropdowns */
+body.dark-mode .leaderboard-filter {
+    background: var(--bg-secondary);
+    border-color: var(--border-color);
+    color: var(--text-primary);
+}
+
+/* Team activity items */
+body.dark-mode .team-activity-item {
+    background: var(--bg-secondary);
+    border-color: var(--border-color);
+}
+
+body.dark-mode .team-activity-item .activity-text {
+    color: var(--text-primary);
+}
+
+body.dark-mode .team-activity-item .activity-time {
+    color: var(--text-secondary);
+}
+
+/* ==========================================
+   RESPONSIVE
+   ========================================== */
+
+@media (max-width: 768px) {
+    .leaderboard-type-tabs {
+        flex-direction: column;
+    }
+
+    .xp-guide-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .bp-tier {
+        grid-template-columns: 45px 35px 1fr auto;
+        font-size: 0.85rem;
+        padding: 0.5rem;
+    }
+
+    .team-stats-row {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 0.5rem;
+    }
+
+    .team-stat {
+        padding: 0.75rem 0.5rem;
+    }
+
+    .team-stat .stat-value {
+        font-size: 1.25rem;
+    }
+
+    .elo-tiers-legend {
+        justify-content: center;
+        flex-wrap: wrap;
+        gap: 0.25rem;
+    }
+
+    .elo-tier-badge {
+        font-size: 0.7rem;
+        padding: 0.2rem 0.4rem;
+    }
+
+    .elo-leaderboard-item {
+        padding: 0.5rem;
+        gap: 0.5rem;
+    }
+
+    .elo-leaderboard-item .rank {
+        min-width: 28px;
+        font-size: 0.8rem;
+    }
+
+    .elo-profile-pic img,
+    .elo-profile-placeholder {
+        width: 32px;
+        height: 32px;
+        font-size: 0.85rem;
+    }
+
+    .elo-player-info {
+        gap: 0.5rem;
+        min-width: 0;
+        overflow: hidden;
+    }
+
+    .elo-player-details {
+        min-width: 0;
+        overflow: hidden;
+    }
+
+    .elo-player-details .player-name {
+        font-size: 0.85rem;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 150px;
+    }
+
+    .elo-player-details .player-title {
+        font-size: 0.65rem;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .elo-rating {
+        flex-shrink: 0;
+        gap: 0.25rem;
+        flex-direction: column;
+        align-items: flex-end;
+        text-align: right;
+    }
+
+    .elo-tier-icon {
+        font-size: 1rem;
+    }
+
+    .elo-value {
+        font-size: 1rem;
+        line-height: 1;
+    }
+
+    .elo-tier-name {
+        font-size: 0.65rem;
+        display: none;
+    }
+
+    /* Points leaderboard mobile styles */
+    .elo-rating.points-stats,
+    .elo-rating.points-stats-secondary {
+        min-width: 55px;
+    }
+
+    .elo-rating.points-stats .elo-value,
+    .elo-rating.points-stats-secondary .elo-value {
+        font-size: 0.9rem;
+    }
+
+    .elo-rating.points-stats .elo-tier-name,
+    .elo-rating.points-stats-secondary .elo-tier-name {
+        display: block;
+        font-size: 0.55rem;
+    }
+
+    .elo-player-details .join-order-badge,
+    .elo-player-details .player-achievements-badge {
+        font-size: 0.6rem;
+    }
+
+    .h2h-challenge-btn.compact {
+        padding: 0.3rem 0.4rem;
+        font-size: 0.85rem;
+    }
+
+    .my-team-header {
+        flex-direction: column;
+        text-align: center;
+    }
+
+    .my-team-stats {
+        align-items: center;
+    }
+}
+
+/* ==========================================
+   TEAM MODAL ENHANCEMENTS
+   ========================================== */
+
+.team-modal-large {
+    max-width: 550px;
+}
+
+.section-header-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.75rem;
+}
+
+.section-header-row h4 {
+    margin: 0;
+}
+
+.btn-small {
+    padding: 0.375rem 0.75rem;
+    font-size: 0.8rem;
+    border-radius: 0.375rem;
+    cursor: pointer;
+    border: none;
+    transition: all 0.2s;
+}
+
+.btn-invite {
+    background: #8b5cf6;
+    color: white;
+}
+
+.btn-invite:hover {
+    background: #7c3aed;
+}
+
+.btn-transfer-captain {
+    padding: 0.25rem 0.5rem;
+    background: transparent;
+    border: 1px solid #f59e0b;
+    border-radius: 0.25rem;
+    cursor: pointer;
+    font-size: 0.9rem;
+    opacity: 0.6;
+    transition: all 0.2s;
+}
+
+.btn-transfer-captain:hover {
+    opacity: 1;
+    background: #fef3c7;
+}
+
+/* Team Activity Section */
+.team-activity-section {
+    margin-top: 1.5rem;
+    border-top: 1px solid #e5e7eb;
+    padding-top: 1rem;
+}
+
+.team-activity-section h4 {
+    margin: 0 0 0.75rem;
+    color: #374151;
+}
+
+.team-activity-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    max-height: 200px;
+    overflow-y: auto;
+}
+
+.team-activity-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.5rem;
+    padding: 0.5rem;
+    background: #f9fafb;
+    border-radius: 0.375rem;
+    font-size: 0.85rem;
+}
+
+.activity-avatar img,
+.activity-avatar .avatar-placeholder-sm {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.activity-avatar .avatar-placeholder-sm {
+    background: #8b5cf6;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+.activity-content {
+    flex: 1;
+    line-height: 1.4;
+}
+
+.activity-content strong {
+    color: #374151;
+}
+
+.activity-time {
+    display: block;
+    font-size: 0.75rem;
+    color: #9ca3af;
+    margin-top: 0.25rem;
+}
+
+.empty-activity {
+    color: #9ca3af;
+    font-style: italic;
+    text-align: center;
+    padding: 1rem;
+}
+
+/* ==========================================
+   TEAM INVITES
+   ========================================== */
+
+.team-invites-section {
+    margin-bottom: 1.5rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.team-invites-section h4 {
+    margin: 0 0 0.75rem;
+    color: #374151;
+}
+
+.team-invites-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.team-invite-item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.75rem;
+    background: #faf5ff;
+    border: 1px solid #e9d5ff;
+    border-radius: 0.5rem;
+}
+
+.team-invite-item .invite-icon {
+    font-size: 1.5rem;
+}
+
+.team-invite-item .invite-info {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.invite-team-name {
+    font-weight: 600;
+    color: #374151;
+}
+
+.invite-from {
+    font-size: 0.8rem;
+    color: #6b7280;
+}
+
+.invite-actions {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.btn-accept-invite {
+    padding: 0.375rem 0.75rem;
+    background: #22c55e;
+    color: white;
+    border: none;
+    border-radius: 0.375rem;
+    cursor: pointer;
+    font-size: 0.85rem;
+    font-weight: 500;
+}
+
+.btn-accept-invite:hover {
+    background: #16a34a;
+}
+
+.btn-decline-invite {
+    padding: 0.375rem 0.5rem;
+    background: #f3f4f6;
+    color: #6b7280;
+    border: none;
+    border-radius: 0.375rem;
+    cursor: pointer;
+    font-size: 0.85rem;
+}
+
+.btn-decline-invite:hover {
+    background: #e5e7eb;
+    color: #374151;
+}
+
+/* ==========================================
+   BROWSE TEAMS MODAL
+   ========================================== */
+
+.browse-teams-modal {
+    max-width: 500px;
+}
+
+.public-teams-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+.public-team-item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.75rem;
+    background: #f9fafb;
+    border-radius: 0.5rem;
+    transition: background 0.2s;
+}
+
+.public-team-item:hover {
+    background: #f3f4f6;
+}
+
+.public-team-item .team-info {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.public-team-item .team-name {
+    font-weight: 600;
+    color: #374151;
+}
+
+.public-team-item .team-tag {
+    color: #6b7280;
+    margin-left: 0.25rem;
+}
+
+.public-team-item .team-meta {
+    font-size: 0.8rem;
+    color: #9ca3af;
+}
+
+.btn-join-team {
+    padding: 0.5rem 1rem;
+    background: #8b5cf6;
+    color: white;
+    border: none;
+    border-radius: 0.375rem;
+    cursor: pointer;
+    font-weight: 500;
+    transition: background 0.2s;
+}
+
+.btn-join-team:hover {
+    background: #7c3aed;
+}
+
+.team-full-badge {
+    padding: 0.375rem 0.75rem;
+    background: #e5e7eb;
+    color: #6b7280;
+    border-radius: 0.375rem;
+    font-size: 0.85rem;
+}
+
+/* ==========================================
+   TEAM INVITE MODAL
+   ========================================== */
+
+.team-invite-modal {
+    max-width: 450px;
+}
+
+.invite-hint {
+    color: #6b7280;
+    margin-bottom: 1rem;
+}
+
+.invitable-friends-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+.invitable-friend-item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.5rem;
+    background: #f9fafb;
+    border-radius: 0.375rem;
+}
+
+.invitable-friend-item .friend-avatar img,
+.invitable-friend-item .friend-avatar .avatar-placeholder {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.invitable-friend-item .friend-avatar .avatar-placeholder {
+    background: #8b5cf6;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+}
+
+.invitable-friend-item .friend-info {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.invitable-friend-item .friend-name {
+    font-weight: 500;
+    color: #374151;
+}
+
+.invitable-friend-item .friend-points {
+    font-size: 0.8rem;
+    color: #6b7280;
+}
+
+.btn-send-invite {
+    padding: 0.375rem 0.75rem;
+    background: #8b5cf6;
+    color: white;
+    border: none;
+    border-radius: 0.375rem;
+    cursor: pointer;
+    font-size: 0.85rem;
+    font-weight: 500;
+    transition: background 0.2s;
+}
+
+.btn-send-invite:hover {
+    background: #7c3aed;
+}
+
+.hint {
+    font-size: 0.85rem;
+    color: #9ca3af;
+}
+
+/* ==========================================
+   DARK MODE FOR NEW FEATURES
+   ========================================== */
+
+body.dark-mode .team-activity-item,
+body.dark-mode .public-team-item,
+body.dark-mode .invitable-friend-item {
+    background: var(--bg-secondary);
+}
+
+body.dark-mode .team-invite-item {
+    background: rgba(139, 92, 246, 0.1);
+    border-color: rgba(139, 92, 246, 0.3);
+}
+
+body.dark-mode .team-activity-section {
+    border-color: var(--border-color);
+}
+
+body.dark-mode .team-invites-section {
+    border-color: var(--border-color);
+}
+
+body.dark-mode .activity-content strong,
+body.dark-mode .invite-team-name,
+body.dark-mode .public-team-item .team-name,
+body.dark-mode .invitable-friend-item .friend-name {
+    color: var(--text-primary);
+}
+
+body.dark-mode .btn-decline-invite {
+    background: var(--bg-secondary);
+    color: var(--text-muted);
+}
+
+body.dark-mode .btn-decline-invite:hover {
+    background: var(--bg-card);
+}
+
+body.dark-mode .team-full-badge {
+    background: var(--bg-secondary);
+    color: var(--text-muted);
+}
+
+body.dark-mode .btn-transfer-captain {
+    border-color: #f59e0b;
+}
+
+body.dark-mode .btn-transfer-captain:hover {
+    background: rgba(245, 158, 11, 0.2);
+}
+
+/* Season level badge - small circle with level number */
+.section-badge-small {
+    position: absolute;
+    top: -2px;
+    right: -2px;
+    background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+    color: white;
+    font-size: 9px;
+    font-weight: bold;
+    min-width: 14px;
+    height: 14px;
+    border-radius: 7px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 3px;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.2);
+}
+
+/* Team indicator dot */
+.section-badge-dot {
+    position: absolute;
+    top: 2px;
+    right: 2px;
+    width: 8px;
+    height: 8px;
+    background: #10b981;
+    border-radius: 50%;
+    box-shadow: 0 0 4px rgba(16, 185, 129, 0.5);
+}
+
+/* Friend activity list in panel */
+.friend-activity-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.friend-activity-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px;
+    background: rgba(0,0,0,0.03);
+    border-radius: 8px;
+}
+
+.friend-avatar-small {
+    width: 32px;
+    height: 32px;
+    flex-shrink: 0;
+}
+
+.friend-avatar-small img {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.avatar-placeholder-sm {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: bold;
+    font-size: 12px;
+}
+
+.friend-activity-item .activity-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.friend-activity-item .activity-user {
+    display: block;
+    font-weight: 600;
+    font-size: 12px;
+    color: #111827;
+}
+
+.friend-activity-item .activity-detail {
+    display: block;
+    font-size: 11px;
+    color: #6b7280;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.friend-activity-item .activity-time {
+    display: block;
+    font-size: 10px;
+    color: #9ca3af;
+}
+
+.friend-activity-item .activity-pts {
+    flex-shrink: 0;
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    color: white;
+    font-size: 10px;
+    font-weight: bold;
+    padding: 2px 6px;
+    border-radius: 10px;
+}
+
+/* Dark mode for friend activity */
+.dark-mode .friend-activity-item {
+    background: rgba(255,255,255,0.05);
+}
+
+.dark-mode .friend-activity-item .activity-user {
+    color: #f3f4f6;
+}
+
+.dark-mode .friend-activity-item .activity-detail {
+    color: #ffffff;
+}
+
+.dark-mode .friend-activity-item .activity-time {
+    color: #ffffff;
+}
+
+/* ==========================================
+   FRIEND COMPARISON MODAL
+   ========================================== */
+
+.comparison-modal {
+    max-width: 500px;
+    width: 95%;
+}
+
+.comparison-header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+}
+
+.comparison-header h2 {
+    margin: 0;
+}
+
+/* Players Header */
+.comparison-players {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.5rem 1rem;
+    background: var(--bg-color);
+    border-radius: 12px;
+    margin-bottom: 1.5rem;
+}
+
+.comparison-player {
+    text-align: center;
+    flex: 1;
+}
+
+.comparison-avatar {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    margin: 0 auto 0.5rem;
+    overflow: hidden;
+    border: 3px solid var(--border-color);
+}
+
+.comparison-player.you .comparison-avatar {
+    border-color: var(--accent-color);
+}
+
+.comparison-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.comparison-avatar .avatar-placeholder {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, var(--accent-color), #e65100);
+    color: white;
+    font-size: 1.5rem;
+    font-weight: bold;
+}
+
+.comparison-name {
+    font-weight: 600;
+    font-size: 1rem;
+    color: var(--text-color);
+    margin-bottom: 0.25rem;
+}
+
+.comparison-wins {
+    font-size: 0.8rem;
+    color: var(--accent-color);
+    font-weight: 600;
+}
+
+.comparison-vs-big {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--text-muted);
+    padding: 0 1rem;
+}
+
+/* Stats Comparison */
+.comparison-stats {
+    margin-bottom: 1rem;
+}
+
+.comparison-stat-row {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    gap: 0.75rem;
+    padding: 0.75rem;
+    background: var(--bg-color);
+    border-radius: 8px;
+    margin-bottom: 0.5rem;
+    align-items: center;
+}
+
+.comparison-stat-row .comparison-value {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--text-color);
+}
+
+.comparison-stat-row .comparison-value:first-child {
+    text-align: right;
+}
+
+.comparison-stat-row .comparison-value:last-child {
+    text-align: left;
+}
+
+.comparison-stat-row .comparison-value.winner {
+    color: #4CAF50;
+}
+
+.comparison-stat-row .comparison-label {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    text-align: center;
+    min-width: 100px;
+}
+
+/* Distance Comparison */
+.comparison-distance-header {
+    display: grid;
+    grid-template-columns: 50px 1fr 30px 1fr;
+    gap: 0.5rem;
+    padding: 0.5rem;
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.comparison-distance-header > div:nth-child(2),
+.comparison-distance-header > div:nth-child(4) {
+    text-align: center;
+}
+
+.comparison-distances {
+    background: var(--bg-color);
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.comparison-distance-row {
+    display: grid;
+    grid-template-columns: 50px 1fr 30px 1fr;
+    gap: 0.5rem;
+    padding: 0.6rem 0.75rem;
+    align-items: center;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.comparison-distance-row:last-child {
+    border-bottom: none;
+}
+
+.comparison-distance-row:hover {
+    background: rgba(255, 152, 0, 0.05);
+}
+
+.comparison-distance {
+    font-weight: 600;
+    font-size: 0.85rem;
+    color: var(--text-color);
+}
+
+.comparison-distance-row .comparison-value {
+    text-align: center;
+    font-weight: 500;
+    color: var(--text-color);
+}
+
+.comparison-distance-row .comparison-value.winner {
+    color: #4CAF50;
+    font-weight: 700;
+}
+
+.comparison-vs {
+    text-align: center;
+    color: var(--text-muted);
+    font-weight: bold;
+}
+
+/* Accent button for compare */
+.btn-accent {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border: none;
+}
+
+.btn-accent:hover {
+    background: linear-gradient(135deg, #5a67d8 0%, #6b46c1 100%);
+    transform: translateY(-1px);
+}
+
+/* Dark mode */
+[data-theme="dark"] .comparison-players,
+[data-theme="dark"] .comparison-stat-row,
+[data-theme="dark"] .comparison-distances {
+    background: var(--bg-color);
+}
+
+[data-theme="dark"] .comparison-distance-row {
+    border-bottom-color: var(--border-color);
+}
+
+/* Mobile responsive */
+@media (max-width: 500px) {
+    .comparison-modal {
+        max-height: 90vh;
+        overflow-y: auto;
+    }
+
+    .comparison-players {
+        padding: 1rem 0.5rem;
+    }
+
+    .comparison-avatar {
+        width: 50px;
+        height: 50px;
+    }
+
+    .comparison-name {
+        font-size: 0.9rem;
+    }
+
+    .comparison-vs-big {
+        font-size: 1.25rem;
+        padding: 0 0.5rem;
+    }
+
+    .comparison-stat-row {
+        padding: 0.6rem;
+    }
+
+    .comparison-stat-row .comparison-value {
+        font-size: 1rem;
+    }
+
+    .comparison-stat-row .comparison-label {
+        font-size: 0.65rem;
+        min-width: 70px;
+    }
+
+    .comparison-distance-row {
+        padding: 0.5rem;
+    }
+
+    .comparison-distance {
+        font-size: 0.8rem;
+    }
+}
+
+/* ============================================================
+   DARK MODE FIXES — phase5.css gaps (v10.1.7)
+   ============================================================ */
+
+body.dark-mode .my-team-name {
+    color: #f1f5f9;
+}
+body.dark-mode .member-name {
+    color: #f1f5f9;
+}
+body.dark-mode .team-members-section h4,
+body.dark-mode .team-activity-section h4,
+body.dark-mode .team-invites-section h4 {
+    color: #f1f5f9;
+}
+body.dark-mode .team-leaderboard-info .team-name {
+    color: #f1f5f9;
+}
+body.dark-mode .friend-activity-item .activity-user {
+    color: #f1f5f9;
+}

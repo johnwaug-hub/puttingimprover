@@ -1,0 +1,786 @@
+/**
+ * (c) 2024-2026 Lock Jaw Disc Golf / John Waugaman. All rights reserved.
+ * PROPRIETARY - Unauthorized use prohibited. DMCA protected.
+ */
+/* Interactive Visual Tutorial Styles */
+
+.tutorial-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.9);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10000;
+    padding: 0.5rem;
+    animation: fadeIn 0.3s ease-out;
+}
+
+.tutorial-modal-visual {
+    background: white;
+    border-radius: 16px;
+    max-width: 1000px;
+    width: 100%;
+    max-height: 98vh;
+    overflow: hidden;
+    box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5);
+    animation: slideUp 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    display: flex;
+    flex-direction: column;
+}
+
+/* Legend Layout Modal */
+.tutorial-modal-legend {
+    background: white;
+    border-radius: 16px;
+    max-width: 1200px;
+    width: 95%;
+    max-height: 95vh;
+    overflow: hidden;
+    box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5);
+    animation: slideUp 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    display: flex;
+    flex-direction: column;
+}
+
+.tutorial-content-split {
+    display: flex;
+    flex: 1;
+    overflow: hidden;
+    gap: 0;
+}
+
+.tutorial-screenshot-side {
+    flex: 2;
+    overflow: auto;
+    background: #f3f4f6;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    padding: 1rem;
+    max-height: 75vh;
+}
+
+.screenshot-container-legend {
+    position: relative;
+    display: inline-block;
+}
+
+.screenshot-container-legend img {
+    display: block;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* Default: fit to view */
+.screenshot-container-legend img.screenshot-actual {
+    max-width: 100%;
+    max-height: 70vh;
+}
+
+/* Vertical scroll only: fit width, allow height scroll */
+.screenshot-container-legend.scroll-vertical img.screenshot-actual {
+    max-width: 100%;
+    max-height: none;
+    width: 100%;
+    height: auto;
+}
+
+/* Profile screen: zoom in larger */
+.screenshot-container-legend.zoomed img.screenshot-actual {
+    max-width: none;
+    max-height: none;
+    width: 400px;
+}
+
+.tutorial-legend-side {
+    flex: 1;
+    min-width: 280px;
+    max-width: 320px;
+    background: #fff;
+    border-left: 1px solid #e5e7eb;
+    overflow-y: auto;
+}
+
+.legend-list {
+    padding: 0.5rem;
+}
+
+.legend-header {
+    padding: 0.75rem;
+    font-weight: 600;
+    color: #374151;
+    border-bottom: 1px solid #e5e7eb;
+    font-size: 0.9rem;
+}
+
+.legend-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+    padding: 0.5rem 0.75rem;
+    border-radius: 8px;
+    transition: all 0.2s;
+    border-bottom: 1px solid #f3f4f6;
+}
+
+.legend-item:hover {
+    background: #fff7ed;
+}
+
+.legend-icon {
+    font-size: 1.2rem;
+    flex-shrink: 0;
+    width: 28px;
+    text-align: center;
+}
+
+.legend-text {
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+}
+
+.legend-text strong {
+    font-size: 0.85rem;
+    color: #1f2937;
+}
+
+.legend-location {
+    font-size: 0.7rem;
+    color: #9ca3af;
+    font-style: italic;
+}
+
+.legend-desc {
+    font-size: 0.8rem;
+    color: #6b7280;
+}
+
+/* Markers on screenshot */
+.marker {
+    position: absolute;
+    transform: translate(-50%, -50%);
+    z-index: 100;
+    cursor: pointer;
+}
+
+.marker-num {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    background: #FF6B35;
+    color: white;
+    border-radius: 50%;
+    font-weight: 700;
+    font-size: 0.85rem;
+    box-shadow: 0 2px 8px rgba(255, 107, 53, 0.5);
+    border: 2px solid white;
+    transition: all 0.2s;
+}
+
+.marker:hover .marker-num,
+.marker.highlight .marker-num {
+    transform: scale(1.3);
+    box-shadow: 0 4px 12px rgba(255, 107, 53, 0.6);
+}
+
+/* Mobile: Stack vertically */
+@media (max-width: 768px) {
+    .tutorial-content-split {
+        flex-direction: column;
+    }
+
+    .tutorial-screenshot-side {
+        max-height: 50vh;
+    }
+
+    .tutorial-legend-side {
+        max-width: 100%;
+        min-width: 100%;
+        max-height: 30vh;
+        border-left: none;
+        border-top: 1px solid #e5e7eb;
+    }
+}
+
+/* Compact Header */
+.tutorial-header-compact {
+    background: linear-gradient(135deg, #FF6B35 0%, #D9534F 100%);
+    padding: 0.6rem 1rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: white;
+    min-height: 40px;
+}
+
+.tutorial-header-left {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.tutorial-header-left h2 {
+    font-size: 1.1rem;
+    margin: 0;
+    font-weight: 600;
+}
+
+.tutorial-hint {
+    font-size: 0.85rem;
+    opacity: 0.9;
+}
+
+.tutorial-header-right {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.tutorial-progress-mini {
+    width: 80px;
+    height: 4px;
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: 2px;
+    overflow: hidden;
+}
+
+.tutorial-progress-fill-mini {
+    height: 100%;
+    background: white;
+    transition: width 0.3s;
+}
+
+.tutorial-step-mini {
+    font-size: 0.85rem;
+    font-weight: 500;
+}
+
+.tutorial-close {
+    position: absolute;
+    top: 0.4rem;
+    right: 0.5rem;
+    background: rgba(255, 255, 255, 0.2);
+    border: none;
+    color: white;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    font-size: 18px;
+    cursor: pointer;
+    transition: all 0.2s;
+    z-index: 10;
+}
+
+.tutorial-close:hover {
+    background: rgba(255, 255, 255, 0.3);
+    transform: scale(1.1);
+}
+
+/* Old header styles kept for compatibility */
+.tutorial-header-visual {
+    background: linear-gradient(135deg, #FF6B35 0%, #D9534F 100%);
+    padding: 1rem;
+    text-align: center;
+    color: white;
+    position: relative;
+}
+
+.tutorial-header-visual h2 {
+    font-size: 1.5rem;
+    margin: 0 0 0.25rem 0;
+}
+
+.tutorial-header-visual p {
+    font-size: 0.95rem;
+    margin: 0 0 0.5rem 0;
+    opacity: 0.95;
+}
+
+.tutorial-progress-bar {
+    height: 4px;
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: 2px;
+    overflow: hidden;
+    margin: 0.5rem auto 0.25rem;
+    max-width: 400px;
+}
+
+.tutorial-progress-fill {
+    height: 100%;
+    background: white;
+    transition: width 0.3s ease;
+    box-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+}
+
+.tutorial-step-indicator {
+    font-size: 0.875rem;
+    opacity: 0.9;
+    margin-top: 0.5rem;
+}
+
+/* Screenshot Area */
+.tutorial-screenshot-area {
+    flex: 1;
+    overflow-y: auto;
+    padding: 2rem;
+    background: #f9fafb;
+}
+
+.tutorial-instruction {
+    text-align: center;
+    font-size: 1.1rem;
+    color: #6b7280;
+    margin-bottom: 1.5rem;
+    font-weight: 500;
+}
+
+.pulse-dot {
+    display: inline-block;
+    color: #FF6B35;
+    animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.7; transform: scale(1.2); }
+}
+
+/* Screenshot Container */
+.screenshot-container {
+    position: relative;
+    max-width: 900px;
+    margin: 0 auto;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    min-height: 500px;
+    border: 2px solid #e5e7eb;
+    overflow: hidden;
+}
+
+/* Privacy blur for username area */
+.screenshot-container::before {
+    content: 'Your Username';
+    position: absolute;
+    top: 3%;
+    right: 12%;
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    font-weight: 600;
+    color: #6b7280;
+    border: 2px solid #e5e7eb;
+    z-index: 50;
+    font-size: 0.9rem;
+}
+
+/* Privacy blurs for leaderboard view - usernames and pictures */
+.screenshot-container[data-step="5"]::after {
+    content: '';
+    position: absolute;
+    left: 10%;
+    top: 45%;
+    width: 50%;
+    height: 40%;
+    background: rgba(255, 255, 255, 0.3);
+    backdrop-filter: blur(12px);
+    border-radius: 12px;
+    z-index: 45;
+}
+
+/* Privacy blur for stats view - username */
+.screenshot-container[data-step="6"]::after {
+    content: 'Your Username';
+    position: absolute;
+    left: 15%;
+    top: 18%;
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    padding: 0.5rem 1.5rem;
+    border-radius: 20px;
+    font-weight: 600;
+    color: #6b7280;
+    border: 2px solid #e5e7eb;
+    z-index: 50;
+    font-size: 0.9rem;
+}
+
+/* Privacy blur for profile screen - picture and display name */
+.screenshot-container[data-step="7"] {
+    position: relative;
+}
+
+.screenshot-container[data-step="7"]::after {
+    content: '';
+    position: absolute;
+    left: 8%;
+    top: 3%;
+    width: 27%;
+    height: 14%;
+    background: rgba(255, 255, 255, 0.35);
+    backdrop-filter: blur(15px);
+    border-radius: 16px;
+    z-index: 45;
+    border: 2px solid rgba(229, 231, 235, 0.8);
+}
+
+.screenshot-actual {
+    width: 100%;
+    height: auto;
+    display: block;
+    border-radius: 10px;
+}
+
+.placeholder-icon {
+    font-size: 5rem;
+    margin-bottom: 1rem;
+    opacity: 0.5;
+}
+
+.placeholder-text {
+    font-size: 1.5rem;
+    color: #6b7280;
+    font-weight: 600;
+}
+
+/* Feature Zones - Transparent hover areas over UI elements */
+.feature-zone {
+    position: absolute;
+    cursor: pointer;
+    border: 2px dashed rgba(255, 107, 53, 0.5);
+    border-radius: 4px;
+    transition: all 0.2s ease;
+    z-index: 100;
+    background: rgba(255, 107, 53, 0.05);
+}
+
+.feature-zone:hover {
+    border-color: #FF6B35;
+    border-style: solid;
+    background: rgba(255, 107, 53, 0.2);
+    box-shadow: 0 0 0 3px rgba(255, 107, 53, 0.3);
+}
+
+/* Feature Tooltip */
+.feature-tooltip {
+    position: absolute;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+    padding: 0;
+    width: 280px;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.25s ease;
+    z-index: 200;
+    transform: translate(-50%, 0);
+    pointer-events: none;
+    border: 2px solid #FF6B35;
+}
+
+.feature-tooltip.show {
+    opacity: 1;
+    visibility: visible;
+}
+
+.feature-tooltip::before {
+    content: '';
+    position: absolute;
+    top: -10px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 0;
+    height: 0;
+    border-left: 10px solid transparent;
+    border-right: 10px solid transparent;
+    border-bottom: 10px solid #FF6B35;
+}
+
+.feature-tooltip.above::before {
+    top: auto;
+    bottom: -10px;
+    border-bottom: none;
+    border-top: 10px solid #FF6B35;
+}
+
+.tooltip-title {
+    background: linear-gradient(135deg, #FF6B35 0%, #D9534F 100%);
+    color: white;
+    padding: 0.75rem 1rem;
+    border-radius: 10px 10px 0 0;
+    font-weight: 600;
+    font-size: 1rem;
+}
+
+.tooltip-text {
+    padding: 0.75rem 1rem;
+    color: #4b5563;
+    font-size: 0.9rem;
+    line-height: 1.5;
+}
+
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+    background: white;
+}
+
+.tutorial-dots {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+}
+
+.tutorial-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: #d1d5db;
+    transition: all 0.3s;
+}
+
+.tutorial-dot.active {
+    background: #FF6B35;
+    transform: scale(1.3);
+}
+
+.tutorial-dot.completed {
+    background: #10b981;
+}
+
+.tutorial-footer-visual .btn {
+    padding: 0.75rem 1.5rem;
+    font-weight: 600;
+    min-width: 120px;
+}
+
+/* Compact Footer */
+.tutorial-footer-compact {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.5rem 1rem;
+    background: #f9fafb;
+    border-top: 1px solid #e5e7eb;
+}
+
+.tutorial-footer-compact .btn-sm {
+    padding: 0.4rem 1rem;
+    font-size: 0.9rem;
+    min-width: 80px;
+}
+
+.tutorial-dots-mini {
+    display: flex;
+    gap: 6px;
+}
+
+.dot-mini {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #d1d5db;
+    transition: all 0.2s;
+}
+
+.dot-mini.active {
+    background: #FF6B35;
+    transform: scale(1.2);
+}
+
+.dot-mini.done {
+    background: #10b981;
+}
+
+/* Getting Started Button */
+.getting-started-btn {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    padding: 0.875rem 1.5rem;
+    background: linear-gradient(135deg, #FF6B35 0%, #D9534F 100%);
+    color: white;
+    border: none;
+    border-radius: 50px;
+    font-size: 1rem;
+    font-weight: 600;
+    box-shadow: 0 4px 12px rgba(255, 107, 53, 0.4);
+    cursor: pointer;
+    transition: all 0.3s;
+    z-index: 9998;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.getting-started-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(255, 107, 53, 0.5);
+}
+
+.getting-started-btn:active {
+    transform: translateY(0);
+}
+
+.getting-started-btn::before {
+    content: '🎓';
+    font-size: 1.2rem;
+}
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+    .tutorial-modal-visual {
+        max-width: 100%;
+        border-radius: 20px 20px 0 0;
+    }
+
+    .tutorial-header-visual {
+        padding: 1.5rem 1rem;
+    }
+
+    .tutorial-header-visual h2 {
+        font-size: 1.5rem;
+    }
+
+    .tutorial-screenshot-area {
+        padding: 1rem;
+    }
+
+    .tutorial-instruction {
+        font-size: 0.95rem;
+    }
+
+    .screenshot-container {
+        min-height: 400px;
+    }
+
+    .tutorial-hotspot {
+        width: 36px;
+        height: 36px;
+    }
+
+    .hotspot-number {
+        width: 36px;
+        height: 36px;
+        font-size: 16px;
+    }
+
+    .info-bubble {
+        min-width: 220px;
+        max-width: calc(100vw - 60px);
+    }
+
+    .tutorial-footer-visual {
+        flex-direction: column;
+        padding: 1rem;
+        gap: 0.75rem;
+    }
+
+    .tutorial-footer-visual .btn {
+        width: 100%;
+    }
+
+    .getting-started-btn {
+        bottom: 70px;
+        right: 15px;
+        padding: 0.75rem 1.25rem;
+        font-size: 0.9rem;
+    }
+}
+
+/* Animations */
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes slideUp {
+    from {
+        transform: translateY(50px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+/* ═══════════════════════════════════════════════
+   DARK MODE
+═══════════════════════════════════════════════ */
+
+body.dark-mode .tutorial-modal-legend {
+    background: #1e293b;
+}
+
+body.dark-mode .tutorial-header-compact,
+body.dark-mode .tutorial-header-visual {
+    background: linear-gradient(135deg, #c0522b 0%, #a33c38 100%);
+}
+
+body.dark-mode .tutorial-content-split {
+    background: #1e293b;
+}
+
+body.dark-mode .tutorial-screenshot-side {
+    background: #0f172a;
+}
+
+body.dark-mode .screenshot-container-legend img {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+}
+
+body.dark-mode .tutorial-legend-side {
+    background: #1e293b;
+    border-left-color: #334155;
+}
+
+body.dark-mode .legend-header {
+    color: #cbd5e1;
+    border-bottom-color: #334155;
+}
+
+body.dark-mode .legend-item {
+    border-bottom-color: #1e293b;
+}
+
+body.dark-mode .legend-item:hover {
+    background: #0f172a;
+}
+
+body.dark-mode .legend-text strong {
+    color: #f1f5f9;
+}
+
+body.dark-mode .legend-location {
+    color: #475569;
+}
+
+body.dark-mode .legend-desc {
+    color: #94a3b8;
+}
+
+body.dark-mode .tutorial-footer-compact {
+    background: #0f172a;
+    border-top-color: #334155;
+}
+
+body.dark-mode .dot-mini {
+    background: #334155;
+}
+
+body.dark-mode .dot-mini.done {
+    background: #10b981;
+}
+
+body.dark-mode .getting-started-btn {
+    box-shadow: 0 4px 12px rgba(255, 107, 53, 0.3);
+}

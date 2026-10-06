@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="en">
+<!--
+  ============================================================================
+  PUTTING IMPROVER — Lock Jaw Disc Golf
+  © 2024-2026 John Waugaman / Lock Jaw Disc Golf. All rights reserved.
+  PROPRIETARY AND CONFIDENTIAL — Unauthorized use is prohibited.
+  Protected under DMCA and US Copyright Law (17 U.S.C. §§ 101-810).
+  Contact: lockjawdiscgolf@gmail.com | Patent Pending
+  ============================================================================
+-->
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Putting Improver - Lock Jaw Disc Golf</title>
+
+    <!-- Copyright & Rights -->
+    <meta name="author" content="John Waugaman, Lock Jaw Disc Golf">
+    <meta name="copyright" content="© 2024-2026 Lock Jaw Disc Golf. All rights reserved.">
+    <meta name="robots" content="noarchive, noimageindex">
+
+    <!-- PWA Meta Tags -->
+    <meta name="description" content="Track and improve your disc golf putting game with custom routines and challenges">
+    <meta name="theme-color" content="#2563eb">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Putting Improver">
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="favicon.ico">
+    <link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="favicon-16.png">
+
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="manifest.json">
+
+    <!-- Apple Touch Icons -->
+    <link rel="apple-touch-icon" sizes="152x152" href="icons/icon-152x152.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="icons/icon-192x192.png">
+    <link rel="apple-touch-icon" sizes="167.1.9" href="icons/icon-192x192.png">
+
+    <!-- Firebase SDK v11 (latest stable) - Must load BEFORE our modules -->
+    <!-- DO NOT use 'defer' - we need Firebase loaded before our app -->
+    <script src="https://www.gstatic.com/firebasejs/11.0.2/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/11.0.2/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/11.0.2/firebase-firestore-compat.js"></script>
+
+    <!-- Chart.js for data visualization -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js" integrity="sha512-CQBWl4fJHWbryGE+Pc7UAxWMUMNMWzWxF4SQo9CgkJIN1kx6djDQZjh3Y8SZ1d+6I+1zze6Z7kHXO7q3UyZAWw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+    <!-- Application CSS -->
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="css/enhancements.css">
+    <link rel="stylesheet" href="css/mobile-fixes.css">
+    <link rel="stylesheet" href="css/phase2.css">
+    <link rel="stylesheet" href="css/phase5.css">
+    <link rel="stylesheet" href="css/modal-redesign.css">
+    <link rel="stylesheet" href="css/tutorialVisual.css">
+    <link rel="stylesheet" href="css/onboarding.css">
+    <link rel="stylesheet" href="css/coaching.css">
+
+    <!-- Mobile nav — flex-column app shell, tabs always visible -->
+    <style>
+@media (max-width: 640px) {
+  #app { display:flex; flex-direction:column; height:100dvh; height:100vh; overflow:hidden; }
+  body { background-color:#FF6B35; }
+  .app-header { flex-shrink:0; padding:0 !important; padding-top:env(safe-area-inset-top, 0px) !important; margin-bottom:0.5rem !important; }
+  body.capacitor-native .app-header { padding-top:max(env(safe-area-inset-top, 28px), 28px) !important; }
+  .app-header .container { padding:4px 8px !important; }
+  .app-header .header-content { gap:6px !important; padding:0 !important; }
+  .app-header .header-right { gap:6px !important; }
+  .app-title { font-size:1rem !important; white-space:nowrap !important; }
+  .header-logo { height:28px !important; width:28px !important; }
+  .header-profile-pic img, .header-profile-placeholder { width:26px !important; height:26px !important; }
+  .user-name { font-size:0.75rem !important; }
+  #logoutBtn { font-size:0.75rem !important; padding:0.25rem 0.6rem !important; }
+  .main-content { flex:1; overflow-y:auto; overflow-x:hidden; min-height:0; -webkit-overflow-scrolling:touch; min-height:0 !important; }
+  .stats-grid { margin-bottom:0.5rem !important; }
+  .card { margin-bottom:0.5rem !important; }
+  .tabs { display:flex; flex-direction:row; flex-wrap:nowrap; align-items:center; flex-shrink:0; border-radius:0; margin:0; padding:0.3rem 0.2rem; padding-bottom:calc(0.3rem + env(safe-area-inset-bottom,0px)); border-top:2px solid rgba(255,107,53,0.2); box-shadow:0 -4px 16px rgba(0,0,0,0.18); overflow:hidden; }
+  .tabs > .tab { flex:1 1 0; min-width:0; min-height:0; height:auto; padding:0.4rem 0.1rem; font-size:0; line-height:1; white-space:nowrap; overflow:hidden; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:2px; border:none; cursor:pointer; background:transparent; }
+  .tabs > .tab .tab-icon { font-size:20px; line-height:1; display:block; }
+  .tabs > .tab .tab-label { font-size:0.62rem; line-height:1; display:block; }
+  .tabs > .tab.active { background:linear-gradient(135deg,#FF6B35 0%,#D9534F 100%) !important; color:white !important; border-radius:8px; }
+  .tabs > .tab.active .tab-label, .tabs > .tab.active .tab-icon { color:white !important; background:transparent !important; }
+}
+    </style>
+</head>
+<body>
+    <!-- Main application container -->
+    <div id="app"></div>
+
+    <!-- Service Worker Registration -->
+    <script>
+        // Detect platform
+        const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+        const isInStandaloneMode = ('standalone' in window.navigator) && (window.navigator.standalone);
+        const isCapacitorNative = window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform();
+
+        // App version tracking
+        const APP_VERSION = '10.5.56';
+        const STORED_VERSION = localStorage.getItem('app_version');
+
+        // Check if version changed - show notification instead of forcing reload
+        if (STORED_VERSION && STORED_VERSION !== APP_VERSION) {
+            console.log(`🔄 Version changed from ${STORED_VERSION} to ${APP_VERSION}`);
+            localStorage.setItem('app_version', APP_VERSION);
+            
+            // Clear old caches in background (don't force reload)
+            if ('caches' in window) {
+                caches.keys().then(names => {
+                    names.forEach(name => {
+                        if (!name.includes(APP_VERSION)) {
+                            console.log('Deleting old cache:', name);
+                            caches.delete(name);
+                        }
+                    });
+                });
+            }
+        } else if (!STORED_VERSION) {
+            localStorage.setItem('app_version', APP_VERSION);
+        }
+
+        // Register service worker for PWA functionality (skip in native Capacitor app)
+        if ('serviceWorker' in navigator && !isCapacitorNative) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/service-worker.js')
+                    .then((registration) => {
+                        console.log('ServiceWorker registered:', registration.scope);
+
+                        // Check for updates every 2 minutes (balanced)
+                        setInterval(() => {
+                            registration.update();
+                        }, 120000);
+
+                        // Handle updates - show non-blocking notification
+                        registration.addEventListener('updatefound', () => {
+                            const newWorker = registration.installing;
+                            console.log('🆕 New service worker found, installing...');
+                            
+                            newWorker.addEventListener('statechange', () => {
+                                if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                                    console.log('✅ New version ready');
+                                    // Show update toast - let user decide when to reload
+                                    showUpdateAvailableToast(newWorker);
+                                }
+                            });
+                        });
+                    })
+                    .catch((error) => {
+                        console.log('ServiceWorker registration failed:', error);
+                    });
+
+                // Handle service worker controller change
+                let refreshing = false;
+                navigator.serviceWorker.addEventListener('controllerchange', () => {
+                    if (!refreshing) {
+                        refreshing = true;
+                        console.log('🔄 Service worker updated');
+                    }
+                });
+            });
+        }
+
+        // Show update available toast - non-blocking
+        function showUpdateAvailableToast(newWorker) {
+            // Remove existing update toast if any
+            const existingToast = document.getElementById('updateToast');
+            if (existingToast) existingToast.remove();
+
+            const toast = document.createElement('div');
+            toast.id = 'updateToast';
+            toast.innerHTML = `
+                <div style="position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%); 
+                            background: linear-gradient(135deg, #00d4aa, #00b894); color: white; 
+                            padding: 12px 20px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+                            display: flex; align-items: center; gap: 12px; z-index: 10000; 
+                            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
+                    <span>🆕 Update available!</span>
+                    <button onclick="window.updateApp()" style="background: white; color: #00b894; border: none; 
+                            padding: 6px 12px; border-radius: 6px; font-weight: 600; cursor: pointer;">
+                        Refresh
+                    </button>
+                    <button onclick="this.parentElement.parentElement.remove()" style="background: transparent; 
+                            color: white; border: none; font-size: 18px; cursor: pointer; padding: 0 4px;">
+                        ✕
+                    </button>
+                </div>
+            `;
+            document.body.appendChild(toast);
+
+            // Store reference to new worker for update
+            window.pendingWorker = newWorker;
+            window.updateApp = function() {
+                if (window.pendingWorker) {
+                    window.pendingWorker.postMessage({ type: 'SKIP_WAITING' });
+                }
+                window.location.reload();
+            };
+
+            // Auto-dismiss after 30 seconds
+            setTimeout(() => {
+                if (toast.parentElement) toast.remove();
+            }, 30000);
+        }
+
+        // Add install prompt handler
+        let deferredPrompt;
+
+        // Check if already installed (standalone mode)
+        const isInstalled = window.matchMedia('(display-mode: standalone)').matches ||
+                           window.navigator.standalone === true;
+
+        // For iOS, show custom instructions
+        if (isIOS && !isInStandaloneMode) {
+            // Make iOS install helper available globally
+            window.isIOSInstallable = true;
+
+            // Dispatch event that app can listen for
+            window.addEventListener('DOMContentLoaded', () => {
+                window.dispatchEvent(new CustomEvent('ios-installable'));
+            });
+        }
+        // For other browsers, use standard install prompt
+        else if (!isInstalled && !isIOS) {
+            window.addEventListener('beforeinstallprompt', (e) => {
+                // Prevent the mini-infobar from appearing on mobile
+                e.preventDefault();
+                // Stash the event so it can be triggered later
+                deferredPrompt = e;
+                window.deferredPrompt = e;
+
+                console.log('PWA install prompt available');
+
+                // Show install button in header if it exists
+                const installBtn = document.getElementById('pwaInstallBtn');
+                if (installBtn) {
+                    installBtn.style.display = 'inline-block';
+                }
+
+                // Show install button on login screen if it exists
+                const installBtnLogin = document.getElementById('pwaInstallBtnLogin');
+                if (installBtnLogin) {
+                    installBtnLogin.style.display = 'inline-block';
+                }
+
+                // Dispatch custom event that the app can listen for
+                window.dispatchEvent(new CustomEvent('pwa-installable'));
+            });
+        } else {
+            console.log('App is already installed or on iOS in standalone mode');
+        }
+
+        // Track if installed
+        window.addEventListener('appinstalled', () => {
+            console.log('PWA was installed');
+            deferredPrompt = null;
+            window.deferredPrompt = null;
+
+            // Hide install button
+            const installBtn = document.getElementById('pwaInstallBtn');
+            if (installBtn) {
+                installBtn.style.display = 'none';
+            }
+
+            const installBtnLogin = document.getElementById('pwaInstallBtnLogin');
+            if (installBtnLogin) {
+                installBtnLogin.style.display = 'none';
+            }
+        });
+
+        // Add version display to page
+        window.addEventListener('DOMContentLoaded', () => {
+            const versionDisplay = document.createElement('div');
+            versionDisplay.id = 'app-version';
+            versionDisplay.textContent = `v${APP_VERSION}`;
+
+            // Check if mobile
+            const isMobile = window.innerWidth <= 640;
+
+            versionDisplay.style.cssText = `
+                position: fixed;
+                bottom: ${isMobile ? '72px' : '8px'};
+                right: ${isMobile ? '10px' : '8px'};
+                font-size: ${isMobile ? '12px' : '11px'};
+                color: rgba(255, 255, 255, 0.7);
+                background: rgba(0, 0, 0, 0.4);
+                padding: ${isMobile ? '4px 8px' : '2px 6px'};
+                border-radius: 4px;
+                z-index: 9999;
+                pointer-events: none;
+                font-family: monospace;
+                font-weight: 600;
+                backdrop-filter: blur(4px);
+            `;
+            document.body.appendChild(versionDisplay);
+        });
+    </script>
+
+    <!-- Load our modular JavaScript - waits for Firebase to be ready -->
+    <script type="module" src="js/app.js"></script>
+</body>
+</html>

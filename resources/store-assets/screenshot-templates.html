@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Screenshot Generator - App Store</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: #1a1a1a;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 40px;
+            gap: 60px;
+        }
+        h1 {
+            color: #fff;
+            text-align: center;
+        }
+        .instructions {
+            background: #333;
+            padding: 20px;
+            border-radius: 12px;
+            color: #ccc;
+            max-width: 600px;
+        }
+        .instructions h3 {
+            color: #ff6b35;
+            margin-bottom: 10px;
+        }
+        .instructions ol {
+            margin-left: 20px;
+        }
+        .instructions li {
+            margin-bottom: 8px;
+        }
+        .screenshots-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 40px;
+            justify-content: center;
+        }
+        .screenshot-frame {
+            position: relative;
+        }
+        .screenshot-frame .label {
+            color: #888;
+            text-align: center;
+            margin-bottom: 10px;
+            font-size: 14px;
+        }
+        /* iPhone 6.7" - 1290 x 2796 - scaled to 25% for preview */
+        .iphone-67 {
+            width: 322px;
+            height: 699px;
+            background: linear-gradient(145deg, #1a1a2e, #0f3460);
+            border-radius: 50px;
+            padding: 15px;
+            position: relative;
+            overflow: hidden;
+        }
+        .iphone-67::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 120px;
+            height: 35px;
+            background: #000;
+            border-radius: 0 0 20px 20px;
+            z-index: 10;
+        }
+        .iphone-67 .screen {
+            width: 100%;
+            height: 100%;
+            background: #1a1a1a;
+            border-radius: 38px;
+            overflow: hidden;
+            position: relative;
+        }
+        /* Content inside phone */
+        .promo-content {
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+        .promo-header {
+            background: linear-gradient(135deg, #1a1a2e, #0f3460);
+            padding: 60px 20px 30px;
+            text-align: center;
+        }
+        .promo-header h2 {
+            color: #fff;
+            font-size: 22px;
+            font-weight: 700;
+            line-height: 1.3;
+        }
+        .promo-header h2 span {
+            color: #ff6b35;
+        }
+        .promo-header p {
+            color: #00d4aa;
+            font-size: 14px;
+            margin-top: 8px;
+        }
+        .mock-app {
+            flex: 1;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg"><rect fill="%231a1a1a" width="100%" height="100%"/></svg>');
+            position: relative;
+        }
+        .mock-app img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            object-position: top;
+        }
+        .placeholder-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: #666;
+            text-align: center;
+            font-size: 12px;
+        }
+        /* Screenshot variants */
+        .ss-practice .promo-header h2::before { content: '📊 '; }
+        .ss-games .promo-header h2::before { content: '🎮 '; }
+        .ss-routines .promo-header h2::before { content: '📋 '; }
+        .ss-achievements .promo-header h2::before { content: '🏆 '; }
+        .ss-leaderboard .promo-header h2::before { content: '🥇 '; }
+        .ss-stats .promo-header h2::before { content: '📈 '; }
+    </style>
+</head>
+<body>
+    <h1>📱 Store Screenshot Templates</h1>
+    
+    <div class="instructions">
+        <h3>How to Create Final Screenshots</h3>
+        <ol>
+            <li>Take actual app screenshots on a device or emulator</li>
+            <li>Replace the placeholder areas below with your screenshots</li>
+            <li>Use a tool like Figma, Photoshop, or online screenshot generators</li>
+            <li>Export at exact required dimensions:
+                <ul>
+                    <li>iPhone 6.7": 1290 x 2796</li>
+                    <li>iPhone 6.5": 1284 x 2778</li>
+                    <li>iPhone 5.5": 1242 x 2208</li>
+                    <li>iPad 12.9": 2048 x 2732</li>
+                </ul>
+            </li>
+        </ol>
+    </div>
+
+    <div class="screenshots-grid">
+        <!-- Screenshot 1: Practice -->
+        <div class="screenshot-frame">
+            <div class="label">1. Practice View (1290x2796)</div>
+            <div class="iphone-67">
+                <div class="screen">
+                    <div class="promo-content ss-practice">
+                        <div class="promo-header">
+                            <h2>Track Your<br><span>Practice Sessions</span></h2>
+                            <p>Log putts from any distance</p>
+                        </div>
+                        <div class="mock-app">
+                            <div class="placeholder-text">
+                                [Insert practice-view.png]<br>
+                                From /screenshots/ folder
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Screenshot 2: Games -->
+        <div class="screenshot-frame">
+            <div class="label">2. Games View (1290x2796)</div>
+            <div class="iphone-67">
+                <div class="screen">
+                    <div class="promo-content ss-games">
+                        <div class="promo-header">
+                            <h2>Play 10<br><span>Putting Games</span></h2>
+                            <p>HORSE, Par, Ladder & more</p>
+                        </div>
+                        <div class="mock-app">
+                            <div class="placeholder-text">
+                                [Insert games-view.png]<br>
+                                From /screenshots/ folder
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Screenshot 3: Routines -->
+        <div class="screenshot-frame">
+            <div class="label">3. Routines View (1290x2796)</div>
+            <div class="iphone-67">
+                <div class="screen">
+                    <div class="promo-content ss-routines">
+                        <div class="promo-header">
+                            <h2>Follow<br><span>Practice Routines</span></h2>
+                            <p>Beginner to Expert levels</p>
+                        </div>
+                        <div class="mock-app">
+                            <div class="placeholder-text">
+                                [Insert routines-view.png]<br>
+                                From /screenshots/ folder
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Screenshot 4: Achievements -->
+        <div class="screenshot-frame">
+            <div class="label">4. Achievements (1290x2796)</div>
+            <div class="iphone-67">
+                <div class="screen">
+                    <div class="promo-content ss-achievements">
+                        <div class="promo-header">
+                            <h2>Unlock 190+<br><span>Achievements</span></h2>
+                            <p>Earn badges and XP</p>
+                        </div>
+                        <div class="mock-app">
+                            <div class="placeholder-text">
+                                [Insert achievements-view.png]<br>
+                                From /screenshots/ folder
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Screenshot 5: Leaderboard -->
+        <div class="screenshot-frame">
+            <div class="label">5. Leaderboard (1290x2796)</div>
+            <div class="iphone-67">
+                <div class="screen">
+                    <div class="promo-content ss-leaderboard">
+                        <div class="promo-header">
+                            <h2>Compete on<br><span>Leaderboards</span></h2>
+                            <p>Points, ELO & Season rankings</p>
+                        </div>
+                        <div class="mock-app">
+                            <div class="placeholder-text">
+                                [Insert leaderboard-view.png]<br>
+                                From /screenshots/ folder
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Screenshot 6: Stats -->
+        <div class="screenshot-frame">
+            <div class="label">6. Stats & Charts (1290x2796)</div>
+            <div class="iphone-67">
+                <div class="screen">
+                    <div class="promo-content ss-stats">
+                        <div class="promo-header">
+                            <h2>Track Your<br><span>Progress</span></h2>
+                            <p>Charts and analytics</p>
+                        </div>
+                        <div class="mock-app">
+                            <div class="placeholder-text">
+                                [Insert stats-view.png]<br>
+                                From /screenshots/ folder
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

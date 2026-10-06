@@ -1,0 +1,79 @@
+{
+  "name": "putting-improver",
+  "version": "10.1.0",
+  "description": "Disc golf putting practice tracker for Lock Jaw Disc Golf in Tucson, AZ",
+  "main": "index.html",
+  "scripts": {
+    "start": "npx serve .",
+    "deploy": "firebase deploy",
+    "deploy:hosting": "firebase deploy --only hosting",
+    "deploy:firestore": "firebase deploy --only firestore:rules",
+    "deploy:preview": "firebase hosting:channel:deploy preview",
+    "serve": "firebase serve --only hosting",
+    "build": "echo 'No build step required - static HTML app'",
+    "test": "npx playwright test",
+    "test:smoke": "npx playwright test tests/e2e/smoke.spec.ts",
+    "test:all": "npx playwright test tests/e2e/*.spec.ts",
+    "test:ui": "npx playwright test --ui",
+    "test:headed": "npx playwright test --headed",
+    "test:debug": "npx playwright test --debug",
+    "test:chromium": "npx playwright test --project=chromium",
+    "test:mobile": "npx playwright test --project=mobile-chrome",
+    "test:report": "npx playwright show-report tests/reports",
+    "test:install": "npx playwright install",
+    "cap:init": "npx cap init 'Putting Improver' 'com.lockjawdiscgolf.puttingimprover'",
+    "cap:add:android": "npx cap add android",
+    "cap:add:ios": "npx cap add ios",
+    "cap:sync": "npx cap sync",
+    "cap:copy": "npx cap copy",
+    "cap:open:android": "npx cap open android",
+    "cap:open:ios": "npx cap open ios",
+    "cap:build": "node -e \"require('fs').cpSync('.', 'www', {recursive: true, filter: (src) => !src.includes('node_modules') && !src.includes('.git') && !src.includes('android') && !src.includes('ios') && !src.includes('www') && !src.includes('functions')})\" && npx cap sync",
+    "cap:build:win": "build-cap.bat && npx cap sync",
+    "cap:build:mac": "chmod +x build-cap.sh && ./build-cap.sh && npx cap sync",
+    "build:ios": "chmod +x build-ios.sh && ./build-ios.sh",
+    "fix:ios": "chmod +x fix-ios.sh && ./fix-ios.sh",
+    "fix:android": "chmod +x fix-android.sh && ./fix-android.sh"
+  },
+  "keywords": [
+    "disc-golf",
+    "putting",
+    "practice",
+    "tracker",
+    "sports",
+    "lock-jaw",
+    "capacitor",
+    "pwa"
+  ],
+  "author": "Lock Jaw Disc Golf",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/yourusername/putting-improver.git"
+  },
+  "bugs": {
+    "url": "https://github.com/yourusername/putting-improver/issues"
+  },
+  "homepage": "https://puttingimprover.com",
+  "devDependencies": {
+    "firebase-tools": "^13.0.0",
+    "@playwright/test": "^1.42.0",
+    "@types/node": "^20.11.0"
+  },
+  "dependencies": {
+    "@capacitor/core": "^6.0.0",
+    "@capacitor/cli": "^6.0.0",
+    "@capacitor/android": "^6.0.0",
+    "@capacitor/ios": "^6.0.0",
+    "@capacitor/splash-screen": "^6.0.0",
+    "@capacitor/status-bar": "^6.0.0",
+    "@capacitor/keyboard": "^6.0.0",
+    "@capacitor/app": "^6.0.0",
+    "@capacitor/haptics": "^6.0.0",
+    "@capacitor/share": "^6.0.0"
+  },
+  "engines": {
+    "node": ">=16.0.0",
+    "npm": ">=8.0.0"
+  }
+}

@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>App Icon - 1024x1024</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: #333;
+            font-family: 'Segoe UI', system-ui, sans-serif;
+        }
+        .icon-container {
+            width: 1024px;
+            height: 1024px;
+            border-radius: 224px; /* iOS style rounded corners ~22% */
+            background: linear-gradient(145deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+        }
+        /* Desert ground */
+        .desert-ground {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 35%;
+            background: linear-gradient(180deg, #d4a574 0%, #c4956a 50%, #b8895e 100%);
+            border-radius: 0 0 224px 224px;
+        }
+        .desert-ground::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 30px;
+            background: linear-gradient(180deg, rgba(212,165,116,0) 0%, #d4a574 100%);
+            transform: translateY(-100%);
+        }
+        /* Cactus silhouettes */
+        .cactus-left {
+            position: absolute;
+            bottom: 28%;
+            left: 8%;
+            width: 80px;
+            height: 200px;
+            background: #2d5a3d;
+            border-radius: 40px 40px 20px 20px;
+            opacity: 0.7;
+        }
+        .cactus-left::before {
+            content: '';
+            position: absolute;
+            top: 40%;
+            left: -30px;
+            width: 50px;
+            height: 80px;
+            background: #2d5a3d;
+            border-radius: 25px;
+            transform: rotate(-20deg);
+        }
+        .cactus-right {
+            position: absolute;
+            bottom: 25%;
+            right: 6%;
+            width: 100px;
+            height: 280px;
+            background: #3d6b4d;
+            border-radius: 50px 50px 25px 25px;
+            opacity: 0.8;
+        }
+        .cactus-right::before {
+            content: '';
+            position: absolute;
+            top: 30%;
+            right: -40px;
+            width: 60px;
+            height: 100px;
+            background: #3d6b4d;
+            border-radius: 30px;
+            transform: rotate(15deg);
+        }
+        .cactus-right::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: -35px;
+            width: 55px;
+            height: 90px;
+            background: #3d6b4d;
+            border-radius: 28px;
+            transform: rotate(-20deg);
+        }
+        /* Disc/basket icon */
+        .basket {
+            position: relative;
+            z-index: 10;
+            margin-bottom: 40px;
+        }
+        .basket-pole {
+            width: 24px;
+            height: 180px;
+            background: linear-gradient(90deg, #888 0%, #ccc 50%, #888 100%);
+            margin: 0 auto;
+            border-radius: 12px;
+        }
+        .basket-top {
+            width: 200px;
+            height: 120px;
+            background: linear-gradient(180deg, #ffd700 0%, #ffb800 50%, #ff9500 100%);
+            border-radius: 100px 100px 20px 20px;
+            margin: -20px auto 0;
+            position: relative;
+            border: 8px solid #ff6b00;
+        }
+        .basket-chains {
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 12px;
+        }
+        .chain {
+            width: 6px;
+            height: 80px;
+            background: linear-gradient(180deg, #ccc 0%, #999 100%);
+            border-radius: 3px;
+        }
+        .basket-tray {
+            width: 180px;
+            height: 30px;
+            background: linear-gradient(180deg, #666 0%, #444 100%);
+            border-radius: 10px;
+            margin: 60px auto 0;
+            border: 4px solid #333;
+        }
+        /* Flying disc */
+        .disc {
+            position: absolute;
+            top: 18%;
+            right: 22%;
+            width: 140px;
+            height: 45px;
+            background: linear-gradient(180deg, #ff6b35 0%, #f7931e 50%, #ffcc00 100%);
+            border-radius: 70px / 22px;
+            transform: rotate(-15deg);
+            box-shadow: 
+                inset 0 -10px 20px rgba(0,0,0,0.3),
+                0 10px 30px rgba(0,0,0,0.4);
+            z-index: 5;
+        }
+        .disc::before {
+            content: '';
+            position: absolute;
+            top: 8px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 60px;
+            height: 20px;
+            background: rgba(255,255,255,0.3);
+            border-radius: 30px / 10px;
+        }
+        /* App name */
+        .app-name {
+            position: relative;
+            z-index: 10;
+            text-align: center;
+            margin-top: 20px;
+        }
+        .app-name h1 {
+            font-size: 110px;
+            font-weight: 800;
+            color: #fff;
+            text-shadow: 
+                0 4px 8px rgba(0,0,0,0.5),
+                0 0 40px rgba(255,107,53,0.5);
+            letter-spacing: -2px;
+            line-height: 1;
+        }
+        .app-name h1 span {
+            color: #ff6b35;
+        }
+        .app-name p {
+            font-size: 48px;
+            color: #00d4aa;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 8px;
+            margin-top: 10px;
+            text-shadow: 0 2px 10px rgba(0,212,170,0.5);
+        }
+        /* Subtle grid pattern */
+        .icon-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image: 
+                radial-gradient(circle at 2px 2px, rgba(255,255,255,0.03) 1px, transparent 0);
+            background-size: 40px 40px;
+            pointer-events: none;
+        }
+        /* Export instructions */
+        .instructions {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            background: rgba(0,0,0,0.8);
+            color: #fff;
+            padding: 15px 20px;
+            border-radius: 8px;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="icon-container">
+        <div class="desert-ground"></div>
+        <div class="cactus-left"></div>
+        <div class="cactus-right"></div>
+        <div class="disc"></div>
+        <div class="basket">
+            <div class="basket-top">
+                <div class="basket-chains">
+                    <div class="chain"></div>
+                    <div class="chain"></div>
+                    <div class="chain"></div>
+                    <div class="chain"></div>
+                    <div class="chain"></div>
+                    <div class="chain"></div>
+                    <div class="chain"></div>
+                </div>
+            </div>
+            <div class="basket-tray"></div>
+        </div>
+        <div class="app-name">
+            <h1>P<span>I</span></h1>
+            <p>Putting</p>
+        </div>
+    </div>
+    <div class="instructions">
+        📱 App Icon 1024x1024<br>
+        Right-click → Save as image, or screenshot at 100% zoom
+    </div>
+</body>
+</html>

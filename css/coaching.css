@@ -1,0 +1,1598 @@
+/**
+ * (c) 2024-2026 Lock Jaw Disc Golf / John Waugaman. All rights reserved.
+ * PROPRIETARY - Unauthorized use prohibited. DMCA protected.
+ */
+/**
+ * Coaching Engine Styles
+ * Enhanced Work On card and coaching dashboard
+ */
+
+/* =============================================================================
+   COACHING CARD - COMPACT SINGLE LINE
+   ============================================================================= */
+
+.work-on-card.coaching-compact {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.6rem 0.75rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.work-on-card.coaching-compact:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+    border-color: var(--accent-color);
+}
+
+.coaching-icon {
+    font-size: 1rem;
+    flex-shrink: 0;
+}
+
+.coaching-title {
+    font-weight: 600;
+    font-size: 0.85rem;
+    color: var(--text-color);
+    flex-shrink: 0;
+}
+
+.coaching-divider {
+    color: var(--border-color);
+    font-weight: 300;
+    flex-shrink: 0;
+}
+
+.coaching-info {
+    flex: 1;
+    font-size: 0.85rem;
+    color: var(--text-color);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.coaching-info .trend-up {
+    color: #4CAF50;
+    font-weight: 600;
+    margin-left: 0.25rem;
+}
+
+.coaching-info .trend-down {
+    color: #f44336;
+    font-weight: 600;
+    margin-left: 0.25rem;
+}
+
+.coaching-progress {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    font-weight: 500;
+}
+
+.coaching-arrow {
+    color: var(--accent-color);
+    font-weight: 600;
+    font-size: 0.9rem;
+}
+
+.work-on-card.coaching-compact .tier-badge-small {
+    padding: 0.15rem 0.3rem;
+    font-size: 0.75rem;
+}
+
+/* =============================================================================
+   COACHING CARD - COMPACT (Original Size) - DEPRECATED
+   ============================================================================= */
+
+.work-on-card.coaching-clickable {
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.work-on-card.coaching-clickable:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    border-color: var(--accent-color);
+}
+
+.coaching-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.5rem;
+}
+
+.coaching-card-header h3 {
+    margin: 0;
+}
+
+.tier-badge-small {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.2rem;
+    padding: 0.15rem 0.4rem;
+    border-radius: 10px;
+    font-size: 0.7rem;
+    font-weight: 600;
+}
+
+.tier-badge-small.beginner { background: rgba(120, 144, 156, 0.2); color: #78909C; }
+.tier-badge-small.intermediate { background: rgba(76, 175, 80, 0.2); color: #4CAF50; }
+.tier-badge-small.advanced { background: rgba(33, 150, 243, 0.2); color: #2196F3; }
+.tier-badge-small.pro { background: rgba(255, 215, 0, 0.2); color: #FFD700; }
+
+.insight-message .trend-up { color: #4CAF50; font-weight: 600; }
+.insight-message .trend-down { color: #f44336; font-weight: 600; }
+
+.coaching-cta {
+    margin-top: 0.75rem;
+    padding-top: 0.5rem;
+    border-top: 1px solid var(--border-color);
+}
+
+.get-coached-link {
+    font-size: 0.85rem;
+    color: var(--accent-color);
+    font-weight: 500;
+}
+
+.work-on-card.coaching-clickable:hover .get-coached-link {
+    text-decoration: underline;
+}
+
+/* =============================================================================
+   WORK ON CARD - ENHANCED (kept for modal use)
+   ============================================================================= */
+
+.work-on-card-enhanced {
+    background: linear-gradient(135deg, var(--card-bg) 0%, rgba(255, 152, 0, 0.08) 100%);
+    border: 1px solid var(--border-color);
+    border-left: 4px solid var(--accent-color);
+    border-radius: var(--border-radius);
+    padding: 1.25rem;
+    margin-bottom: 1rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.work-on-card-enhanced:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.work-on-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.75rem;
+}
+
+.work-on-header h3 {
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 1.1rem;
+}
+
+.tier-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    padding: 0.25rem 0.5rem;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+.tier-badge.beginner { background: rgba(120, 144, 156, 0.2); color: #78909C; }
+.tier-badge.intermediate { background: rgba(76, 175, 80, 0.2); color: #4CAF50; }
+.tier-badge.advanced { background: rgba(33, 150, 243, 0.2); color: #2196F3; }
+.tier-badge.pro { background: rgba(255, 215, 0, 0.2); color: #FFD700; }
+
+.work-on-focus {
+    background: var(--bg-color);
+    border-radius: 8px;
+    padding: 0.75rem;
+    margin-bottom: 0.75rem;
+}
+
+.focus-label {
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--text-muted);
+    margin-bottom: 0.25rem;
+}
+
+.focus-distance {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--text-color);
+    display: flex;
+    align-items: baseline;
+    gap: 0.5rem;
+}
+
+.focus-distance .unit {
+    font-size: 0.9rem;
+    font-weight: 400;
+    color: var(--text-muted);
+}
+
+.focus-stats {
+    display: flex;
+    gap: 1rem;
+    margin-top: 0.5rem;
+}
+
+.focus-stat {
+    display: flex;
+    flex-direction: column;
+}
+
+.focus-stat-value {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--text-color);
+}
+
+.focus-stat-label {
+    font-size: 0.7rem;
+    color: var(--text-muted);
+}
+
+.focus-stat-value.trend-up { color: #4CAF50; }
+.focus-stat-value.trend-down { color: #f44336; }
+
+.work-on-recommendation {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+    padding: 0.75rem;
+    background: rgba(255, 152, 0, 0.1);
+    border-radius: 8px;
+    margin-bottom: 0.75rem;
+}
+
+.work-on-recommendation .rec-icon {
+    font-size: 1.25rem;
+    flex-shrink: 0;
+}
+
+.work-on-recommendation .rec-content {
+    flex: 1;
+}
+
+.work-on-recommendation .rec-title {
+    font-weight: 600;
+    margin-bottom: 0.25rem;
+    color: var(--text-color);
+}
+
+.work-on-recommendation .rec-desc {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    margin: 0;
+}
+
+.work-on-alerts {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.alert-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    padding: 0.25rem 0.5rem;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    background: rgba(255, 152, 0, 0.15);
+    color: var(--accent-color);
+}
+
+.alert-chip.severity-high {
+    background: rgba(244, 67, 54, 0.15);
+    color: #f44336;
+}
+
+.work-on-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 0.75rem;
+    padding-top: 0.75rem;
+    border-top: 1px solid var(--border-color);
+}
+
+.consistency-score {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.consistency-bar {
+    width: 60px;
+    height: 6px;
+    background: var(--border-color);
+    border-radius: 3px;
+    overflow: hidden;
+}
+
+.consistency-fill {
+    height: 100%;
+    border-radius: 3px;
+    transition: width 0.3s ease;
+}
+
+.consistency-fill.excellent { background: #4CAF50; }
+.consistency-fill.good { background: #8BC34A; }
+.consistency-fill.fair { background: #FFC107; }
+.consistency-fill.poor { background: #f44336; }
+
+.view-details-link {
+    font-size: 0.85rem;
+    color: var(--accent-color);
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+}
+
+.view-details-link:hover {
+    text-decoration: underline;
+}
+
+/* =============================================================================
+   COACHING DASHBOARD MODAL
+   ============================================================================= */
+
+.coaching-modal {
+    max-width: 700px;
+    max-height: 90vh;
+    overflow-y: auto;
+}
+
+.coaching-modal .modal-body {
+    padding: 0;
+}
+
+.coaching-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 1.25rem;
+    background: linear-gradient(135deg, var(--accent-color) 0%, #e65100 100%);
+    color: white;
+}
+
+.coaching-header h2 {
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.coaching-tier-display {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+}
+
+.coaching-tier-label {
+    font-size: 0.7rem;
+    opacity: 0.8;
+}
+
+.coaching-tier-value {
+    font-size: 1.25rem;
+    font-weight: 700;
+}
+
+/* Tabs */
+.coaching-tabs {
+    display: flex;
+    border-bottom: 1px solid var(--border-color);
+    background: var(--card-bg);
+    overflow-x: auto;
+}
+
+.coaching-tab {
+    flex: 1;
+    padding: 0.75rem 1rem;
+    border: none;
+    background: none;
+    cursor: pointer;
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    border-bottom: 2px solid transparent;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+}
+
+.coaching-tab:hover {
+    color: var(--text-color);
+    background: rgba(255, 152, 0, 0.05);
+}
+
+.coaching-tab.active {
+    color: var(--accent-color);
+    border-bottom-color: var(--accent-color);
+    font-weight: 600;
+}
+
+/* Tab Content */
+.coaching-tab-content {
+    padding: 1.25rem;
+    min-height: 300px;
+}
+
+/* Overview Tab */
+.overview-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.overview-stat {
+    background: var(--bg-color);
+    border-radius: 8px;
+    padding: 1rem;
+    text-align: center;
+}
+
+.overview-stat-icon {
+    font-size: 1.5rem;
+    margin-bottom: 0.5rem;
+}
+
+.overview-stat-value {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--text-color);
+}
+
+.overview-stat-label {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+}
+
+.overview-stat-trend {
+    font-size: 0.75rem;
+    margin-top: 0.25rem;
+}
+
+.overview-stat-trend.up { color: #4CAF50; }
+.overview-stat-trend.down { color: #f44336; }
+
+/* Distance Profile */
+.distance-profile-grid {
+    display: grid;
+    gap: 0.75rem;
+}
+
+.distance-row {
+    display: grid;
+    grid-template-columns: 50px 1fr 60px 80px;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.75rem;
+    background: var(--bg-color);
+    border-radius: 8px;
+    transition: all 0.2s ease;
+}
+
+.distance-row:hover {
+    background: rgba(255, 152, 0, 0.1);
+}
+
+.distance-row.neglected {
+    border-left: 3px solid #f44336;
+}
+
+.distance-row.weakest {
+    border-left: 3px solid var(--accent-color);
+}
+
+.distance-row.strongest {
+    border-left: 3px solid #4CAF50;
+}
+
+.distance-value {
+    font-weight: 600;
+    font-size: 1rem;
+}
+
+.distance-bar-wrapper {
+    position: relative;
+    height: 8px;
+    background: var(--border-color);
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.distance-bar-fill {
+    height: 100%;
+    border-radius: 4px;
+    transition: width 0.3s ease;
+}
+
+.distance-bar-fill.beginner { background: #78909C; }
+.distance-bar-fill.intermediate { background: #4CAF50; }
+.distance-bar-fill.advanced { background: #2196F3; }
+.distance-bar-fill.pro { background: #FFD700; }
+
+.distance-accuracy {
+    font-weight: 600;
+    text-align: right;
+}
+
+.distance-meta {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    font-size: 0.75rem;
+    color: var(--text-muted);
+}
+
+.distance-trend {
+    font-weight: 600;
+}
+
+.distance-trend.up { color: #4CAF50; }
+.distance-trend.down { color: #f44336; }
+
+/* Recommendations Section */
+.recommendations-section {
+    margin-top: 1.5rem;
+}
+
+.recommendations-section h3 {
+    margin-bottom: 1rem;
+    font-size: 1rem;
+}
+
+.recommendation-card {
+    display: flex;
+    gap: 1rem;
+    padding: 1rem;
+    background: var(--bg-color);
+    border-radius: 8px;
+    margin-bottom: 0.75rem;
+    transition: all 0.2s ease;
+}
+
+.recommendation-card:hover {
+    background: rgba(255, 152, 0, 0.1);
+}
+
+.recommendation-card.priority-1,
+.recommendation-card.priority-2 {
+    border-left: 3px solid #f44336;
+}
+
+.recommendation-card.priority-3,
+.recommendation-card.priority-4 {
+    border-left: 3px solid var(--accent-color);
+}
+
+.recommendation-card .rec-icon {
+    font-size: 1.5rem;
+    flex-shrink: 0;
+}
+
+.recommendation-card .rec-body {
+    flex: 1;
+}
+
+.recommendation-card .rec-title {
+    font-weight: 600;
+    margin-bottom: 0.25rem;
+}
+
+.recommendation-card .rec-desc {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    margin: 0;
+}
+
+.recommendation-card .rec-action {
+    margin-top: 0.5rem;
+}
+
+.recommendation-card .rec-action-btn {
+    padding: 0.25rem 0.75rem;
+    font-size: 0.8rem;
+    background: var(--accent-color);
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.recommendation-card .rec-action-btn:hover {
+    background: #e65100;
+}
+
+/* Drill Prescription */
+.drill-prescription-card {
+    background: linear-gradient(135deg, var(--card-bg) 0%, rgba(255, 152, 0, 0.1) 100%);
+    border: 1px solid var(--accent-color);
+    border-radius: 8px;
+    padding: 1.25rem;
+    margin-top: 1.5rem;
+}
+
+.drill-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.75rem;
+}
+
+.drill-header h4 {
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.drill-duration {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+}
+
+.drill-desc {
+    color: var(--text-muted);
+    font-size: 0.9rem;
+    margin-bottom: 1rem;
+}
+
+.drill-steps {
+    margin: 0;
+    padding-left: 1.25rem;
+}
+
+.drill-steps li {
+    margin-bottom: 0.5rem;
+    color: var(--text-color);
+}
+
+.drill-start-btn {
+    width: 100%;
+    margin-top: 1rem;
+    padding: 0.75rem;
+    font-size: 1rem;
+    font-weight: 600;
+    background: var(--accent-color);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.drill-start-btn:hover {
+    background: #e65100;
+    transform: translateY(-1px);
+}
+
+/* Trends Tab */
+.trends-chart-placeholder {
+    background: var(--bg-color);
+    border-radius: 8px;
+    padding: 2rem;
+    text-align: center;
+    color: var(--text-muted);
+    margin-bottom: 1.5rem;
+}
+
+.trend-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+}
+
+.trend-card {
+    background: var(--bg-color);
+    border-radius: 8px;
+    padding: 1rem;
+}
+
+.trend-card h4 {
+    margin: 0 0 0.5rem;
+    font-size: 0.9rem;
+    color: var(--text-muted);
+}
+
+.trend-card .value {
+    font-size: 1.5rem;
+    font-weight: 700;
+}
+
+.trend-card .change {
+    font-size: 0.85rem;
+    margin-top: 0.25rem;
+}
+
+.trend-card .change.positive { color: #4CAF50; }
+.trend-card .change.negative { color: #f44336; }
+
+/* Benchmarks Tab */
+.benchmark-legend {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+    flex-wrap: wrap;
+}
+
+.benchmark-legend-item {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    font-size: 0.8rem;
+}
+
+.benchmark-legend-dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+}
+
+.benchmark-legend-dot.beginner { background: #78909C; }
+.benchmark-legend-dot.intermediate { background: #4CAF50; }
+.benchmark-legend-dot.advanced { background: #2196F3; }
+.benchmark-legend-dot.pro { background: #FFD700; }
+
+.benchmark-grid {
+    display: grid;
+    gap: 1rem;
+}
+
+.benchmark-row {
+    display: grid;
+    grid-template-columns: 60px 1fr;
+    align-items: center;
+    gap: 1rem;
+    padding: 0.75rem;
+    background: var(--bg-color);
+    border-radius: 8px;
+}
+
+.benchmark-distance {
+    font-weight: 600;
+}
+
+.benchmark-bar-container {
+    position: relative;
+    height: 24px;
+    background: var(--border-color);
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+.benchmark-tier-marker {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background: rgba(255, 255, 255, 0.5);
+}
+
+.benchmark-user-marker {
+    position: absolute;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    width: 16px;
+    height: 16px;
+    background: var(--accent-color);
+    border: 2px solid white;
+    border-radius: 50%;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    z-index: 10;
+}
+
+.benchmark-zones {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    display: flex;
+}
+
+.benchmark-zone {
+    height: 100%;
+    opacity: 0.3;
+}
+
+.benchmark-zone.beginner { background: #78909C; }
+.benchmark-zone.intermediate { background: #4CAF50; }
+.benchmark-zone.advanced { background: #2196F3; }
+.benchmark-zone.pro { background: #FFD700; }
+
+/* Time Optimization */
+.time-optimization-grid {
+    display: grid;
+    gap: 0.75rem;
+}
+
+.time-slot-row {
+    display: grid;
+    grid-template-columns: 140px 1fr 60px;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.75rem;
+    background: var(--bg-color);
+    border-radius: 8px;
+}
+
+.time-slot-row.best {
+    border-left: 3px solid #4CAF50;
+    background: rgba(76, 175, 80, 0.1);
+}
+
+.time-slot-label {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.time-slot-bar {
+    height: 8px;
+    background: var(--border-color);
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.time-slot-fill {
+    height: 100%;
+    background: var(--accent-color);
+    border-radius: 4px;
+}
+
+.time-slot-accuracy {
+    font-weight: 600;
+    text-align: right;
+}
+
+/* Loading State */
+.coaching-loading {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 3rem;
+    color: var(--text-muted);
+}
+
+.coaching-loading .spinner {
+    width: 40px;
+    height: 40px;
+    border: 3px solid var(--border-color);
+    border-top-color: var(--accent-color);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+/* Not Enough Data State */
+.coaching-not-enough-data {
+    text-align: center;
+    padding: 3rem;
+}
+
+.coaching-not-enough-data .icon {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+}
+
+.coaching-not-enough-data h3 {
+    margin-bottom: 0.5rem;
+}
+
+.coaching-not-enough-data p {
+    color: var(--text-muted);
+    margin-bottom: 1.5rem;
+}
+
+.coaching-not-enough-data .progress-bar {
+    max-width: 200px;
+    margin: 0 auto 1rem;
+    height: 8px;
+    background: var(--border-color);
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.coaching-not-enough-data .progress-fill {
+    height: 100%;
+    background: var(--accent-color);
+    border-radius: 4px;
+    transition: width 0.3s ease;
+}
+
+/* Weekly Progress Card */
+.weekly-progress-card {
+    background: var(--bg-color);
+    border-radius: 8px;
+    padding: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.weekly-progress-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.75rem;
+}
+
+.weekly-progress-header h4 {
+    margin: 0;
+}
+
+.weekly-progress-stats {
+    display: flex;
+    gap: 1.5rem;
+}
+
+.weekly-stat {
+    text-align: center;
+}
+
+.weekly-stat-value {
+    font-size: 1.25rem;
+    font-weight: 700;
+}
+
+.weekly-stat-label {
+    font-size: 0.7rem;
+    color: var(--text-muted);
+}
+
+/* Dark Mode Adjustments */
+body.dark-mode .work-on-card-enhanced {
+    background: linear-gradient(135deg, var(--card-bg) 0%, rgba(255, 152, 0, 0.05) 100%);
+}
+
+body.dark-mode .coaching-header {
+    background: linear-gradient(135deg, #e65100 0%, #bf360c 100%);
+}
+
+body.dark-mode .distance-bar-wrapper,
+body.dark-mode .benchmark-bar-container,
+body.dark-mode .time-slot-bar {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+/* Dark mode text visibility fixes */
+body.dark-mode .coaching-modal {
+    background: var(--card-bg);
+    color: var(--text-color);
+}
+
+body.dark-mode .coaching-tab-content {
+    background: var(--card-bg);
+}
+
+body.dark-mode .overview-stat,
+body.dark-mode .distance-row,
+body.dark-mode .trend-card,
+body.dark-mode .benchmark-row,
+body.dark-mode .time-slot-row,
+body.dark-mode .recommendation-card,
+body.dark-mode .weekly-progress-card {
+    background: var(--bg-color);
+}
+
+body.dark-mode .overview-stat-value,
+body.dark-mode .distance-value,
+body.dark-mode .distance-accuracy,
+body.dark-mode .trend-card .value,
+body.dark-mode .benchmark-distance,
+body.dark-mode .time-slot-accuracy,
+body.dark-mode .weekly-stat-value,
+body.dark-mode .recommendation-card .rec-title,
+body.dark-mode .drill-header h4,
+body.dark-mode h3 {
+    color: var(--text-color);
+}
+
+body.dark-mode .overview-stat-label,
+body.dark-mode .distance-meta,
+body.dark-mode .trend-card h4,
+body.dark-mode .benchmark-legend-item,
+body.dark-mode .time-slot-label,
+body.dark-mode .weekly-stat-label,
+body.dark-mode .recommendation-card .rec-desc,
+body.dark-mode .drill-desc,
+body.dark-mode .drill-duration {
+    color: var(--text-muted);
+}
+
+body.dark-mode .drill-steps li {
+    color: var(--text-color);
+}
+
+body.dark-mode .coaching-tabs {
+    background: var(--card-bg);
+    border-bottom-color: var(--border-color);
+}
+
+body.dark-mode .coaching-tab {
+    color: var(--text-muted);
+}
+
+body.dark-mode .coaching-tab:hover {
+    color: var(--text-color);
+}
+
+body.dark-mode .coaching-tab.active {
+    color: var(--accent-color);
+}
+
+/* Light mode explicit text colors */
+.overview-stat-value,
+.distance-value,
+.distance-accuracy,
+.trend-card .value,
+.benchmark-distance,
+.time-slot-accuracy,
+.weekly-stat-value,
+.recommendation-card .rec-title,
+.drill-header h4 {
+    color: var(--text-color);
+}
+
+.overview-stat-label,
+.distance-meta,
+.trend-card h4,
+.benchmark-legend-item,
+.time-slot-label,
+.weekly-stat-label,
+.recommendation-card .rec-desc,
+.drill-desc,
+.drill-duration {
+    color: var(--text-muted);
+}
+
+/* =============================================================================
+   COMMUNITY COMPARISON TAB
+   ============================================================================= */
+
+.community-header-card {
+    display: flex;
+    justify-content: space-around;
+    gap: 1rem;
+    padding: 1rem;
+    background: var(--bg-color);
+    border-radius: 8px;
+    margin-bottom: 1.5rem;
+}
+
+.community-stat {
+    text-align: center;
+}
+
+.community-stat-value {
+    display: block;
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--text-color);
+}
+
+.community-stat-label {
+    font-size: 0.7rem;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.community-insights {
+    margin-bottom: 1.5rem;
+}
+
+/* Community comparison row */
+.community-row {
+    grid-template-columns: 50px 1fr 70px;
+}
+
+.community-row.top-performer {
+    border-left: 3px solid #4CAF50;
+    background: rgba(76, 175, 80, 0.08);
+}
+
+.community-row.above-avg {
+    border-left: 3px solid #8BC34A;
+}
+
+.community-row.below-avg {
+    border-left: 3px solid var(--accent-color);
+}
+
+.community-row.needs-work {
+    border-left: 3px solid #f44336;
+    background: rgba(244, 67, 54, 0.05);
+}
+
+.community-comparison-bar {
+    flex: 1;
+}
+
+.comparison-bar-container {
+    position: relative;
+    height: 12px;
+    background: var(--border-color);
+    border-radius: 6px;
+    overflow: visible;
+}
+
+.comparison-bar-fill {
+    height: 100%;
+    background: var(--accent-color);
+    border-radius: 6px;
+    transition: width 0.3s ease;
+}
+
+.comparison-avg-marker {
+    position: absolute;
+    top: -4px;
+    bottom: -4px;
+    width: 3px;
+    background: #666;
+    border-radius: 2px;
+    transform: translateX(-50%);
+    z-index: 5;
+}
+
+.comparison-user-marker {
+    position: absolute;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    width: 14px;
+    height: 14px;
+    background: var(--accent-color);
+    border: 2px solid white;
+    border-radius: 50%;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+    z-index: 10;
+}
+
+.comparison-labels {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 0.25rem;
+    font-size: 0.75rem;
+}
+
+.you-label {
+    font-weight: 600;
+    color: var(--text-color);
+}
+
+.you-label.above {
+    color: #4CAF50;
+}
+
+.you-label.below {
+    color: #f44336;
+}
+
+.you-label .diff {
+    font-weight: normal;
+    opacity: 0.8;
+}
+
+.avg-label {
+    color: var(--text-muted);
+}
+
+.percentile-badge {
+    font-size: 0.7rem;
+    font-weight: 600;
+    padding: 0.25rem 0.5rem;
+    border-radius: 12px;
+    text-align: center;
+    white-space: nowrap;
+}
+
+.percentile-badge.top-performer {
+    background: rgba(76, 175, 80, 0.2);
+    color: #4CAF50;
+}
+
+.percentile-badge.above-avg {
+    background: rgba(139, 195, 74, 0.2);
+    color: #689F38;
+}
+
+.percentile-badge.below-avg {
+    background: rgba(255, 152, 0, 0.2);
+    color: var(--accent-color);
+}
+
+.percentile-badge.needs-work {
+    background: rgba(244, 67, 54, 0.2);
+    color: #f44336;
+}
+
+.percentile-legend {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    margin-top: 1.5rem;
+    flex-wrap: wrap;
+}
+
+.percentile-legend .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    font-size: 0.75rem;
+    color: var(--text-muted);
+}
+
+.percentile-legend .legend-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+}
+
+.percentile-legend .legend-dot.top-performer {
+    background: #4CAF50;
+}
+
+.percentile-legend .legend-dot.above-avg {
+    background: #8BC34A;
+}
+
+.percentile-legend .legend-dot.below-avg {
+    background: var(--accent-color);
+}
+
+.percentile-legend .legend-dot.needs-work {
+    background: #f44336;
+}
+
+/* Dark mode community styles */
+body.dark-mode .community-header-card {
+    background: var(--bg-color);
+}
+
+body.dark-mode .comparison-avg-marker {
+    background: #aaa;
+}
+
+body.dark-mode .community-row.top-performer {
+    background: rgba(76, 175, 80, 0.1);
+}
+
+body.dark-mode .community-row.needs-work {
+    background: rgba(244, 67, 54, 0.08);
+}
+
+/* Responsive */
+@media (max-width: 600px) {
+    /* Compact coaching card mobile */
+    .work-on-card.coaching-compact {
+        padding: 0.5rem 0.6rem;
+        gap: 0.4rem;
+    }
+
+    .coaching-icon {
+        font-size: 0.9rem;
+    }
+
+    .coaching-title {
+        font-size: 0.8rem;
+    }
+
+    .coaching-info {
+        font-size: 0.8rem;
+    }
+
+    .work-on-card.coaching-compact .tier-badge-small {
+        font-size: 0.7rem;
+    }
+
+    .coaching-arrow {
+        font-size: 0.8rem;
+    }
+
+    .coaching-modal {
+        max-width: 100%;
+        max-height: 100vh;
+        border-radius: 0;
+        margin: 0;
+    }
+
+    .coaching-header {
+        padding: 0.75rem 1rem;
+    }
+
+    .coaching-header h2 {
+        font-size: 1.1rem;
+    }
+
+    .coaching-tier-value {
+        font-size: 1rem;
+    }
+
+    .coaching-tab-content {
+        padding: 1rem;
+        min-height: auto;
+    }
+
+    .overview-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 0.5rem;
+    }
+
+    .overview-stat {
+        padding: 0.75rem;
+    }
+
+    .overview-stat-icon {
+        font-size: 1.25rem;
+        margin-bottom: 0.25rem;
+    }
+
+    .overview-stat-value {
+        font-size: 1.25rem;
+    }
+
+    .overview-stat-label {
+        font-size: 0.65rem;
+    }
+
+    .distance-row {
+        grid-template-columns: 40px 1fr 50px;
+        padding: 0.5rem;
+        gap: 0.5rem;
+    }
+
+    .distance-value {
+        font-size: 0.85rem;
+    }
+
+    .distance-accuracy {
+        font-size: 0.85rem;
+    }
+
+    .distance-meta {
+        display: none;
+    }
+
+    .coaching-tabs {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .coaching-tab {
+        flex: none;
+        padding: 0.6rem 0.5rem;
+        font-size: 0.75rem;
+    }
+
+    .benchmark-row {
+        grid-template-columns: 45px 1fr;
+        padding: 0.5rem;
+        gap: 0.5rem;
+    }
+
+    .benchmark-distance {
+        font-size: 0.85rem;
+    }
+
+    .benchmark-bar-container {
+        height: 20px;
+    }
+
+    .time-slot-row {
+        grid-template-columns: 1fr 45px;
+        padding: 0.5rem;
+    }
+
+    .time-slot-label {
+        font-size: 0.8rem;
+    }
+
+    .time-slot-accuracy {
+        font-size: 0.85rem;
+    }
+
+    .trend-cards {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 0.5rem;
+    }
+
+    .trend-card {
+        padding: 0.75rem;
+    }
+
+    .trend-card h4 {
+        font-size: 0.75rem;
+    }
+
+    .trend-card .value {
+        font-size: 1.25rem;
+    }
+
+    .recommendation-card {
+        padding: 0.75rem;
+        gap: 0.5rem;
+    }
+
+    .recommendation-card .rec-icon {
+        font-size: 1.25rem;
+    }
+
+    .recommendation-card .rec-title {
+        font-size: 0.9rem;
+    }
+
+    .recommendation-card .rec-desc {
+        font-size: 0.8rem;
+    }
+
+    .drill-prescription-card {
+        padding: 1rem;
+    }
+
+    .drill-header h4 {
+        font-size: 0.95rem;
+    }
+
+    .drill-desc {
+        font-size: 0.85rem;
+    }
+
+    .drill-steps li {
+        font-size: 0.85rem;
+    }
+
+    .weekly-progress-card {
+        padding: 0.75rem;
+    }
+
+    .weekly-progress-stats {
+        gap: 1rem;
+        flex-wrap: wrap;
+        justify-content: space-around;
+    }
+
+    .weekly-stat-value {
+        font-size: 1.1rem;
+    }
+
+    .weekly-stat-label {
+        font-size: 0.65rem;
+    }
+
+    .benchmark-legend {
+        gap: 0.5rem;
+    }
+
+    .benchmark-legend-item {
+        font-size: 0.7rem;
+    }
+
+    .benchmark-legend-dot {
+        width: 10px;
+        height: 10px;
+    }
+
+    /* Section headers on mobile */
+    .coaching-tab-content h3 {
+        font-size: 1rem;
+        margin-bottom: 0.75rem;
+    }
+
+    /* Community tab mobile */
+    .community-header-card {
+        flex-wrap: wrap;
+        gap: 0.5rem;
+        padding: 0.75rem;
+    }
+
+    .community-stat {
+        flex: 1 1 40%;
+        min-width: 70px;
+    }
+
+    .community-stat-value {
+        font-size: 1.25rem;
+    }
+
+    .community-stat-label {
+        font-size: 0.6rem;
+    }
+
+    .community-row {
+        grid-template-columns: 40px 1fr 55px;
+        padding: 0.5rem;
+    }
+
+    .comparison-labels {
+        font-size: 0.65rem;
+    }
+
+    .percentile-badge {
+        font-size: 0.6rem;
+        padding: 0.2rem 0.35rem;
+    }
+
+    .percentile-legend {
+        gap: 0.5rem;
+    }
+
+    .percentile-legend .legend-item {
+        font-size: 0.65rem;
+    }
+}
+
+/* Extra small screens */
+@media (max-width: 380px) {
+    .coaching-tab {
+        padding: 0.5rem 0.4rem;
+        font-size: 0.7rem;
+    }
+
+    .overview-grid {
+        gap: 0.4rem;
+    }
+
+    .overview-stat-value {
+        font-size: 1.1rem;
+    }
+
+    .trend-cards {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* ─── Dark mode additions (body.dark-mode pattern) ─────────────── */
+/* These supplement the converted [data-theme="dark"] rules above   */
+
+body.dark-mode .coaching-modal {
+    background: var(--card-bg);
+    color: var(--text-color);
+}
+
+body.dark-mode .coaching-tab-content {
+    background: var(--card-bg);
+}
+
+body.dark-mode .coaching-not-enough-data h3,
+body.dark-mode .coaching-not-enough-data p {
+    color: var(--text-muted);
+}
+
+body.dark-mode .coaching-not-enough-data h3 {
+    color: var(--text-color);
+}
+
+body.dark-mode .drill-prescription-card {
+    background: linear-gradient(135deg, var(--card-bg) 0%, rgba(255, 152, 0, 0.07) 100%);
+}
+
+body.dark-mode .coaching-header {
+    background: linear-gradient(135deg, #e65100 0%, #bf360c 100%);
+}
+
+body.dark-mode .comparison-avg-marker {
+    background: #94a3b8;
+}

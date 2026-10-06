@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Offline - Putting Improver</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+            color: #ffffff;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .offline-container {
+            text-align: center;
+            max-width: 500px;
+        }
+
+        .offline-icon {
+            font-size: 80px;
+            margin-bottom: 20px;
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        h1 {
+            font-size: 32px;
+            margin-bottom: 16px;
+            color: #2563eb;
+        }
+
+        p {
+            font-size: 18px;
+            line-height: 1.6;
+            margin-bottom: 24px;
+            color: #a0a0a0;
+        }
+
+        .retry-btn {
+            background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+            color: white;
+            border: none;
+            padding: 14px 32px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 4px 6px rgba(37, 99, 235, 0.3);
+        }
+
+        .retry-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(37, 99, 235, 0.4);
+        }
+
+        .retry-btn:active {
+            transform: translateY(0);
+        }
+
+        .features {
+            margin-top: 40px;
+            text-align: left;
+            background: rgba(255, 255, 255, 0.05);
+            padding: 24px;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .features h2 {
+            font-size: 18px;
+            margin-bottom: 16px;
+            color: #ffffff;
+        }
+
+        .features ul {
+            list-style: none;
+        }
+
+        .features li {
+            padding: 8px 0;
+            color: #a0a0a0;
+            font-size: 14px;
+        }
+
+        .features li:before {
+            content: "✓ ";
+            color: #2563eb;
+            font-weight: bold;
+            margin-right: 8px;
+        }
+
+        @media (max-width: 640px) {
+            h1 {
+                font-size: 24px;
+            }
+
+            p {
+                font-size: 16px;
+            }
+
+            .offline-icon {
+                font-size: 60px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="offline-container">
+        <div class="offline-icon">📡</div>
+        <h1>You're Offline</h1>
+        <p>
+            It looks like you've lost your internet connection.
+            Don't worry, some features of Putting Improver still work offline!
+        </p>
+
+        <button class="retry-btn" onclick="location.reload()">
+            Try Again
+        </button>
+
+        <div class="features">
+            <h2>Available Offline:</h2>
+            <ul>
+                <li>View cached practice routines</li>
+                <li>Access previously loaded statistics</li>
+                <li>Browse saved game configurations</li>
+                <li>Review past achievements</li>
+            </ul>
+        </div>
+
+        <div class="features" style="margin-top: 20px;">
+            <h2>Requires Connection:</h2>
+            <ul>
+                <li>Start new practice sessions</li>
+                <li>Save progress to cloud</li>
+                <li>Update statistics and leaderboards</li>
+                <li>Sync across devices</li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        // Automatically retry connection every 5 seconds
+        let retryCount = 0;
+        const maxRetries = 10;
+
+        function checkConnection() {
+            retryCount++;
+
+            fetch('/manifest.json', { method: 'HEAD', cache: 'no-store' })
+                .then(() => {
+                    // Connection restored
+                    location.reload();
+                })
+                .catch(() => {
+                    // Still offline
+                    if (retryCount < maxRetries) {
+                        setTimeout(checkConnection, 5000);
+                    }
+                });
+        }
+
+        // Start checking after 5 seconds
+        setTimeout(checkConnection, 5000);
+
+        // Also check when the page becomes visible again
+        document.addEventListener('visibilitychange', () => {
+            if (!document.hidden) {
+                checkConnection();
+            }
+        });
+    </script>
+</body>
+</html>

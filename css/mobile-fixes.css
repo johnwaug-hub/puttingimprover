@@ -1,0 +1,663 @@
+/**
+ * (c) 2024-2026 Lock Jaw Disc Golf / John Waugaman. All rights reserved.
+ * PROPRIETARY - Unauthorized use prohibited. DMCA protected.
+ */
+/* ============================================
+   MOBILE RESPONSIVENESS FIXES
+   Putting Improver - Mobile Optimizations
+   ============================================ */
+
+/* Dashboard Stats - Mobile */
+@media (max-width: 640px) {
+    /* Stats container */
+    .stats-container {
+        padding: 0.5rem;
+    }
+
+    /* Stats grid - 2 columns on mobile */
+    .stats-grid {
+        grid-template-columns: repeat(2, 1fr) !important;
+        gap: 0.5rem;
+        margin-bottom: 1rem;
+    }
+
+    /* Individual stat cards */
+    .stat-card {
+        padding: 0.6rem 0.5rem;
+        min-width: auto;
+        border-radius: 8px;
+        overflow: hidden;
+    }
+
+    /* Stat numbers - auto-scaling font */
+    .stat-card .stat-number,
+    .stat-card .stat-value,
+    .stat-number,
+    .stat-value {
+        font-size: clamp(1rem, 5vw, 1.5rem) !important;
+        font-weight: 700;
+        line-height: 1.2;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        max-width: 100%;
+    }
+
+    /* Stat labels - smaller font */
+    .stat-card .stat-label,
+    .stat-label {
+        font-size: 0.65rem !important;
+        text-transform: uppercase;
+        letter-spacing: 0.3px;
+        margin-top: 0.2rem;
+        line-height: 1.2;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    /* Dashboard title */
+    .dashboard-header h2 {
+        font-size: 1.5rem;
+    }
+}
+
+/* Extra small devices */
+@media (max-width: 380px) {
+    .stat-card .stat-number,
+    .stat-card .stat-value,
+    .stat-number,
+    .stat-value {
+        font-size: clamp(0.9rem, 4.5vw, 1.25rem) !important;
+    }
+
+    .stat-card .stat-label,
+    .stat-label {
+        font-size: 0.6rem !important;
+        letter-spacing: 0.2px;
+    }
+
+    .stats-grid {
+        gap: 0.35rem;
+    }
+
+    .stat-card {
+        padding: 0.5rem 0.4rem;
+    }
+}
+
+/* Charts - Mobile Responsive */
+@media (max-width: 640px) {
+    /* Chart containers */
+    .chart-container {
+        height: 200px !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        position: relative;
+        margin-bottom: 1rem;
+    }
+
+    .chart-wrapper {
+        width: 100%;
+        max-width: 100%;
+        padding: 0.5rem;
+    }
+
+    /* Canvas responsive */
+    canvas {
+        max-width: 100% !important;
+        height: auto !important;
+        display: block;
+    }
+
+    /* Chart sections */
+    .chart-section {
+        padding: 0.75rem;
+        margin-bottom: 1rem;
+        border-radius: 8px;
+        background: var(--card-bg, white);
+    }
+
+    .chart-title {
+        font-size: 0.95rem;
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+    }
+
+    /* Chart legends */
+    .chart-legend {
+        font-size: 0.7rem;
+        padding: 0.25rem;
+        margin-top: 0.5rem;
+    }
+
+    /* Stats page content */
+    .stats-content {
+        padding: 0.5rem;
+    }
+
+    /* Enable horizontal scroll for wide charts */
+    .chart-scroll {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        padding-bottom: 0.5rem;
+    }
+
+    .chart-scroll::-webkit-scrollbar {
+        height: 4px;
+    }
+
+    .chart-scroll::-webkit-scrollbar-thumb {
+        background: #d1d5db;
+        border-radius: 4px;
+    }
+}
+
+/* User Stats Modal - Mobile */
+@media (max-width: 640px) {
+    .user-stats-modal {
+        width: 95% !important;
+        max-width: 95% !important;
+        margin: 2rem auto;
+        padding: 1rem;
+    }
+
+    .user-stats-modal h3 {
+        font-size: 1.25rem;
+        margin-bottom: 1rem;
+    }
+
+    .user-stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 0.5rem;
+    }
+
+    .user-stats-modal .stat-card {
+        padding: 0.75rem;
+    }
+
+    .user-stats-modal .stat-number {
+        font-size: 1.5rem !important;
+    }
+
+    .user-stats-modal .stat-label {
+        font-size: 0.7rem !important;
+    }
+
+    .achievements-section {
+        margin-top: 1rem;
+    }
+
+    .achievements-section h4 {
+        font-size: 1rem;
+    }
+
+    .achievements-list {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+    }
+
+    .achievement-badge {
+        font-size: 0.8rem;
+        padding: 0.4rem 0.6rem;
+    }
+}
+
+/* Recent Practice - Fix null display */
+.activity-name {
+    font-weight: 600;
+    color: var(--text-color, #111827);
+}
+
+.activity-name:empty::before {
+    content: 'Practice Session';
+    color: var(--text-muted, #6b7280);
+    font-style: italic;
+}
+
+/* Responsive tables on mobile */
+@media (max-width: 640px) {
+    .leaderboard-table {
+        font-size: 0.85rem;
+    }
+
+    .leaderboard-table th,
+    .leaderboard-table td {
+        padding: 0.5rem 0.25rem;
+    }
+
+    /* Hide less important columns on mobile */
+    .leaderboard-table .hide-mobile {
+        display: none;
+    }
+}
+
+/* Modal responsiveness */
+@media (max-width: 640px) {
+    .modal-content {
+        width: 95%;
+        margin: 1rem auto;
+        padding: 1rem;
+        max-height: 90vh;
+        overflow-y: auto;
+    }
+
+    .modal h3,
+    .modal h2 {
+        font-size: 1.25rem;
+    }
+
+    .modal h4 {
+        font-size: 1.1rem;
+    }
+
+    .form-group {
+        margin-bottom: 0.75rem;
+    }
+
+    .btn {
+        padding: 0.75rem 1rem;
+        font-size: 0.95rem;
+    }
+}
+
+/* Practice session form - mobile */
+@media (max-width: 640px) {
+    .practice-form {
+        padding: 0.75rem;
+    }
+
+    .form-row {
+        flex-direction: column;
+        gap: 0.75rem;
+    }
+
+    .form-row .form-group {
+        width: 100%;
+    }
+
+    input[type="number"],
+    input[type="text"],
+    input[type="date"],
+    input[type="time"],
+    select {
+        font-size: 16px; /* Prevents zoom on iOS */
+        padding: 0.75rem;
+    }
+}
+
+/* Activity feed - mobile */
+@media (max-width: 640px) {
+    .activity-card {
+        padding: 0.75rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .activity-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.5rem;
+    }
+
+    .activity-meta {
+        font-size: 0.75rem;
+    }
+
+    .activity-stats {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 0.5rem;
+    }
+}
+
+/* Game cards - mobile */
+@media (max-width: 640px) {
+    .games-grid {
+        grid-template-columns: 1fr;
+        gap: 0.75rem;
+    }
+
+    .game-card {
+        padding: 0.75rem;
+    }
+
+    .game-header h4 {
+        font-size: 1rem;
+    }
+
+    .game-description {
+        font-size: 0.85rem;
+    }
+
+    .game-meta {
+        font-size: 0.75rem;
+        flex-wrap: wrap;
+    }
+
+    .game-actions {
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+
+    .game-actions .btn {
+        width: 100%;
+    }
+}
+
+/* Routines - mobile */
+@media (max-width: 640px) {
+    .routines-grid {
+        grid-template-columns: 1fr;
+        gap: 0.75rem;
+    }
+
+    .routine-card {
+        padding: 0.75rem;
+    }
+
+    .routine-header h4 {
+        font-size: 1rem;
+    }
+}
+
+/* Leaderboard - mobile improvements */
+@media (max-width: 640px) {
+    .leaderboard-tabs {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .leaderboard-tab {
+        font-size: 0.85rem;
+        padding: 0.5rem 0.75rem;
+        white-space: nowrap;
+    }
+
+    .leaderboard-filters {
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+
+    .leaderboard-filters select {
+        width: 100%;
+    }
+}
+
+/* Achievements - mobile */
+@media (max-width: 640px) {
+    .achievements-grid {
+        grid-template-columns: 1fr;
+        gap: 0.75rem;
+    }
+
+    .achievement-card {
+        padding: 0.75rem;
+    }
+
+    .achievement-icon {
+        font-size: 2rem;
+    }
+
+    .achievement-name {
+        font-size: 0.85rem;
+    }
+
+    .achievement-description {
+        font-size: 0.75rem;
+    }
+}
+
+/* Navigation - mobile */
+@media (max-width: 640px) {
+    .nav-tabs {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        gap: 0.25rem;
+    }
+
+    .nav-tab {
+        font-size: 0.85rem;
+        padding: 0.5rem 0.75rem;
+        white-space: nowrap;
+    }
+
+    .nav-tab-icon {
+        font-size: 1rem;
+    }
+}
+
+/* Bottom navigation handled via inline <style> in index.html */
+
+/* Header - mobile */
+@media (max-width: 640px) {
+    .app-header {
+        padding: 0.75rem;
+    }
+
+    .header-title {
+        font-size: 1.25rem;
+    }
+
+    .user-info {
+        font-size: 0.85rem;
+    }
+
+    .logout-btn {
+        font-size: 0.85rem;
+        padding: 0.5rem 0.75rem;
+    }
+}
+
+/* Multiplayer log - mobile */
+@media (max-width: 640px) {
+    .player-scores-grid {
+        grid-template-columns: 1fr;
+        gap: 0.5rem;
+    }
+
+    .player-score-card {
+        padding: 0.75rem;
+    }
+}
+
+/* Filter controls - mobile */
+@media (max-width: 640px) {
+    .filter-controls {
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+
+    .filter-controls select,
+    .filter-controls input {
+        width: 100%;
+    }
+}
+
+/* Pagination - mobile */
+@media (max-width: 640px) {
+    .pagination {
+        font-size: 0.85rem;
+    }
+
+    .pagination button {
+        padding: 0.5rem 0.75rem;
+    }
+}
+
+/* Touch-friendly improvements */
+@media (max-width: 640px) {
+    /* Minimum touch target size */
+    button,
+    .btn,
+    a,
+    .clickable {
+        min-height: 44px;
+        min-width: 44px;
+    }
+
+    /* Better spacing for touch */
+    .btn-group {
+        gap: 0.5rem;
+    }
+
+    /* Easier to tap checkboxes/radios */
+    input[type="checkbox"],
+    input[type="radio"] {
+        width: 20px;
+        height: 20px;
+    }
+}
+
+/* Profile Modal Mobile Fixes */
+@media (max-width: 640px) {
+    .profile-modal {
+        margin: 0.25rem !important;
+        max-height: 98vh !important;
+        width: calc(100% - 0.5rem) !important;
+    }
+
+    .profile-modal .modal-body {
+        padding: 0.75rem !important;
+        max-height: calc(98vh - 55px) !important;
+        overflow-y: auto !important;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .profile-content {
+        gap: 1rem !important;
+    }
+
+    .profile-stats-section {
+        padding: 1rem !important;
+    }
+
+    .profile-stats-grid {
+        grid-template-columns: repeat(3, 1fr) !important;
+        gap: 0.5rem !important;
+    }
+
+    .profile-stat {
+        padding: 0.5rem 0.25rem !important;
+    }
+
+    .profile-stat-value {
+        font-size: 1.1rem !important;
+    }
+
+    .profile-stat-label {
+        font-size: 0.65rem !important;
+    }
+
+    .profile-picture-section {
+        padding: 1rem !important;
+    }
+
+    .profile-picture {
+        width: 80px !important;
+        height: 80px !important;
+    }
+
+    .profile-info-section {
+        gap: 0.75rem !important;
+    }
+
+    .profile-field label {
+        font-size: 0.8rem !important;
+    }
+
+    .profile-input {
+        padding: 0.5rem !important;
+        font-size: 0.9rem !important;
+    }
+
+    .recalculate-stats-section {
+        margin-top: 0.75rem !important;
+        padding-top: 0.75rem !important;
+    }
+
+    .recalculate-stats-section .btn {
+        padding: 0.6rem 0.75rem !important;
+        font-size: 0.85rem !important;
+    }
+
+    .recalculate-stats-section .profile-hint {
+        font-size: 0.75rem !important;
+    }
+
+    .profile-member-since {
+        font-size: 0.8rem !important;
+        padding-top: 0.75rem !important;
+    }
+
+    .profile-actions {
+        padding-top: 0.75rem !important;
+        gap: 0.5rem !important;
+    }
+
+    /* Friends section compact */
+    .profile-friends-section,
+    .profile-disc-section {
+        padding: 0.75rem !important;
+    }
+
+    .friend-search {
+        flex-direction: column !important;
+        gap: 0.5rem !important;
+    }
+
+    .friend-search input {
+        width: 100% !important;
+    }
+
+    /* Goals section compact */
+    .goal-item {
+        margin-bottom: 0.75rem !important;
+    }
+
+    .goal-item label {
+        font-size: 0.8rem !important;
+    }
+
+    .goal-item input {
+        padding: 0.5rem !important;
+    }
+}
+
+/* Landscape mobile adjustments */
+@media (max-width: 900px) and (orientation: landscape) {
+    .stats-grid {
+        grid-template-columns: repeat(4, 1fr);
+    }
+
+    .modal-content {
+        max-height: 80vh;
+        overflow-y: auto;
+    }
+
+    .profile-modal {
+        max-height: 95vh !important;
+    }
+
+    .profile-modal .modal-body {
+        max-height: calc(95vh - 50px) !important;
+    }
+
+    .profile-stats-grid {
+        grid-template-columns: repeat(6, 1fr) !important;
+    }
+}
+
+/* ── Dark mode overrides ───────────────────────────────────────── */
+body.dark-mode .chart-section {
+    background: var(--card-bg);
+    border-color: var(--border-color);
+}
+
+body.dark-mode .chart-title {
+    color: var(--text-color);
+}
+
+body.dark-mode .chart-scroll::-webkit-scrollbar-thumb {
+    background: #334155;
+}

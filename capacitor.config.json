@@ -1,0 +1,52 @@
+{
+  "appId": "com.lockjawdiscgolf.puttingimprover",
+  "appName": "Putting Improver",
+  "webDir": "www",
+  "server": {
+    "androidScheme": "https",
+    "iosScheme": "https",
+    "url": "https://puttingimprover.com",
+    "cleartext": false
+  },
+  "plugins": {
+    "SplashScreen": {
+      "launchShowDuration": 2000,
+      "backgroundColor": "#1a1a1a",
+      "androidSplashResourceName": "splash",
+      "androidScaleType": "CENTER_INSIDE",
+      "showSpinner": false
+    },
+    "StatusBar": {
+      "style": "Dark",
+      "backgroundColor": "#1a1a1a"
+    },
+    "Keyboard": {
+      "resize": "body",
+      "resizeOnFullScreen": true
+    },
+    "GoogleAuth": {
+      "scopes": [
+        "profile",
+        "email"
+      ],
+      "serverClientId": "775646376758-m91shah619jcm5cn1qfqdvscs5eo2ppu.apps.googleusercontent.com",
+      "forceCodeForRefreshToken": true
+    },
+    "FirebaseAuthentication": {
+      "skipNativeAuth": false,
+      "providers": [
+        "google.com",
+        "apple.com"
+      ]
+    }
+  },
+  "ios": {
+    "contentInset": "automatic",
+    "preferredContentMode": "mobile",
+    "scheme": "Putting Improver"
+  },
+  "android": {
+    "allowMixedContent": true,
+    "backgroundColor": "#1a1a1a"
+  }
+}

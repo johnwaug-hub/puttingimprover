@@ -1,0 +1,12 @@
+# local.properties.template
+# Copy this to your Android project root as: android/local.properties
+# Fill in your actual passwords — this file is gitignored automatically.
+
+# Android SDK (already set by Android Studio — don't change this line)
+# sdk.dir=C\:\\Users\\YourName\\AppData\\Local\\Android\\Sdk
+
+# Keystore signing config (use forward slashes even on Windows)
+storeFile=C:/puttingimprover/putting-improver.jks
+storePassword=Waugavate5896$
+keyAlias=putting-improver
+keyPassword=Waugavate5896$

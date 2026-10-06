@@ -1,0 +1,260 @@
+{
+  "id": "/",
+  "name": "Putting Improver - Lock Jaw Disc Golf",
+  "short_name": "Putting Improver",
+  "description": "Track and improve your disc golf putting game with custom routines and challenges",
+  "lang": "en-US",
+  "dir": "ltr",
+  "start_url": "/",
+  "display": "standalone",
+  "display_override": [
+    "window-controls-overlay",
+    "tabbed",
+    "standalone"
+  ],
+  "background_color": "#1a1a1a",
+  "theme_color": "#2563eb",
+  "orientation": "portrait-primary",
+  "scope": "/",
+  "note_taking": {
+    "new_note_url": "/new-note"
+  },
+  "prefer_related_applications": false,
+  "related_applications": [
+    {
+      "platform": "play",
+      "url": "https://play.google.com/store/apps/details?id=com.lockjawdiscgolf.puttingimprover",
+      "id": "com.lockjawdiscgolf.puttingimprover"
+    },
+    {
+      "platform": "windows",
+      "url": "ms-windows-store://pdp/?productid=9NBLGGH4NNS1"
+    },
+    {
+      "platform": "itunes",
+      "url": "https://apps.apple.com/app/id123456789"
+    }
+  ],
+  "icons": [
+    {
+      "src": "/icons/icon-72x72.png",
+      "sizes": "72x72",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/icon-72x72.png",
+      "sizes": "72x72",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "/icons/icon-96x96.png",
+      "sizes": "96x96",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/icon-96x96.png",
+      "sizes": "96x96",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "/icons/icon-128x128.png",
+      "sizes": "128x128",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/icon-144x144.png",
+      "sizes": "144x144",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/icon-152x152.png",
+      "sizes": "152x152",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/icon-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/icon-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "/icons/icon-384x384.png",
+      "sizes": "384x384",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/icon-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/icon-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ],
+  "categories": [
+    "sports",
+    "lifestyle",
+    "utilities"
+  ],
+  "screenshots": [
+    {
+      "src": "/resources/screenshots/practice-view.png",
+      "sizes": "1080x1920",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Dashboard view with practice statistics"
+    },
+    {
+      "src": "/resources/screenshots/stats-view.png",
+      "sizes": "1080x1920",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Detailed stats and progress tracking"
+    },
+    {
+      "src": "/resources/screenshots/leaderboard-view.png",
+      "sizes": "1080x1920",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Leaderboard and competition view"
+    },
+    {
+      "src": "/resources/screenshots/games-view.png",
+      "sizes": "1080x1920",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Interactive putting games"
+    },
+    {
+      "src": "/resources/screenshots/achievements-view.png",
+      "sizes": "1080x1920",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Achievement badges and progression"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Start Practice",
+      "short_name": "Practice",
+      "description": "Begin a new practice session",
+      "url": "/?action=practice",
+      "icons": [
+        {
+          "src": "/icons/icon-96x96.png",
+          "sizes": "96x96",
+          "type": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "View Stats",
+      "short_name": "Stats",
+      "description": "View your putting statistics",
+      "url": "/?action=stats",
+      "icons": [
+        {
+          "src": "/icons/icon-96x96.png",
+          "sizes": "96x96",
+          "type": "image/png"
+        }
+      ]
+    }
+  ],
+  "protocol_handlers": [
+    {
+      "protocol": "web+puttingimprover",
+      "url": "/?action=%s"
+    },
+    {
+      "protocol": "mailto",
+      "url": "/share?mailto=%s"
+    }
+  ],
+  "share_target": {
+    "action": "/share",
+    "method": "POST",
+    "enctype": "multipart/form-data",
+    "params": {
+      "title": "title",
+      "text": "text",
+      "url": "url",
+      "files": [
+        {
+          "name": "media",
+          "accept": [
+            "image/*",
+            "video/*",
+            ".json",
+            ".csv"
+          ]
+        }
+      ]
+    }
+  },
+  "widgets": [
+    {
+      "name": "Practice Stats",
+      "short_name": "Stats",
+      "description": "Quick view of your putting statistics",
+      "tag": "practice-stats",
+      "template": "practice-stats-template",
+      "ms_ac_template": "widgets/practice-stats.json",
+      "data": "widgets/practice-stats-data.json",
+      "type": "application/json",
+      "screenshots": [
+        {
+          "src": "/icons/icon-192x192.png",
+          "sizes": "192x192",
+          "label": "Practice stats widget"
+        }
+      ],
+      "icons": [
+        {
+          "src": "/icons/icon-72x72.png",
+          "sizes": "72x72"
+        }
+      ],
+      "auth": false,
+      "update": 86400
+    }
+  ],
+  "edge_side_panel": {
+    "preferred_width": 400
+  },
+  "file_handlers": [
+    {
+      "action": "/",
+      "accept": {
+        "application/json": [
+          ".json"
+        ],
+        "text/csv": [
+          ".csv"
+        ]
+      }
+    }
+  ],
+  "launch_handler": {
+    "client_mode": "focus-existing"
+  },
+  "iarc_rating_id": "e84b072d-71b3-4d3e-86ae-31a8ce4e53b7"
+}

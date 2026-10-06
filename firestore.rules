@@ -1,0 +1,208 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // Helper function to check if two users are friends
+    function areFriends(userId1, userId2) {
+      let friendshipId1 = userId1 + "_" + userId2;
+      let friendshipId2 = userId2 + "_" + userId1;
+      return exists(/databases/$(database)/documents/friendships/$(friendshipId1)) ||
+             exists(/databases/$(database)/documents/friendships/$(friendshipId2));
+    }
+    
+    // Users collection - users can read all, write only their own
+    match /users/{userId} {
+      allow read: if request.auth != null;
+      // Allow write if:
+      // 1. User is writing to their own document, OR
+      // 2. User is only clearing teamId/isTeamCaptain fields (for team deletion by captain), OR
+      // 3. An accepted friend is updating only stat fields (for Group Scorer bulk logging)
+      allow write: if request.auth != null && 
+                     (request.auth.uid == userId || 
+                      (request.resource.data.diff(resource.data).affectedKeys().hasOnly(['teamId', 'isTeamCaptain'])) ||
+                      (areFriends(request.auth.uid, userId) &&
+                       request.resource.data.diff(resource.data).affectedKeys()
+                         .hasOnly(['totalPoints', 'totalSessions', 'totalPutts', 'totalMakes',
+                                   'totalRoutines', 'totalGames',
+                                   'bestAccuracy', 'bestSession', 'achievements', 'communityStats',
+                                   'bulkLogStats'])));
+      
+      // User's sessions subcollection
+      // Only allow writing if the user is writing to their own account OR is an accepted friend
+      match /sessions/{sessionId} {
+        allow read: if request.auth != null;
+        allow write: if request.auth != null && 
+                       (request.auth.uid == userId || areFriends(request.auth.uid, userId));
+      }
+      
+      // User's friends subcollection
+      match /friends/{friendId} {
+        allow read: if request.auth != null && request.auth.uid == userId;
+        allow write: if request.auth != null && request.auth.uid == userId;
+      }
+      
+      // User's routine completions subcollection
+      // Only allow writing if the user is writing to their own account OR is an accepted friend
+      match /routineCompletions/{completionId} {
+        allow read: if request.auth != null;
+        allow write: if request.auth != null && 
+                       (request.auth.uid == userId || areFriends(request.auth.uid, userId));
+      }
+      
+      // User's game completions subcollection
+      // Only allow writing if the user is writing to their own account OR is an accepted friend
+      match /gameCompletions/{completionId} {
+        allow read: if request.auth != null;
+        allow write: if request.auth != null && 
+                       (request.auth.uid == userId || areFriends(request.auth.uid, userId));
+      }
+      
+      // User's routines subcollection
+      match /routines/{routineId} {
+        allow read: if request.auth != null;
+        allow write: if request.auth != null && request.auth.uid == userId;
+      }
+      
+      // User's games subcollection
+      match /games/{gameId} {
+        allow read: if request.auth != null;
+        allow write: if request.auth != null && request.auth.uid == userId;
+      }
+      
+      // User's notifications subcollection
+      match /notifications/{notificationId} {
+        allow read: if request.auth != null && request.auth.uid == userId;
+        allow write: if request.auth != null;
+      }
+    }
+    
+    // Weekly challenges - all authenticated users can read and write
+    match /challenges/{challengeId} {
+      allow read: if request.auth != null;
+      allow write: if request.auth != null;
+    }
+    
+    // Community routines - all can read, authenticated can write
+    match /routines/{routineId} {
+      allow read: if request.auth != null;
+      allow create: if request.auth != null;
+      allow update: if request.auth != null;
+      allow delete: if request.auth != null && 
+                       resource.data.createdBy == request.auth.uid;
+    }
+    
+    // Custom routines collection
+    match /custom_routines/{routineId} {
+      allow read: if request.auth != null;
+      allow write: if request.auth != null;
+    }
+    
+    // Community routines collection
+    match /community_routines/{routineId} {
+      allow read: if request.auth != null;
+      allow write: if request.auth != null;
+    }
+    
+    // Custom games collection
+    match /custom_games/{gameId} {
+      allow read: if request.auth != null;
+      allow write: if request.auth != null;
+    }
+    
+    // Community games collection
+    match /community_games/{gameId} {
+      allow read: if request.auth != null;
+      allow write: if request.auth != null;
+    }
+    
+    // User favorites collection
+    match /user_favorites/{favoriteId} {
+      allow read: if request.auth != null;
+      allow write: if request.auth != null;
+    }
+    
+    // Routine ratings collection
+    match /routine_ratings/{ratingId} {
+      allow read: if request.auth != null;
+      allow write: if request.auth != null;
+    }
+    
+    // Routine favorites collection
+    match /routine_favorites/{favoriteId} {
+      allow read: if request.auth != null;
+      allow write: if request.auth != null;
+    }
+    
+    // Friend requests - any authenticated user can read/write
+    match /friend_requests/{requestId} {
+      allow read: if request.auth != null;
+      allow write: if request.auth != null;
+    }
+    
+    // Friendships - any authenticated user can read/write
+    match /friendships/{friendshipId} {
+      allow read: if request.auth != null;
+      allow write: if request.auth != null;
+    }
+    
+    // Activity feed - any authenticated user can read/write
+    match /activity_feed/{activityId} {
+      allow read: if request.auth != null;
+      allow write: if request.auth != null;
+    }
+    
+    // Head-to-head challenges - authenticated users can read/write their own challenges
+    match /h2h_challenges/{challengeId} {
+      allow read: if request.auth != null;
+      allow create: if request.auth != null;
+      allow update: if request.auth != null;
+      allow delete: if request.auth != null;
+    }
+    
+    // Teams collection - Phase 5
+    match /teams/{teamId} {
+      allow read: if request.auth != null;
+      allow create: if request.auth != null;
+      allow update: if request.auth != null;
+      allow delete: if request.auth != null && 
+                       resource.data.captainId == request.auth.uid;
+      
+      // Team activity subcollection
+      match /activity/{activityId} {
+        allow read: if request.auth != null;
+        allow write: if request.auth != null;
+      }
+    }
+    
+    // Team invites collection - Phase 5
+    match /team_invites/{inviteId} {
+      allow read: if request.auth != null;
+      allow create: if request.auth != null;
+      allow update: if request.auth != null;
+      allow delete: if request.auth != null;
+    }
+    
+    // User seasons subcollection - Phase 5
+    // Allow friends to write (for Group Scorer XP awards)
+    match /users/{userId}/seasons/{seasonId} {
+      allow read: if request.auth != null;
+      allow write: if request.auth != null && 
+                     (request.auth.uid == userId || areFriends(request.auth.uid, userId));
+      
+      // XP log sub-subcollection (idempotency guard)
+      match /xpLog/{xpLogId} {
+        allow read: if request.auth != null;
+        allow write: if request.auth != null &&
+                       (request.auth.uid == userId || areFriends(request.auth.uid, userId));
+      }
+    }
+    
+    // Live sessions - real-time shared scoring
+    match /live_sessions/{sessionId} {
+      allow read: if request.auth != null;
+      allow create: if request.auth != null;
+      allow update: if request.auth != null;
+      allow delete: if request.auth != null;
+    }
+  }
+}
